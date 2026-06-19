@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # AI Job Assistant
 
 AI-powered job application assistant.
@@ -21,3 +22,6 @@ Tech Stack:
 - OpenAI
 - GitHub Actions
 - AWS EC2
+=======
+# Ai-job-assistant
+>>>>>>> 5866b69b1988f2a258b1995be85e65166efbcbf4
