@@ -28,6 +28,7 @@ from routes.saved_jobs import router as saved_jobs_router
 from routes.job_alerts import router as job_alerts_router
 from routes.admin import router as admin_router
 from routes.profile import router as profile_router
+from routes.ai_resume import router as ai_resume_router
 
 app = FastAPI(
     title="AI Job Assistant",
@@ -190,6 +191,12 @@ app.include_router(
     profile_router,
     prefix="/profile",
     tags=["Profile"]
+)
+
+app.include_router(
+    ai_resume_router,
+    prefix="/ai-resume",
+    tags=["AI Resume"]
 )
 
 @app.get("/")
