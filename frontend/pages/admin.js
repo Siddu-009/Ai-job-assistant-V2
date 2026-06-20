@@ -26,7 +26,7 @@ export default function Admin() {
   const login = async () => {
 
     const response = await fetch(
-      "http://localhost:8000/admin/login",
+      "/api/admin/login",
       {
         method: "POST",
         headers: {
@@ -65,7 +65,7 @@ export default function Admin() {
 
     const response =
       await fetch(
-        "http://localhost:8000/admin/stats"
+        "/api/admin/stats"
       );
 
     const data =
@@ -78,7 +78,7 @@ export default function Admin() {
 
     const response =
       await fetch(
-        "http://localhost:8000/admin/users"
+        "/api/admin/users"
       );
 
     const data =
@@ -91,7 +91,7 @@ export default function Admin() {
 
     const response =
       await fetch(
-        "http://localhost:8000/admin/jobs"
+        "/api/admin/jobs"
       );
 
     const data =
@@ -104,7 +104,7 @@ export default function Admin() {
 
     const response =
       await fetch(
-        "http://localhost:8000/admin/applications"
+        "/api/admin/applications"
       );
 
     const data =

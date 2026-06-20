@@ -20,7 +20,7 @@ export default function RecommendedJobs() {
         localStorage.getItem("token");
 
       const response = await fetch(
-        "http://localhost:8000/recommend-jobs/",
+        "/api/recommend-jobs/",
         {
           method: "POST",
           headers: {
@@ -57,7 +57,7 @@ export default function RecommendedJobs() {
       localStorage.getItem("token");
 
     const response = await fetch(
-      "http://localhost:8000/saved-jobs/add",
+      "/api/saved-jobs/add",
       {
         method: "POST",
         headers: {
@@ -86,7 +86,7 @@ export default function RecommendedJobs() {
       localStorage.getItem("token");
 
     const response = await fetch(
-      "http://localhost:8000/applications/apply",
+      "/api/applications/apply",
       {
         method: "POST",
         headers: {

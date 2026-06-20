@@ -11,7 +11,7 @@ export default function ATSScore() {
   const checkScore = async () => {
 
     const response = await fetch(
-      "http://localhost:8000/ats-score/",
+      "/api/ats-score/",
       {
         method: "POST",
         headers: {

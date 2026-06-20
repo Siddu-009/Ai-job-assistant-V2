@@ -14,7 +14,7 @@ export default function SavedJobs() {
       localStorage.getItem("token");
 
     const response = await fetch(
-      `http://localhost:8000/saved-jobs/${token}`
+      `/api/saved-jobs/${token}`
     );
 
     const data = await response.json();
@@ -27,7 +27,7 @@ export default function SavedJobs() {
   const deleteJob = async (savedId) => {
 
     await fetch(
-      `http://localhost:8000/saved-jobs/${savedId}`,
+      `/api/saved-jobs/${savedId}`,
       {
         method: "DELETE"
       }

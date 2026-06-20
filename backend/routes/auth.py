@@ -24,93 +24,119 @@ class LoginRequest(BaseModel):
     email: str
     password: str
 
+
 @router.post("/register")
 def register(req: RegisterRequest):
 
     db = SessionLocal()
 
-    hashed = hash_password(
-        req.password
-    )
+    try:
 
-    db.execute(
-        text(
-            """
-            INSERT INTO users
-            (
-                name,
-                email,
-                password
-            )
-            VALUES
-            (
-                :name,
-                :email,
-                :password
-            )
-            """
-        ),
-        {
-            "name": req.name,
-            "email": req.email,
-            "password": hashed
+        existing = db.execute(
+            text(
+                """
+                SELECT id
+                FROM users
+                WHERE email = :email
+                """
+            ),
+            {
+                "email": req.email
+            }
+        ).fetchone()
+
+        if existing:
+            return {
+                "error": "Email already registered"
+            }
+
+        hashed = hash_password(
+            req.password
+        )
+
+        db.execute(
+            text(
+                """
+                INSERT INTO users
+                (
+                    name,
+                    email,
+                    password
+                )
+                VALUES
+                (
+                    :name,
+                    :email,
+                    :password
+                )
+                """
+            ),
+            {
+                "name": req.name,
+                "email": req.email,
+                "password": hashed
+            }
+        )
+
+        db.commit()
+
+        return {
+            "message": "User registered successfully"
         }
-    )
 
-    db.commit()
+    finally:
+        db.close()
 
-    db.close()
-
-    return {
-        "message": "User registered successfully"
-    }
 
 @router.post("/login")
 def login(req: LoginRequest):
 
     db = SessionLocal()
 
-    result = db.execute(
-        text(
-            """
-            SELECT
-                id,
-                email,
-                password
-            FROM users
-            WHERE email = :email
-            """
-        ),
-        {
-            "email": req.email
-        }
-    )
+    try:
 
-    user = result.fetchone()
+        result = db.execute(
+            text(
+                """
+                SELECT
+                    id,
+                    email,
+                    password
+                FROM users
+                WHERE email = :email
+                """
+            ),
+            {
+                "email": req.email
+            }
+        )
 
-    db.close()
+        user = result.fetchone()
 
-    if not user:
+        if not user:
+            return {
+                "error": "User not found"
+            }
+
+        if not verify_password(
+            req.password,
+            user[2]
+        ):
+            return {
+                "error": "Invalid password"
+            }
+
+        token = create_access_token(
+            {
+                "user_id": user[0],
+                "email": user[1]
+            }
+        )
+
         return {
-            "error": "User not found"
+            "access_token": token,
+            "token_type": "bearer"
         }
 
-    if not verify_password(
-        req.password,
-        user[2]
-    ):
-        return {
-            "error": "Invalid password"
-        }
-
-    token = create_access_token(
-        {
-            "user_id": user[0],
-            "email": user[1]
-        }
-    )
-
-    return {
-        "access_token": token,
-        "token_type": "bearer"
-    }
+    finally:
+        db.close()

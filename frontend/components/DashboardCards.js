@@ -26,7 +26,7 @@ export default function DashboardCards() {
       localStorage.getItem("token");
 
     fetch(
-      `http://localhost:8000/dashboard/${token}`
+      `/api/dashboard/${token}`
     )
       .then(
         res => res.json()

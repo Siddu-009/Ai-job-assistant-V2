@@ -12,7 +12,7 @@ export default function RecentApplications() {
 
     const response =
       await fetch(
-        "http://localhost:8000/applications/my-applications",
+        "/api/applications/my-applications",
         {
           method: "POST",
           headers: {

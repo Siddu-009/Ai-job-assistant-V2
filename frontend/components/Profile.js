@@ -11,7 +11,7 @@ export default function Profile() {
       localStorage.getItem("token");
 
     const response = await fetch(
-      "http://localhost:8000/profile/",
+      "/api/profile/",
       {
         method: "POST",
         headers: {

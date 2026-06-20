@@ -11,7 +11,7 @@ export default function ResumeCenter() {
   const generateATSResume = async () => {
 
     const response = await fetch(
-      "http://localhost:8000/auto-resume/",
+      "/api/auto-resume/",
       {
         method: "POST",
         headers: {
@@ -38,7 +38,7 @@ export default function ResumeCenter() {
   const downloadTXT = () => {
 
     window.open(
-      "http://localhost:8000/download/resume-txt",
+      "/api/download/resume-txt",
       "_blank"
     );
 
@@ -47,7 +47,7 @@ export default function ResumeCenter() {
   const downloadPDF = () => {
 
     window.open(
-      "http://localhost:8000/download/resume-pdf",
+      "/api/download/resume-pdf",
       "_blank"
     );
 
@@ -56,7 +56,7 @@ export default function ResumeCenter() {
   const downloadATS = () => {
 
     window.open(
-      "http://localhost:8000/download/ats-resume",
+      "/api/download/ats-resume",
       "_blank"
     );
 

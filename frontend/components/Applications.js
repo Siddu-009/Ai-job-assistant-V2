@@ -11,7 +11,7 @@ export default function Applications() {
       localStorage.getItem("token");
 
     const response = await fetch(
-      "http://localhost:8000/applications/my-applications",
+      "/api/applications/my-applications",
       {
         method: "POST",
         headers: {
