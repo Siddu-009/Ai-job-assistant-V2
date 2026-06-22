@@ -1,4 +1,4 @@
-name: Deploy AI Job Assistant
+name: AI Job Assistant CI/CD
 
 on:
   push:
@@ -12,17 +12,16 @@ jobs:
 
     steps:
 
-      - name: Checkout
+      - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Deploy EC2
+      - name: Deploy to EC2
         uses: appleboy/ssh-action@v1.0.3
 
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ubuntu
-          key: ${{ secrets.EC2_KEY }}
-
+          key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             cd ~/Ai-job-assistant
 
@@ -33,3 +32,5 @@ jobs:
             docker compose build
 
             docker compose up -d
+
+            docker image prune -af
