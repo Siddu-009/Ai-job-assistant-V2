@@ -29,6 +29,28 @@ from routes.job_alerts import router as job_alerts_router
 from routes.admin import router as admin_router
 from routes.profile import router as profile_router
 from routes.ai_resume import router as ai_resume_router
+from routes.resume_history import router as resume_history_router
+from routes.resume_history import router as resume_history_router
+from routes.resume_dashboard import router as resume_dashboard_router
+from routes.resume_history import router as resume_history_router
+from routes.resume_view import router as resume_view_router
+from routes.ats_analyzer import router as ats_analyzer_router
+from routes.resume_recommend import router as resume_recommend_router
+from routes.job_tracker import router as job_tracker_router
+from routes.application_workflow import router as application_workflow_router
+from routes.recruiter_dashboard import router as recruiter_dashboard_router
+from routes.skill_analytics import router as skill_analytics_router
+from routes.interview_questions import router as interview_questions_router
+from routes.mock_interview import router as mock_interview_router
+from routes.career_roadmap import router as career_roadmap_router
+from routes.cover_letter import router as cover_letter_router
+from routes.resume_versions import router as resume_versions_router
+from routes.job_alerts_engine import router as job_alerts_engine_router
+from routes.recruiter_search import router as recruiter_search_router
+from routes.analytics_dashboard import router as analytics_dashboard_router
+from routes.activity_timeline import router as activity_timeline_router
+from routes.email_notifications import router as email_notifications_router
+from routes.health import router as health_router
 
 app = FastAPI(
     title="AI Job Assistant",
@@ -197,6 +219,138 @@ app.include_router(
     ai_resume_router,
     prefix="/ai-resume",
     tags=["AI Resume"]
+)
+
+app.include_router(
+    resume_history_router,
+    prefix="/resume-history",
+    tags=["Resume History"]
+)
+
+app.include_router(
+    resume_history_router,
+    prefix="/resume-history",
+    tags=["Resume History"]
+)
+
+app.include_router(
+    resume_dashboard_router,
+    prefix="/resume-dashboard",
+    tags=["Resume Dashboard"]
+)
+
+app.include_router(
+    resume_history_router,
+    prefix="/resume-history",
+    tags=["Resume History"]
+)
+
+app.include_router(
+    resume_view_router,
+    prefix="/resume-view",
+    tags=["Resume Viewer"]
+)
+
+app.include_router(
+    ats_analyzer_router,
+    prefix="/ats-analyzer",
+    tags=["Real ATS Analyzer"]
+)
+
+app.include_router(
+    resume_recommend_router,
+    prefix="/resume-recommend",
+    tags=["Resume Recommendations"]
+)
+
+app.include_router(
+    job_tracker_router,
+    prefix="/job-tracker",
+    tags=["Job Tracker"]
+)
+
+app.include_router(
+    application_workflow_router,
+    prefix="/application-workflow",
+    tags=["Application Workflow"]
+)
+
+app.include_router(
+    recruiter_dashboard_router,
+    prefix="/recruiter-dashboard",
+    tags=["Recruiter Dashboard"]
+)
+
+app.include_router(
+    skill_analytics_router,
+    prefix="/skill-analytics",
+    tags=["Skill Analytics"]
+)
+
+app.include_router(
+    interview_questions_router,
+    prefix="/interview-questions",
+    tags=["AI Interview Questions"]
+)
+
+app.include_router(
+    mock_interview_router,
+    prefix="/mock-interview",
+    tags=["Mock Interview"]
+)
+
+app.include_router(
+    career_roadmap_router,
+    prefix="/career-roadmap",
+    tags=["Career Roadmap"]
+)
+
+app.include_router(
+    cover_letter_router,
+    prefix="/cover-letter",
+    tags=["Cover Letter"]
+)
+
+app.include_router(
+    resume_versions_router,
+    prefix="/resume-versions",
+    tags=["Resume Versions"]
+)
+
+app.include_router(
+    job_alerts_engine_router,
+    prefix="/job-alert-engine",
+    tags=["Job Alert Engine"]
+)
+
+app.include_router(
+    recruiter_search_router,
+    prefix="/recruiter-search",
+    tags=["Recruiter Search"]
+)
+
+app.include_router(
+    analytics_dashboard_router,
+    prefix="/analytics-dashboard",
+    tags=["Analytics Dashboard"]
+)
+
+app.include_router(
+    activity_timeline_router,
+    prefix="/activity",
+    tags=["Activity Timeline"]
+)
+
+app.include_router(
+    email_notifications_router,
+    prefix="/email-notifications",
+    tags=["Email Notifications"]
+)
+
+app.include_router(
+    health_router,
+    prefix="/health",
+    tags=["Health"]
 )
 
 @app.get("/")

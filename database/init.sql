@@ -59,3 +59,11 @@ CREATE TABLE IF NOT EXISTS user_alerts (
     enabled BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+CREATE TABLE IF NOT EXISTS resumes (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER,
+    filename TEXT,
+    resume_text TEXT,
+    skills TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);

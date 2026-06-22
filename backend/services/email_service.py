@@ -1,43 +1,36 @@
-import smtplib
+import os
 
-from email.mime.text import MIMEText
+from fastapi_mail import (
+    FastMail,
+    MessageSchema,
+    ConnectionConfig
+)
+
+conf = ConnectionConfig(
+    MAIL_USERNAME=os.getenv("SMTP_EMAIL"),
+    MAIL_PASSWORD=os.getenv("SMTP_PASSWORD"),
+    MAIL_FROM=os.getenv("SMTP_EMAIL"),
+    MAIL_PORT=587,
+    MAIL_SERVER="smtp.gmail.com",
+    MAIL_STARTTLS=True,
+    MAIL_SSL_TLS=False,
+    USE_CREDENTIALS=True
+)
 
 
-SMTP_SERVER = "smtp.gmail.com"
-SMTP_PORT = 587
-
-EMAIL = "siddhardhamaddula37791@gmail.com"
-PASSWORD = "ciqv jqdq gtbe vnaj"
-
-
-def send_email(
-    recipient,
-    subject,
-    body
+async def send_email(
+    email: str,
+    subject: str,
+    body: str
 ):
 
-    msg = MIMEText(body)
-
-    msg["Subject"] = subject
-    msg["From"] = EMAIL
-    msg["To"] = recipient
-
-    server = smtplib.SMTP(
-        SMTP_SERVER,
-        SMTP_PORT
+    message = MessageSchema(
+        subject=subject,
+        recipients=[email],
+        body=body,
+        subtype="plain"
     )
 
-    server.starttls()
+    fm = FastMail(conf)
 
-    server.login(
-        EMAIL,
-        PASSWORD
-    )
-
-    server.sendmail(
-        EMAIL,
-        recipient,
-        msg.as_string()
-    )
-
-    server.quit()
+    await fm.send_message(message)

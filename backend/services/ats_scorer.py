@@ -18,8 +18,10 @@ KNOWN_SKILLS = [
     "route53",
     "rds",
     "argocd",
-    "helm"
+    "helm",
+    "devops"
 ]
+
 
 def calculate_ats_score(
     resume_text,
@@ -43,21 +45,25 @@ def calculate_ats_score(
 
     total = len(matched) + len(missing)
 
-    if total == 0:
-        score = 0
-    else:
+    score = 0
+
+    if total > 0:
         score = int(
             (len(matched) / total) * 100
         )
 
-    improvements = [
-        f"Add {skill.title()} experience"
-        for skill in missing
-    ]
+    improvements = []
+
+    for skill in missing:
+        improvements.append(
+            f"Add project experience with {skill}"
+        )
 
     return {
         "ats_score": score,
         "matched_skills": matched,
         "missing_skills": missing,
-        "improvements": improvements
+        "improvements": improvements,
+        "total_matched": len(matched),
+        "total_missing": len(missing)
     }
