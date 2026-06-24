@@ -1,5 +1,6 @@
 name: AI Job Assistant CI/CD
 
+
 on:
   push:
     branches:
