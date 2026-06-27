@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
 from database import SessionLocal
@@ -16,70 +16,87 @@ class ProfileRequest(BaseModel):
 @router.post("/")
 def get_profile(req: ProfileRequest):
 
-    payload = decode_token(
-        req.token
-    )
+    payload = decode_token(req.token)
 
-    user_id = payload["user_id"]
+    if not payload:
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid or expired token"
+        )
+
+    user_id = payload.get("user_id")
+
+    if not user_id:
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid token payload"
+        )
 
     db = SessionLocal()
 
-    user = db.execute(
-        text(
-            """
-            SELECT
-                id,
-                name,
-                email,
-                created_at
-            FROM users
-            WHERE id = :id
-            """
-        ),
-        {
-            "id": user_id
-        }
-    ).fetchone()
+    try:
 
-    resume_count = db.execute(
-        text(
-            """
-            SELECT COUNT(*)
-            FROM resumes
-            WHERE user_id = :id
-            """
-        ),
-        {
-            "id": user_id
-        }
-    ).scalar()
+        user = db.execute(
+            text("""
+                SELECT
+                    id,
+                    name,
+                    email,
+                    created_at
+                FROM users
+                WHERE id=:id
+            """),
+            {
+                "id": user_id
+            }
+        ).fetchone()
 
-    generated_count = db.execute(
-        text(
-            """
-            SELECT COUNT(*)
-            FROM generated_resumes
-            WHERE user_id = :id
-            """
-        ),
-        {
-            "id": user_id
-        }
-    ).scalar()
+        if not user:
+            raise HTTPException(
+                status_code=404,
+                detail="User not found"
+            )
 
-    db.close()
+        resume_count = db.execute(
+            text("""
+                SELECT COUNT(*)
+                FROM resumes
+                WHERE user_id=:id
+            """),
+            {
+                "id": user_id
+            }
+        ).scalar()
 
-    if not user:
+        generated_count = db.execute(
+            text("""
+                SELECT COUNT(*)
+                FROM generated_resumes
+                WHERE user_id=:id
+            """),
+            {
+                "id": user_id
+            }
+        ).scalar()
 
         return {
-            "error": "User not found"
+
+            "id": user.id if hasattr(user, "id") else user[0],
+
+            "name": user.name if hasattr(user, "name") else user[1],
+
+            "email": user.email if hasattr(user, "email") else user[2],
+
+            "created_at": str(
+                user.created_at if hasattr(user, "created_at") else user[3]
+            ),
+
+            "uploaded_resumes": resume_count,
+
+            "generated_resumes": generated_count
+
         }
 
-    return {
-        "id": user[0],
-        "name": user[1],
-        "email": user[2],
-        "created_at": str(user[3]),
-        "uploaded_resumes": resume_count,
-        "generated_resumes": generated_count
-    }
+    finally:
+
+        db.close()

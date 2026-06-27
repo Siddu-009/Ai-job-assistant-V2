@@ -1,105 +1,157 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
-
-from database import SessionLocal
 from sqlalchemy import text
 
+from database import SessionLocal
 from services.interview_generator import generate_questions
+from services.token_service import decode_token
 
 router = APIRouter()
 
 
 class InterviewRequest(BaseModel):
+    token: str
     resume_id: int
 
 
 @router.post("/")
 def create_questions(req: InterviewRequest):
 
+    payload = decode_token(req.token)
+
+    if not payload:
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid or expired token"
+        )
+
+    user_id = payload.get("user_id")
+
+    if not user_id:
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid token payload"
+        )
+
     db = SessionLocal()
 
-    result = db.execute(
-        text("""
-        SELECT skills
-        FROM resumes
-        WHERE id=:id
-        """),
-        {
-            "id": req.resume_id
-        }
-    ).fetchone()
+    try:
 
-    if not result:
+        row = db.execute(
+            text("""
+                SELECT skills
+                FROM resumes
+                WHERE id=:resume_id
+                AND user_id=:user_id
+            """),
+            {
+                "resume_id": req.resume_id,
+                "user_id": user_id
+            }
+        ).fetchone()
+
+        if not row:
+            raise HTTPException(
+                status_code=404,
+                detail="Resume not found"
+            )
+
+        skills = row[0]
+
+        questions = generate_questions(skills)
+
+        db.execute(
+            text("""
+                INSERT INTO interview_questions
+                (
+                    resume_id,
+                    question
+                )
+                VALUES
+                (
+                    :resume_id,
+                    :question
+                )
+            """),
+            {
+                "resume_id": req.resume_id,
+                "question": questions
+            }
+        )
+
+        db.commit()
+
+        return {
+            "resume_id": req.resume_id,
+            "questions": questions
+        }
+
+    finally:
 
         db.close()
 
-        return {
-            "error": "Resume not found"
-        }
 
-    skills = result[0]
+@router.get("/{resume_id}/{token}")
+def get_questions(
+    resume_id: int,
+    token: str
+):
 
-    questions = generate_questions(skills)
+    payload = decode_token(token)
 
-    db.execute(
-        text("""
-        INSERT INTO interview_questions
-        (
-            resume_id,
-            question
+    if not payload:
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid or expired token"
         )
-        VALUES
-        (
-            :resume_id,
-            :question
+
+    user_id = payload.get("user_id")
+
+    if not user_id:
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid token payload"
         )
-        """),
-        {
-            "resume_id": req.resume_id,
-            "question": questions
-        }
-    )
-
-    db.commit()
-    db.close()
-
-    return {
-        "resume_id": req.resume_id,
-        "questions": questions
-    }
-
-@router.get("/{resume_id}")
-def get_questions(resume_id: int):
 
     db = SessionLocal()
 
-    result = db.execute(
-        text("""
-        SELECT
-            id,
-            question,
-            created_at
-        FROM interview_questions
-        WHERE resume_id=:resume_id
-        ORDER BY id DESC
-        """),
-        {
-            "resume_id": resume_id
-        }
-    )
+    try:
 
-    rows = result.fetchall()
+        rows = db.execute(
+            text("""
+                SELECT
+                    iq.id,
+                    iq.question,
+                    iq.created_at
+                FROM interview_questions iq
+                JOIN resumes r
+                    ON iq.resume_id = r.id
+                WHERE iq.resume_id=:resume_id
+                AND r.user_id=:user_id
+                ORDER BY iq.id DESC
+            """),
+            {
+                "resume_id": resume_id,
+                "user_id": user_id
+            }
+        ).fetchall()
 
-    db.close()
+        return [
 
-    data = []
+            {
 
-    for row in rows:
+                "id": row[0],
 
-        data.append({
-            "id": row[0],
-            "question": row[1],
-            "created_at": str(row[2])
-        })
+                "question": row[1],
 
-    return data
+                "created_at": str(row[2])
+
+            }
+
+            for row in rows
+
+        ]
+
+    finally:
+
+        db.close()

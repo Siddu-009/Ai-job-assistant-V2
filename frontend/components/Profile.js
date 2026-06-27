@@ -1,98 +1,630 @@
 import { useState } from "react";
 
+import Button from "./ui/Button";
+import Loader from "./ui/Loader";
+
 export default function Profile() {
 
-  const [profile, setProfile] =
-    useState(null);
+  const [profile, setProfile] = useState(null);
+
+  const [loading, setLoading] = useState(false);
 
   const loadProfile = async () => {
 
-    const token =
-      localStorage.getItem("token");
+    setLoading(true);
 
-    const response = await fetch(
-      "/api/profile/",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type":
-            "application/json"
-        },
-        body: JSON.stringify({
-          token
-        })
-      }
-    );
+    try {
 
-    const data =
-      await response.json();
+      const token = localStorage.getItem("token");
 
-    setProfile(data);
+      const response = await fetch(
+
+        "/api/profile/",
+
+        {
+
+          method: "POST",
+
+          headers: {
+
+            "Content-Type": "application/json"
+
+          },
+
+          body: JSON.stringify({
+
+            token
+
+          })
+
+        }
+
+      );
+
+      const data = await response.json();
+
+      setProfile(data);
+
+    }
+
+    catch(error){
+
+      console.error(error);
+
+      alert("Unable to load profile.");
+
+    }
+
+    finally{
+
+      setLoading(false);
+
+    }
+
   };
 
-  return (
+  return(
 
-    <div
-      style={{
-        marginTop: "30px",
-        background: "white",
-        padding: "20px",
-        borderRadius: "10px",
-        border: "1px solid #ddd"
-      }}
-    >
+<div
 
-      <h2>
-        User Profile
-      </h2>
+style={{
 
-      <button
-        onClick={loadProfile}
-      >
-        Load Profile
-      </button>
+marginTop:"30px",
 
-      <br />
-      <br />
+background:"#ffffff",
+
+borderRadius:"18px",
+
+padding:"30px",
+
+boxShadow:"0 10px 30px rgba(0,0,0,.08)"
+
+}}
+
+>
+
+<h2>
+
+My Profile
+
+</h2>
+
+<p
+
+style={{
+
+color:"#6b7280"
+
+}}
+
+>
+
+Manage your AI Job Assistant profile.
+
+</p>
+
+<div
+
+style={{
+
+marginTop:"20px"
+
+}}
+
+>
+
+<Button
+
+onClick={loadProfile}
+
+>
+
+Load Profile
+
+</Button>
+
+</div>
+
+	      {
+
+        loading && (
+
+          <Loader
+
+            text="Loading Profile..."
+
+          />
+
+        )
+
+      }
 
       {
+
         profile && (
 
-          <div>
+          <div
 
-            <p>
-              <strong>Name:</strong>
-              {" "}
-              {profile.name}
-            </p>
+            style={{
 
-            <p>
-              <strong>Email:</strong>
-              {" "}
-              {profile.email}
-            </p>
+              marginTop: "30px",
 
-            <p>
-              <strong>Joined:</strong>
-              {" "}
-              {profile.created_at}
-            </p>
+              border: "1px solid #e5e7eb",
 
-            <p>
-              <strong>Uploaded Resumes:</strong>
-              {" "}
-              {profile.uploaded_resumes}
-            </p>
+              borderRadius: "18px",
 
-            <p>
-              <strong>Generated Resumes:</strong>
-              {" "}
-              {profile.generated_resumes}
-            </p>
+              padding: "30px",
+
+              background: "#ffffff",
+
+              boxShadow: "0 5px 15px rgba(0,0,0,.05)"
+
+            }}
+
+          >
+
+            <div
+
+              style={{
+
+                display: "flex",
+
+                alignItems: "center",
+
+                gap: "20px",
+
+                flexWrap: "wrap"
+
+              }}
+
+            >
+
+              <div
+
+                style={{
+
+                  width: "90px",
+
+                  height: "90px",
+
+                  borderRadius: "50%",
+
+                  background: "#2563eb",
+
+                  color: "#ffffff",
+
+                  display: "flex",
+
+                  alignItems: "center",
+
+                  justifyContent: "center",
+
+                  fontSize: "34px",
+
+                  fontWeight: "bold"
+
+                }}
+
+              >
+
+                {
+
+                  profile.name
+
+                  ?
+
+                  profile.name.charAt(0).toUpperCase()
+
+                  :
+
+                  "U"
+
+                }
+
+              </div>
+
+              <div>
+
+                <h2
+
+                  style={{
+
+                    margin: 0
+
+                  }}
+
+                >
+
+                  {profile.name || "Unknown User"}
+
+                </h2>
+
+                <p
+
+                  style={{
+
+                    marginTop: "8px",
+
+                    color: "#6b7280"
+
+                  }}
+
+                >
+
+                  {profile.email || "No Email"}
+
+                </p>
+
+                <p
+
+                  style={{
+
+                    color: "#9ca3af",
+
+                    fontSize: "14px"
+
+                  }}
+
+                >
+
+                  Joined:
+
+                  {" "}
+
+                  {profile.created_at || "N/A"}
+
+                </p>
+
+              </div>
+
+            </div>
+
+            <div
+
+              style={{
+
+                display: "grid",
+
+                gridTemplateColumns:
+
+                  "repeat(auto-fit,minmax(220px,1fr))",
+
+                gap: "20px",
+
+                marginTop: "30px"
+
+              }}
+
+            >
+
+              <div
+
+                style={{
+
+                  background: "#eff6ff",
+
+                  borderRadius: "12px",
+
+                  padding: "20px"
+
+                }}
+
+              >
+
+                <h4
+
+                  style={{
+
+                    marginTop: 0,
+
+                    color: "#2563eb"
+
+                  }}
+
+                >
+
+                  Uploaded Resumes
+
+                </h4>
+
+                <h2>
+
+                  {
+
+                    profile.uploaded_resumes || 0
+
+                  }
+
+                </h2>
+
+              </div>
+
+              <div
+
+                style={{
+
+                  background: "#ecfdf5",
+
+                  borderRadius: "12px",
+
+                  padding: "20px"
+
+                }}
+
+              >
+
+                <h4
+
+                  style={{
+
+                    marginTop: 0,
+
+                    color: "#16a34a"
+
+                  }}
+
+                >
+
+                  Generated Resumes
+
+                </h4>
+
+                <h2>
+
+                  {
+
+                    profile.generated_resumes || 0
+
+                  }
+
+                </h2>
+
+              </div>
+
+            </div>
+
+            <div
+
+              style={{
+
+                marginTop: "30px"
+
+              }}
+
+            >
+
+		              <h3>
+
+                Profile Completion
+
+              </h3>
+
+              <div
+
+                style={{
+
+                  width: "100%",
+
+                  height: "14px",
+
+                  background: "#e5e7eb",
+
+                  borderRadius: "20px",
+
+                  overflow: "hidden",
+
+                  marginTop: "15px"
+
+                }}
+
+              >
+
+                <div
+
+                  style={{
+
+                    width: "90%",
+
+                    height: "100%",
+
+                    background: "#16a34a"
+
+                  }}
+
+                />
+
+              </div>
+
+              <p
+
+                style={{
+
+                  marginTop: "10px",
+
+                  color: "#6b7280"
+
+                }}
+
+              >
+
+                90% Complete
+
+              </p>
+
+            </div>
+
+            <div
+
+              style={{
+
+                marginTop: "35px",
+
+                padding: "20px",
+
+                background: "#f8fafc",
+
+                borderRadius: "12px",
+
+                border: "1px solid #e5e7eb"
+
+              }}
+
+            >
+
+              <h3
+
+                style={{
+
+                  marginTop: 0,
+
+                  color: "#2563eb"
+
+                }}
+
+              >
+
+                🤖 AI Career Suggestions
+
+              </h3>
+
+              <ul
+
+                style={{
+
+                  margin: 0,
+
+                  paddingLeft: "20px",
+
+                  lineHeight: "1.9",
+
+                  color: "#4b5563"
+
+                }}
+
+              >
+
+                <li>
+
+                  Complete your AWS certification.
+
+                </li>
+
+                <li>
+
+                  Add Terraform and Kubernetes projects.
+
+                </li>
+
+                <li>
+
+                  Improve your ATS score above 90%.
+
+                </li>
+
+                <li>
+
+                  Apply to at least five matching jobs every week.
+
+                </li>
+
+                <li>
+
+                  Practice mock interviews regularly.
+
+                </li>
+
+              </ul>
+
+            </div>
+
+            <div
+
+              style={{
+
+                marginTop: "25px",
+
+                padding: "20px",
+
+                background: "#eff6ff",
+
+                borderRadius: "12px",
+
+                border: "1px solid #bfdbfe"
+
+              }}
+
+            >
+
+              <h3
+
+                style={{
+
+                  marginTop: 0,
+
+                  color: "#1d4ed8"
+
+                }}
+
+              >
+
+                📈 Resume Improvement Tips
+
+              </h3>
+
+              <ul
+
+                style={{
+
+                  margin: 0,
+
+                  paddingLeft: "20px",
+
+                  lineHeight: "1.9",
+
+                  color: "#374151"
+
+                }}
+
+              >
+
+                <li>
+
+                  Quantify achievements with numbers.
+
+                </li>
+
+                <li>
+
+                  Keep your resume to one page.
+
+                </li>
+
+                <li>
+
+                  Include GitHub and LinkedIn links.
+
+                </li>
+
+                <li>
+
+                  Update your skills regularly.
+
+                </li>
+
+                <li>
+
+                  Tailor your resume for each application.
+
+                </li>
+
+              </ul>
+
+            </div>
 
           </div>
 
         )
+
       }
 
     </div>

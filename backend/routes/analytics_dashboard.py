@@ -1,42 +1,106 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
+from pydantic import BaseModel
+from sqlalchemy import text
 
 from database import SessionLocal
-from sqlalchemy import text
+from services.token_service import decode_token
 
 router = APIRouter()
 
 
-@router.get("/")
-def analytics_dashboard():
+class AnalyticsRequest(BaseModel):
+    token: str
+
+
+@router.post("/")
+def analytics_dashboard(req: AnalyticsRequest):
+
+    payload = decode_token(req.token)
+
+    if not payload:
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid or expired token"
+        )
+
+    user_id = payload.get("user_id")
+
+    if not user_id:
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid token payload"
+        )
 
     db = SessionLocal()
 
-    resumes = db.execute(
-        text("SELECT COUNT(*) FROM resumes")
-    ).scalar()
+    try:
 
-    jobs = db.execute(
-        text("SELECT COUNT(*) FROM jobs")
-    ).scalar()
+        uploaded_resumes = db.execute(
+            text("""
+                SELECT COUNT(*)
+                FROM resumes
+                WHERE user_id = :id
+            """),
+            {"id": user_id}
+        ).scalar() or 0
 
-    applications = db.execute(
-        text("SELECT COUNT(*) FROM applications")
-    ).scalar()
+        generated_resumes = db.execute(
+            text("""
+                SELECT COUNT(*)
+                FROM generated_resumes
+                WHERE user_id = :id
+            """),
+            {"id": user_id}
+        ).scalar() or 0
 
-    alerts = db.execute(
-        text("SELECT COUNT(*) FROM job_alerts")
-    ).scalar()
+        saved_jobs = db.execute(
+            text("""
+                SELECT COUNT(*)
+                FROM saved_jobs
+                WHERE user_id = :id
+            """),
+            {"id": user_id}
+        ).scalar() or 0
 
-    interviews = db.execute(
-        text("SELECT COUNT(*) FROM interview_questions")
-    ).scalar()
+        applications = db.execute(
+            text("""
+                SELECT COUNT(*)
+                FROM applications
+                WHERE user_id = :id
+            """),
+            {"id": user_id}
+        ).scalar() or 0
 
-    db.close()
+        total_activity = (
+            uploaded_resumes +
+            generated_resumes +
+            saved_jobs +
+            applications
+        )
 
-    return {
-        "total_resumes": resumes,
-        "total_jobs": jobs,
-        "total_applications": applications,
-        "total_job_alerts": alerts,
-        "total_interview_questions": interviews
-    }
+        if total_activity >= 20:
+            insight = "Excellent job! You are highly active in your job search."
+        elif total_activity >= 10:
+            insight = "Good progress. Keep applying consistently."
+        elif total_activity >= 5:
+            insight = "Your profile is growing. Upload more resumes and apply for more jobs."
+        else:
+            insight = "Start by uploading a resume and applying for jobs."
+
+        return {
+
+            "uploaded_resumes": uploaded_resumes,
+
+            "generated_resumes": generated_resumes,
+
+            "saved_jobs": saved_jobs,
+
+            "applications": applications,
+
+            "insights": insight
+
+        }
+
+    finally:
+
+        db.close()

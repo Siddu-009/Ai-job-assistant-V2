@@ -1,32 +1,57 @@
-const API_URL = "/api";
+import axios from "axios";
 
-export async function login(email, password) {
-  const res = await fetch(`${API_URL}/auth/login`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      email,
-      password
-    })
-  });
+const api = axios.create({
 
-  return res.json();
-}
+  baseURL: "/api",
 
-export async function register(name, email, password) {
-  const res = await fetch(`${API_URL}/auth/register`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      name,
-      email,
-      password
-    })
-  });
+  headers: {
 
-  return res.json();
-}
+    "Content-Type": "application/json"
+
+  }
+
+});
+
+api.interceptors.request.use((config) => {
+
+  if (typeof window !== "undefined") {
+
+    const token = localStorage.getItem("token");
+
+    if (token) {
+
+      config.headers.Authorization = `Bearer ${token}`;
+
+    }
+
+  }
+
+  return config;
+
+});
+
+api.interceptors.response.use(
+
+  (response) => response,
+
+  (error) => {
+
+    if (error.response?.status === 401) {
+
+      if (typeof window !== "undefined") {
+
+        localStorage.removeItem("token");
+
+        window.location.href = "/";
+
+      }
+
+    }
+
+    return Promise.reject(error);
+
+  }
+
+);
+
+export default api;

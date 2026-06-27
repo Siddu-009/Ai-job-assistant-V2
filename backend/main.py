@@ -29,8 +29,6 @@ from routes.job_alerts import router as job_alerts_router
 from routes.admin import router as admin_router
 from routes.profile import router as profile_router
 from routes.ai_resume import router as ai_resume_router
-from routes.resume_history import router as resume_history_router
-from routes.resume_history import router as resume_history_router
 from routes.resume_dashboard import router as resume_dashboard_router
 from routes.resume_history import router as resume_history_router
 from routes.resume_view import router as resume_view_router
@@ -51,6 +49,16 @@ from routes.analytics_dashboard import router as analytics_dashboard_router
 from routes.activity_timeline import router as activity_timeline_router
 from routes.email_notifications import router as email_notifications_router
 from routes.health import router as health_router
+from fastapi import FastAPI
+
+from fastapi.exceptions import RequestValidationError
+from starlette.exceptions import HTTPException as StarletteHTTPException
+
+from utils.exceptions import (
+    http_exception_handler,
+    validation_exception_handler,
+    global_exception_handler
+)
 
 app = FastAPI(
     title="AI Job Assistant",
@@ -222,18 +230,6 @@ app.include_router(
 )
 
 app.include_router(
-    resume_history_router,
-    prefix="/resume-history",
-    tags=["Resume History"]
-)
-
-app.include_router(
-    resume_history_router,
-    prefix="/resume-history",
-    tags=["Resume History"]
-)
-
-app.include_router(
     resume_dashboard_router,
     prefix="/resume-dashboard",
     tags=["Resume Dashboard"]
@@ -360,3 +356,18 @@ def root():
         "status": "success",
         "version": "1.0.0"
     }
+
+app.add_exception_handler(
+    StarletteHTTPException,
+    http_exception_handler
+)
+
+app.add_exception_handler(
+    RequestValidationError,
+    validation_exception_handler
+)
+
+app.add_exception_handler(
+    Exception,
+    global_exception_handler
+)

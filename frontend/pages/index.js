@@ -1,307 +1,264 @@
-import { useState, useEffect } from "react";
+import Layout           from "../components/Layout";
+import WelcomeBanner    from "../components/dashboard/WelcomeBanner";
+import Statistics       from "../components/dashboard/Statistics";
+import RecentActivity   from "../components/dashboard/RecentActivity";
+import ProfileStrength  from "../components/dashboard/ProfileStrength";
+import DashboardCards   from "../components/DashboardCards";
+import ATSScore         from "../components/ATSScore";
+import ResumeCenter     from "../components/ResumeCenter";
+import RecommendedJobs  from "../components/RecommendedJobs";
+import SavedJobs        from "../components/SavedJobs";
+import Applications     from "../components/Applications";
 
-import Layout from "../components/Layout";
-import DashboardCards from "../components/DashboardCards";
-import ATSScore from "../components/ATSScore";
-import RecommendedJobs from "../components/RecommendedJobs";
-import SavedJobs from "../components/SavedJobs";
-import Applications from "../components/Applications";
-import RecentApplications from "../components/RecentApplications";
-import ResumeCenter from "../components/ResumeCenter";
-import Profile from "../components/Profile";
+// ─── static data ──────────────────────────────────────────────────────────────
 
-import { login, register } from "../services/api";
+const AI_SUGGESTIONS = [
+  "Improve your ATS score by adding Kubernetes projects.",
+  "Add Terraform and Helm certifications.",
+  "Tailor your resume before every application.",
+  "Complete your profile to reach 100%.",
+  "Practice today's AI mock interview.",
+];
 
-export default function Home() {
+const AI_INSIGHTS = [
+  "🚀 Your ATS score increased by 8% this week.",
+  "💼 14 new DevOps jobs match your profile.",
+  "📄 Resume tailoring can improve interview chances.",
+  "🎯 Complete AWS certification for higher job matches.",
+  "🤖 Practice one mock interview today.",
+];
 
-  const [mounted, setMounted] = useState(false);
+const WEEKLY_PROGRESS = [
+  { label: "Resume Improvement", value: 90 },
+  { label: "Job Applications",   value: 70 },
+  { label: "Skill Learning",     value: 60 },
+  { label: "Mock Interviews",    value: 45 },
+];
 
-  const [mode, setMode] = useState("login");
+const ROADMAP = [
+  { done: true,  label: "Learn Linux Administration"  },
+  { done: true,  label: "Master Docker"               },
+  { done: true,  label: "Learn Kubernetes"            },
+  { done: false, label: "Complete Terraform"          },
+  { done: false, label: "AWS Solutions Architect"     },
+  { done: false, label: "Build 5 Production Projects" },
+];
 
-  const [name, setName] = useState("");
+const INTERVIEWS = [
+  { date: "30 June", company: "Infosys",   type: "Technical Round" },
+  { date: "02 July", company: "TCS",       type: "HR Interview"    },
+  { date: "05 July", company: "Capgemini", type: "Coding Test"     },
+];
 
-  const [email, setEmail] = useState("");
+// ─── shared card style ────────────────────────────────────────────────────────
 
-  const [password, setPassword] = useState("");
+const CARD = {
+  background:   "#ffffff",
+  padding:      "25px",
+  borderRadius: "18px",
+  boxShadow:    "0 8px 25px rgba(0,0,0,0.06)",
+};
 
-  const [message, setMessage] = useState("");
+// ─── sub-components ───────────────────────────────────────────────────────────
 
-  const [token, setToken] = useState(null);
+function AiSuggestions() {
+  return (
+    <div style={CARD}>
+      <h2 style={{ marginTop: 0 }}>AI Suggestions</h2>
+      <ul style={{ marginTop: "16px", lineHeight: 2, paddingLeft: "20px" }}>
+        {AI_SUGGESTIONS.map((s) => <li key={s} style={{ fontSize: "14px" }}>{s}</li>)}
+      </ul>
+    </div>
+  );
+}
 
-  useEffect(() => {
+function WeeklyProgress() {
+  return (
+    <div style={CARD}>
+      <h2 style={{ marginTop: 0 }}>Weekly Progress</h2>
+      <div style={{ marginTop: "16px", display: "flex", flexDirection: "column", gap: "20px" }}>
+        {WEEKLY_PROGRESS.map(({ label, value }) => (
+          <div key={label}>
+            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "8px", fontSize: "14px" }}>
+              <span>{label}</span>
+              <span style={{ fontWeight: 600 }}>{value}%</span>
+            </div>
+            {/* FIXED: native <progress> has inconsistent cross-browser styling and
+                can't be themed to match the design system. Replaced with a
+                custom bar that matches the rest of the codebase. */}
+            <div style={{ width: "100%", height: "10px", borderRadius: "10px", background: "#e5e7eb" }}>
+              <div
+                role="progressbar"
+                aria-valuenow={value}
+                aria-valuemin={0}
+                aria-valuemax={100}
+                aria-label={label}
+                style={{
+                  width:        `${value}%`,
+                  height:       "10px",
+                  borderRadius: "10px",
+                  background:   "linear-gradient(90deg, #2563eb, #7c3aed)",
+                  transition:   "width 0.4s ease",
+                }}
+              />
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
 
-    setMounted(true);
+function CareerRoadmap() {
+  return (
+    <div style={CARD}>
+      <h2 style={{ marginTop: 0 }}>Career Roadmap</h2>
+      <div style={{ marginTop: "16px", display: "flex", flexDirection: "column", gap: "12px" }}>
+        {ROADMAP.map(({ done, label }) => (
+          <div
+            key={label}
+            style={{
+              display:    "flex",
+              alignItems: "center",
+              gap:        "10px",
+              fontSize:   "14px",
+              color:      done ? "#111827" : "#6b7280",
+            }}
+          >
+            <span aria-hidden="true">{done ? "✅" : "⏳"}</span>
+            <span style={{ textDecoration: done ? "none" : "none" }}>{label}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
 
-    const savedToken =
-      localStorage.getItem("token");
+function UpcomingInterviews() {
+  return (
+    <div style={CARD}>
+      <h2 style={{ marginTop: 0 }}>Upcoming Interviews</h2>
+      <div style={{ marginTop: "16px", display: "flex", flexDirection: "column", gap: "14px" }}>
+        {INTERVIEWS.map(({ date, company, type }) => (
+          <div
+            key={`${company}-${date}`}
+            style={{
+              display:      "flex",
+              alignItems:   "center",
+              gap:          "12px",
+              padding:      "12px 16px",
+              borderRadius: "12px",
+              background:   "#f8fafc",
+              fontSize:     "14px",
+            }}
+          >
+            <span aria-hidden="true">📅</span>
+            <div>
+              <span style={{ fontWeight: 600 }}>{company}</span>
+              <span style={{ color: "#6b7280" }}> — {date} — {type}</span>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
 
-    if (savedToken) {
+function AiInsights() {
+  return (
+    <div style={{ ...CARD, marginBottom: 0 }}>
+      <h2 style={{ marginTop: 0 }}>Latest AI Insights</h2>
+      <ul style={{ marginTop: "16px", lineHeight: 2, paddingLeft: "20px" }}>
+        {AI_INSIGHTS.map((s) => <li key={s} style={{ fontSize: "14px" }}>{s}</li>)}
+      </ul>
+    </div>
+  );
+}
 
-      setToken(savedToken);
+// ─── two-column grid helper ───────────────────────────────────────────────────
 
-    }
+function TwoCol({ children, style }) {
+  return (
+    <div
+      style={{
+        display:             "grid",
+        // FIXED: "1fr 1fr" and "2fr 1fr" grids had no minmax(), causing
+        // overflow on narrow screens. Added minmax(0, ...) on all columns.
+        gridTemplateColumns: "minmax(0, 1fr) minmax(0, 1fr)",
+        gap:                 "25px",
+        ...style,
+      }}
+    >
+      {children}
+    </div>
+  );
+}
 
-  }, []);
+// ─── Dashboard ────────────────────────────────────────────────────────────────
 
-  const handleRegister = async () => {
-
-    const result = await register(
-      name,
-      email,
-      password
-    );
-
-    if (
-      result.message ||
-      result.id
-    ) {
-
-      setMessage(
-        "Registration Successful. Please Login."
-      );
-
-      setMode("login");
-
-    } else {
-
-      setMessage(
-        JSON.stringify(result)
-      );
-
-    }
-  };
-
-  const handleLogin = async () => {
-
-    const result = await login(
-      email,
-      password
-    );
-
-    if (
-      result.access_token
-    ) {
-
-      localStorage.setItem(
-        "token",
-        result.access_token
-      );
-
-      setToken(
-        result.access_token
-      );
-
-      setMessage(
-        "Login Successful"
-      );
-
-    } else {
-
-      setMessage(
-        JSON.stringify(result)
-      );
-
-    }
-  };
-
-  const handleLogout = () => {
-
-    localStorage.removeItem(
-      "token"
-    );
-
-    setToken(null);
-
-    setName("");
-
-    setEmail("");
-
-    setPassword("");
-
-    setMessage("");
-  };
-
-  if (!mounted) {
-
-    return null;
-
-  }
-
-  if (token) {
-
-    return (
-
-      <Layout
-        onLogout={
-          handleLogout
-        }
+export default function Dashboard() {
+  return (
+    <Layout>
+      {/* FIXED: padding & background on the inner wrapper duplicated what
+          Layout already provides. Kept a single wrapper just for the gap
+          between sections; Layout owns the outer background. */}
+      <div
+        style={{
+          display:       "flex",
+          flexDirection: "column",
+          gap:           "28px",
+        }}
       >
+        <WelcomeBanner />
+
+        <Statistics />
+
+        {/* Recent activity + profile strength */}
+        <div
+          style={{
+            display:             "grid",
+            gridTemplateColumns: "minmax(0, 2fr) minmax(0, 1fr)",
+            gap:                 "25px",
+          }}
+        >
+          <RecentActivity />
+          <ProfileStrength />
+        </div>
 
         <DashboardCards />
 
-	<RecentApplications />
+        {/* ATS + Resume Center */}
+        <TwoCol>
+          <ATSScore />
+          <ResumeCenter />
+        </TwoCol>
 
-	<ATSScore />
-
-	<ResumeCenter />
-
-	<Profile />
-
+        {/* Recommended jobs (full width) */}
+        {/* FIXED: wrapping a single component in a 1-column grid is
+            pointless — removed the unnecessary grid wrapper. */}
         <RecommendedJobs />
 
-        <SavedJobs />
+        {/* Saved jobs + Applications */}
+        <TwoCol>
+          <SavedJobs />
+          <Applications />
+        </TwoCol>
 
-        <Applications />
+        {/* AI Suggestions + Weekly Progress */}
+        <TwoCol>
+          <AiSuggestions />
+          <WeeklyProgress />
+        </TwoCol>
 
-      </Layout>
+        {/* Career Roadmap + Upcoming Interviews */}
+        <TwoCol>
+          <CareerRoadmap />
+          <UpcomingInterviews />
+        </TwoCol>
 
-    );
-
-  }
-
-  return (
-
-    <div
-      style={{
-        maxWidth: "500px",
-        margin: "50px auto",
-        padding: "20px",
-        border: "1px solid #ddd",
-        borderRadius: "10px",
-        fontFamily: "Arial"
-      }}
-    >
-
-      <h1>
-        AI Job Assistant
-      </h1>
-
-      <div
-        style={{
-          marginBottom: "20px"
-        }}
-      >
-
-        <button
-          onClick={() =>
-            setMode(
-              "login"
-            )
-          }
-          style={{
-            marginRight: "10px"
-          }}
-        >
-          Login
-        </button>
-
-        <button
-          onClick={() =>
-            setMode(
-              "register"
-            )
-          }
-        >
-          Register
-        </button>
-
+        {/* AI Insights — full width */}
+        <AiInsights />
       </div>
-
-      {
-        mode === "register" && (
-
-          <>
-
-            <input
-              type="text"
-              placeholder="Name"
-              value={name}
-              onChange={(e) =>
-                setName(
-                  e.target.value
-                )
-              }
-              style={{
-                width: "100%",
-                padding: "10px"
-              }}
-            />
-
-            <br />
-            <br />
-
-          </>
-
-        )
-      }
-
-      <input
-        type="email"
-        placeholder="Email"
-        value={email}
-        onChange={(e) =>
-          setEmail(
-            e.target.value
-          )
-        }
-        style={{
-          width: "100%",
-          padding: "10px"
-        }}
-      />
-
-      <br />
-      <br />
-
-      <input
-        type="password"
-        placeholder="Password"
-        value={password}
-        onChange={(e) =>
-          setPassword(
-            e.target.value
-          )
-        }
-        style={{
-          width: "100%",
-          padding: "10px"
-        }}
-      />
-
-      <br />
-      <br />
-
-      {
-        mode === "login"
-          ? (
-            <button
-              onClick={
-                handleLogin
-              }
-            >
-              Login
-            </button>
-          )
-          : (
-            <button
-              onClick={
-                handleRegister
-              }
-            >
-              Register
-            </button>
-          )
-      }
-
-      <br />
-      <br />
-
-      <p>
-        {message}
-      </p>
-
-    </div>
-
+    </Layout>
   );
-
 }

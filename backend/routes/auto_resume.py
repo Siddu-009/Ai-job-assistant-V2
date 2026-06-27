@@ -1,25 +1,16 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
+import os
 
 from services.parser import extract_text
-
-from services.resume_parser_ai import (
-    extract_resume_details
-)
-
-from services.ats_resume_generator import (
-    generate_ats_content
-)
-
-from services.resume_builder import (
-    build_resume
-)
+from services.resume_parser_ai import extract_resume_details
+from services.ats_resume_generator import generate_ats_content
+from services.resume_builder import build_resume
 
 router = APIRouter()
 
 
 class AutoResumeRequest(BaseModel):
-
     filename: str
     job_description: str
 
@@ -29,35 +20,67 @@ def auto_resume(req: AutoResumeRequest):
 
     filepath = f"uploads/{req.filename}"
 
-    resume_text = extract_text(
-        filepath
-    )
+    if not os.path.exists(filepath):
+        raise HTTPException(
+            status_code=404,
+            detail="Resume file not found"
+        )
 
-    details = extract_resume_details(
-        resume_text
-    )
+    try:
 
-    ats_content = generate_ats_content(
-        details,
-        req.job_description
-    )
+        resume_text = extract_text(filepath)
 
-    build_resume(
-        name=details["name"],
-        email=details["email"],
-        phone=details["phone"],
-        linkedin=details["linkedin"],
-        github=details["github"],
-        summary=ats_content,
-        skills=details["skills"],
-        projects=details["projects"],
-        certifications="DevOps Training, Naresh IT",
-        education=details["education"],
-        output_file="generated/ats_resume.pdf"
-    )
+        details = extract_resume_details(resume_text)
 
-    return {
-        "message": "ATS Resume Generated Successfully",
-        "candidate": details["name"],
-        "file": "ats_resume.pdf"
-    }
+        ats_content = generate_ats_content(
+            details,
+            req.job_description
+        )
+
+        output_file = "generated/ats_resume.pdf"
+
+        build_resume(
+
+            name=details.get("name", ""),
+
+            email=details.get("email", ""),
+
+            phone=details.get("phone", ""),
+
+            linkedin=details.get("linkedin", ""),
+
+            github=details.get("github", ""),
+
+            summary=ats_content,
+
+            skills=details.get("skills", []),
+
+            projects=details.get("projects", []),
+
+            certifications="DevOps Training, Naresh IT",
+
+            education=details.get("education", ""),
+
+            output_file=output_file
+
+        )
+
+        return {
+
+            "message": "ATS Resume Generated Successfully",
+
+            "candidate": details.get("name", ""),
+
+            "file": "ats_resume.pdf"
+
+        }
+
+    except Exception as e:
+
+        raise HTTPException(
+
+            status_code=500,
+
+            detail=f"Resume generation failed: {str(e)}"
+
+        )

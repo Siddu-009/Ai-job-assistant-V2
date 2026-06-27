@@ -1,363 +1,171 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
-export default function Admin() {
+export default function AdminDashboard() {
 
-  const [username, setUsername] =
-    useState("");
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  const [password, setPassword] =
-    useState("");
+  useEffect(() => {
+    loadDashboard();
+  }, []);
 
-  const [loggedIn, setLoggedIn] =
-    useState(false);
+  const loadDashboard = async () => {
 
-  const [stats, setStats] =
-    useState(null);
+    try {
 
-  const [users, setUsers] =
-    useState([]);
+      const token = localStorage.getItem("token");
 
-  const [jobs, setJobs] =
-    useState([]);
-
-  const [applications, setApplications] =
-    useState([]);
-
-  const login = async () => {
-
-    const response = await fetch(
-      "/api/admin/login",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type":
-            "application/json"
-        },
-        body: JSON.stringify({
-          username,
-          password
-        })
-      }
-    );
-
-    const data =
-      await response.json();
-
-    if (
-      data.message
-    ) {
-
-      setLoggedIn(true);
-
-      loadStats();
-
-    } else {
-
-      alert(
-        "Invalid Login"
+      const response = await fetch(
+        "/api/admin/dashboard",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            token
+          })
+        }
       );
+
+      const result = await response.json();
+
+      setData(result);
+
+    } catch {
+
+      alert("Unable to load admin dashboard.");
 
     }
 
+    setLoading(false);
+
   };
 
-  const loadStats = async () => {
-
-    const response =
-      await fetch(
-        "/api/admin/stats"
-      );
-
-    const data =
-      await response.json();
-
-    setStats(data);
-  };
-
-  const loadUsers = async () => {
-
-    const response =
-      await fetch(
-        "/api/admin/users"
-      );
-
-    const data =
-      await response.json();
-
-    setUsers(data);
-  };
-
-  const loadJobs = async () => {
-
-    const response =
-      await fetch(
-        "/api/admin/jobs"
-      );
-
-    const data =
-      await response.json();
-
-    setJobs(data);
-  };
-
-  const loadApplications = async () => {
-
-    const response =
-      await fetch(
-        "/api/admin/applications"
-      );
-
-    const data =
-      await response.json();
-
-    setApplications(data);
-  };
-
-  if (!loggedIn) {
-
-    return (
-
-      <div
-        style={{
-          maxWidth: "400px",
-          margin: "50px auto",
-          padding: "20px",
-          border: "1px solid #ddd",
-          borderRadius: "10px"
-        }}
-      >
-
-        <h1>
-          Admin Login
-        </h1>
-
-        <input
-          placeholder="Username"
-          value={username}
-          onChange={(e) =>
-            setUsername(
-              e.target.value
-            )
-          }
-          style={{
-            width: "100%",
-            padding: "10px"
-          }}
-        />
-
-        <br />
-        <br />
-
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) =>
-            setPassword(
-              e.target.value
-            )
-          }
-          style={{
-            width: "100%",
-            padding: "10px"
-          }}
-        />
-
-        <br />
-        <br />
-
-        <button
-          onClick={login}
-        >
-          Login
-        </button>
-
-      </div>
-
-    );
-
-  }
+  if (loading)
+    return <h2 style={{padding:"40px"}}>Loading...</h2>;
 
   return (
 
-    <div
-      style={{
-        padding: "20px",
-        fontFamily: "Arial"
-      }}
-    >
+<div
+style={{
+maxWidth:"1300px",
+margin:"40px auto",
+padding:"35px",
+background:"#fff",
+borderRadius:"20px",
+boxShadow:"0 15px 35px rgba(0,0,0,.08)"
+}}
+>
 
-      <h1>
-        Admin Dashboard
-      </h1>
+<h1>Admin Dashboard</h1>
 
-      {
-        stats && (
+<div
+style={{
+display:"grid",
+gridTemplateColumns:"repeat(auto-fit,minmax(250px,1fr))",
+gap:"20px",
+marginTop:"30px"
+}}
+>
 
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns:
-                "repeat(4,1fr)",
-              gap: "20px",
-              marginBottom: "30px"
-            }}
-          >
+<Card
+title="Users"
+value={data?.users || 0}
+color="#2563eb"
+/>
 
-            <Card
-              title="Users"
-              value={
-                stats.total_users
-              }
-            />
+<Card
+title="Resumes"
+value={data?.resumes || 0}
+color="#16a34a"
+/>
 
-            <Card
-              title="Jobs"
-              value={
-                stats.total_jobs
-              }
-            />
+<Card
+title="Applications"
+value={data?.applications || 0}
+color="#f59e0b"
+/>
 
-            <Card
-              title="Saved Jobs"
-              value={
-                stats.total_saved_jobs
-              }
-            />
+<Card
+title="Jobs"
+value={data?.jobs || 0}
+color="#7c3aed"
+/>
 
-            <Card
-              title="Applications"
-              value={
-                stats.total_applications
-              }
-            />
+</div>
 
-          </div>
+<div
+style={{
+marginTop:"40px"
+}}
+>
 
-        )
-      }
+<h2>Recent Activity</h2>
 
-      <button
-        onClick={loadUsers}
-      >
-        Load Users
-      </button>
+{
+(data?.recent_activity || []).map((item,index)=>(
 
-      {" "}
+<div
+key={index}
+style={{
+padding:"15px",
+borderBottom:"1px solid #eee"
+}}
+>
 
-      <button
-        onClick={loadJobs}
-      >
-        Load Jobs
-      </button>
+<strong>{item.user}</strong>
 
-      {" "}
+<p>{item.action}</p>
 
-      <button
-        onClick={loadApplications}
-      >
-        Load Applications
-      </button>
+<small>{item.time}</small>
 
-      <hr />
+</div>
 
-      <h2>
-        Users
-      </h2>
+))
+}
 
-      {
-        users.map(
-          (user) => (
+</div>
 
-            <div
-              key={user.id}
-            >
-              {user.name}
-              {" - "}
-              {user.email}
-            </div>
+</div>
 
-          )
-        )
-      }
-
-      <h2>
-        Jobs
-      </h2>
-
-      {
-        jobs.map(
-          (job) => (
-
-            <div
-              key={job.id}
-            >
-              {job.title}
-              {" - "}
-              {job.company}
-            </div>
-
-          )
-        )
-      }
-
-      <h2>
-        Applications
-      </h2>
-
-      {
-        applications.map(
-          (app) => (
-
-            <div
-              key={
-                app.application_id
-              }
-            >
-              {app.user_name}
-              {" - "}
-              {app.job_title}
-              {" - "}
-              {app.status}
-            </div>
-
-          )
-        )
-      }
-
-    </div>
-
-  );
+);
 
 }
 
-function Card({
-  title,
-  value
-}) {
+function Card({title,value,color}){
 
-  return (
+return(
 
-    <div
-      style={{
-        border: "1px solid #ddd",
-        borderRadius: "10px",
-        padding: "20px",
-        textAlign: "center",
-        background: "white"
-      }}
-    >
+<div
+style={{
+padding:"25px",
+borderRadius:"15px",
+background:"#fff",
+border:"1px solid #e5e7eb"
+}}
+>
 
-      <h3>
-        {title}
-      </h3>
+<h3
+style={{
+margin:0,
+color:"#6b7280"
+}}
+>
+{title}
+</h3>
 
-      <h1>
-        {value}
-      </h1>
+<h1
+style={{
+marginTop:"15px",
+color
+}}
+>
+{value}
+</h1>
 
-    </div>
+</div>
 
-  );
+);
 
 }

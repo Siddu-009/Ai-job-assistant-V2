@@ -1,15 +1,16 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
-
-from database import SessionLocal
 from sqlalchemy import text
 
+from database import SessionLocal
 from services.career_roadmap import generate_roadmap
+from services.token_service import decode_token
 
 router = APIRouter()
 
 
 class RoadmapRequest(BaseModel):
+    token: str
     resume_id: int
     target_role: str
 
@@ -17,100 +18,143 @@ class RoadmapRequest(BaseModel):
 @router.post("/")
 def create_roadmap(req: RoadmapRequest):
 
+    payload = decode_token(req.token)
+
+    if not payload:
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid or expired token"
+        )
+
+    user_id = payload.get("user_id")
+
+    if not user_id:
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid token payload"
+        )
+
     db = SessionLocal()
 
-    result = db.execute(
-        text("""
-        SELECT skills
-        FROM resumes
-        WHERE id=:id
-        """),
-        {
-            "id": req.resume_id
-        }
-    ).fetchone()
+    try:
 
-    if not result:
+        row = db.execute(
+            text("""
+                SELECT skills
+                FROM resumes
+                WHERE id=:resume_id
+                AND user_id=:user_id
+            """),
+            {
+                "resume_id": req.resume_id,
+                "user_id": user_id
+            }
+        ).fetchone()
 
-        db.close()
+        if not row:
+            raise HTTPException(
+                status_code=404,
+                detail="Resume not found"
+            )
+
+        skills = row[0]
+
+        roadmap = generate_roadmap(
+            skills,
+            req.target_role
+        )
+
+        db.execute(
+            text("""
+                INSERT INTO career_roadmaps
+                (
+                    resume_id,
+                    target_role,
+                    roadmap
+                )
+                VALUES
+                (
+                    :resume_id,
+                    :target_role,
+                    :roadmap
+                )
+            """),
+            {
+                "resume_id": req.resume_id,
+                "target_role": req.target_role,
+                "roadmap": roadmap
+            }
+        )
+
+        db.commit()
 
         return {
-            "error": "Resume not found"
-        }
-
-    skills = result[0]
-
-    roadmap = generate_roadmap(
-        skills,
-        req.target_role
-    )
-
-    db.execute(
-        text("""
-        INSERT INTO career_roadmaps
-        (
-            resume_id,
-            target_role,
-            roadmap
-        )
-        VALUES
-        (
-            :resume_id,
-            :target_role,
-            :roadmap
-        )
-        """),
-        {
             "resume_id": req.resume_id,
             "target_role": req.target_role,
             "roadmap": roadmap
         }
-    )
 
-    db.commit()
-    db.close()
+    finally:
 
-    return {
-        "resume_id": req.resume_id,
-        "target_role": req.target_role,
-        "roadmap": roadmap
-    }
+        db.close()
 
 
-@router.get("/{resume_id}")
-def get_roadmaps(resume_id: int):
+@router.get("/{resume_id}/{token}")
+def get_roadmaps(
+    resume_id: int,
+    token: str
+):
+
+    payload = decode_token(token)
+
+    if not payload:
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid or expired token"
+        )
+
+    user_id = payload.get("user_id")
+
+    if not user_id:
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid token payload"
+        )
 
     db = SessionLocal()
 
-    result = db.execute(
-        text("""
-        SELECT
-            id,
-            target_role,
-            roadmap,
-            created_at
-        FROM career_roadmaps
-        WHERE resume_id=:resume_id
-        ORDER BY id DESC
-        """),
-        {
-            "resume_id": resume_id
-        }
-    )
+    try:
 
-    rows = result.fetchall()
+        rows = db.execute(
+            text("""
+                SELECT
+                    cr.id,
+                    cr.target_role,
+                    cr.roadmap,
+                    cr.created_at
+                FROM career_roadmaps cr
+                JOIN resumes r
+                    ON cr.resume_id = r.id
+                WHERE cr.resume_id=:resume_id
+                AND r.user_id=:user_id
+                ORDER BY cr.id DESC
+            """),
+            {
+                "resume_id": resume_id,
+                "user_id": user_id
+            }
+        ).fetchall()
 
-    db.close()
+        return [
+            {
+                "id": row[0],
+                "target_role": row[1],
+                "roadmap": row[2],
+                "created_at": str(row[3])
+            }
+            for row in rows
+        ]
 
-    data = []
+    finally:
 
-    for row in rows:
-
-        data.append({
-            "id": row[0],
-            "target_role": row[1],
-            "roadmap": row[2],
-            "created_at": str(row[3])
-        })
-
-    return data
+        db.close()
