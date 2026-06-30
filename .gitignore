@@ -1,8 +1,45 @@
+# Node
 node_modules/
+**/node_modules/
+
+# Next.js
 .next/
+out/
+
+# Logs
+*.log
+
+# Environment
 .env
 .env.*
-uploads/
-generated/
+
+# Python
 __pycache__/
 *.pyc
+venv/
+
+# Zip files
+*.zip
+
+# Build
+dist/
+build/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+
+# Docker
+*.tar
+
+# Backup folders
+frontend_backup/
+backend_backup/
