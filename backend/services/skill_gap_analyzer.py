@@ -1,80 +1,135 @@
-KNOWN_SKILLS = [
-    "aws",
-    "docker",
-    "kubernetes",
-    "terraform",
-    "jenkins",
-    "ansible",
-    "linux",
-    "github actions",
-    "git",
-    "python",
-    "prometheus",
-    "grafana",
-    "eks",
-    "ec2",
-    "s3",
-    "iam",
-    "route53",
-    "rds",
-    "argocd",
-    "helm",
-    "devops"
-]
+from services.ai_service import ai_chat
+import json
+import re
 
 
-def analyze_skill_gap(
-    resume_text,
-    job_description
-):
+def extract_skills(text):
 
-    resume_text = resume_text.lower()
-    job_description = job_description.lower()
+    prompt = f"""
+Extract all technical skills from the following text.
 
-    resume_skills = []
-    job_skills = []
+Include programming languages, cloud, DevOps, databases,
+frameworks, operating systems, engineering software,
+mechanical tools, electrical tools, civil software,
+testing tools, networking tools, AI/ML, ERP, SAP,
+cybersecurity, embedded systems and every professional skill.
 
-    for skill in KNOWN_SKILLS:
+Return ONLY JSON.
 
-        if skill in resume_text:
-            resume_skills.append(skill)
+Format:
 
-        if skill in job_description:
-            job_skills.append(skill)
+{{
+    "skills":[
+        "Python",
+        "AWS",
+        "Docker"
+    ]
+}}
 
-    matched = list(
-        set(resume_skills)
-        &
-        set(job_skills)
+Text:
+
+{text}
+"""
+
+    response = ai_chat(prompt)
+
+    try:
+
+        match = re.search(r"\{.*\}", response, re.DOTALL)
+
+        if match:
+            return json.loads(match.group())["skills"]
+
+    except Exception:
+        return []
+
+    return []
+
+
+def analyze_skill_gap(resume_text, job_description):
+
+    resume_skills = extract_skills(resume_text)
+
+    job_skills = extract_skills(job_description)
+
+    resume_set = set(s.lower() for s in resume_skills)
+    job_set = set(s.lower() for s in job_skills)
+
+    matched = sorted(
+        list(resume_set & job_set)
     )
 
-    missing = list(
-        set(job_skills)
-        -
-        set(resume_skills)
+    missing = sorted(
+        list(job_set - resume_set)
     )
 
-    if len(job_skills) == 0:
-        score = 0
-    else:
-        score = int(
-            (
-                len(matched)
-                /
-                len(job_skills)
-            ) * 100
+    score = 0
+
+    if len(job_set) > 0:
+        score = round(
+            len(matched) / len(job_set) * 100,
+            2
         )
 
-    recommendations = []
+    recommendation_prompt = f"""
+The candidate is missing these skills:
 
-    for skill in missing:
-        recommendations.append(
-            f"Learn {skill.title()}"
-        )
+{', '.join(missing)}
+
+Suggest:
+
+1. Learning roadmap
+2. Best certifications
+3. Best online courses
+4. Interview topics
+
+Return JSON only.
+
+Format:
+
+{{
+"recommendations":[],
+"courses":[],
+"certifications":[],
+"interview_topics":[],
+"learning_path":[]
+}}
+"""
+
+    ai = ai_chat(recommendation_prompt)
+
+    try:
+
+        match = re.search(r"\{.*\}", ai, re.DOTALL)
+
+        if match:
+
+            extra = json.loads(match.group())
+
+        else:
+
+            extra = {}
+
+    except Exception:
+
+        extra = {}
 
     return {
+
         "match_score": score,
+
         "matched_skills": matched,
+
         "missing_skills": missing,
-        "recommendations": recommendations
+
+        "recommendations": extra.get("recommendations", []),
+
+        "courses": extra.get("courses", []),
+
+        "certifications": extra.get("certifications", []),
+
+        "interview_topics": extra.get("interview_topics", []),
+
+        "learning_path": extra.get("learning_path", [])
+
     }

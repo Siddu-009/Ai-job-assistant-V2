@@ -1,0 +1,122 @@
+{
+  "DevOps Engineer": {
+    "Fresher": {
+      "easy": [
+        {
+          "id": 1,
+          "question": "What is Linux?",
+          "answer": "Linux is an open-source operating system.",
+          "keywords": ["linux", "kernel", "operating system"]
+        },
+        {
+          "id": 2,
+          "question": "What is Git?",
+          "answer": "Git is a distributed version control system.",
+          "keywords": ["git", "version control", "repository"]
+        },
+        {
+          "id": 3,
+          "question": "What is Docker?",
+          "answer": "Docker is a containerization platform.",
+          "keywords": ["docker", "container", "image"]
+        }
+      ],
+
+      "medium": [
+        {
+          "id": 4,
+          "question": "Explain Kubernetes Pods.",
+          "answer": "A Pod is the smallest deployable unit in Kubernetes.",
+          "keywords": ["pod", "kubernetes", "container"]
+        },
+        {
+          "id": 5,
+          "question": "What is Terraform?",
+          "answer": "Terraform is an Infrastructure as Code tool.",
+          "keywords": ["terraform", "iac", "infrastructure"]
+        }
+      ],
+
+      "hard": [
+        {
+          "id": 6,
+          "question": "Explain Kubernetes networking.",
+          "answer": "Kubernetes networking enables communication between Pods and Services.",
+          "keywords": ["network", "service", "pod"]
+        }
+      ],
+
+      "scenario": [
+        {
+          "id": 7,
+          "question": "A deployment is failing after a Jenkins build. How would you troubleshoot it?",
+          "answer": "Check Jenkins logs, Docker image, Kubernetes events, application logs and deployment configuration.",
+          "keywords": ["jenkins", "logs", "deployment", "docker"]
+        }
+      ],
+
+      "troubleshooting": [
+        {
+          "id": 8,
+          "question": "An EC2 instance is unreachable over SSH. What checks would you perform?",
+          "answer": "Verify security groups, NACLs, route tables, key pair, instance status and SSH service.",
+          "keywords": ["ssh", "security group", "ec2"]
+        }
+      ]
+    }
+  },
+
+  "Python Developer": {
+    "Fresher": {
+      "easy": [
+        {
+          "id": 1001,
+          "question": "What is Python?",
+          "answer": "Python is a high-level interpreted programming language.",
+          "keywords": ["python", "interpreted", "language"]
+        }
+      ],
+
+      "medium": [],
+      "hard": [],
+      "scenario": [],
+      "troubleshooting": []
+    }
+  },
+
+  "Java Developer": {
+    "Fresher": {
+      "easy": [
+        {
+          "id": 2001,
+          "question": "What is JVM?",
+          "answer": "JVM executes Java bytecode.",
+          "keywords": ["jvm", "bytecode"]
+        }
+      ],
+
+      "medium": [],
+      "hard": [],
+      "scenario": [],
+      "troubleshooting": []
+    }
+  },
+
+  "Mechanical Engineer": {
+    "Fresher": {
+      "easy": [
+        {
+          "id": 3001,
+          "question": "Explain Bernoulli's Principle.",
+          "answer": "Pressure decreases as fluid velocity increases.",
+          "keywords": ["bernoulli", "pressure", "fluid"]
+        }
+      ],
+
+      "medium": [],
+      "hard": [],
+      "scenario": [],
+      "troubleshooting": []
+    }
+  }
+}

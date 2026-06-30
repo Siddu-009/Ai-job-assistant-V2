@@ -198,7 +198,7 @@ function TwoCol({ children, style }) {
 
 export default function Dashboard() {
   return (
-    <Layout>
+    <Layout dashboard={true}>
       {/* FIXED: padding & background on the inner wrapper duplicated what
           Layout already provides. Kept a single wrapper just for the gap
           between sections; Layout owns the outer background. */}

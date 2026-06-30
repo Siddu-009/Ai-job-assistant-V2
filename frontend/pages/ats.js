@@ -1,17 +1,30 @@
 import { useState } from "react";
+import Layout from "../components/Layout";
 
 export default function ATSAnalyzer() {
 
-  const [resume, setResume] = useState("");
   const [jobDescription, setJobDescription] = useState("");
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
 
   const analyze = async () => {
 
-    if (!resume || !jobDescription) {
-      alert("Please enter Resume and Job Description");
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+
+      window.location.href = "/login";
+
       return;
+
+    }
+
+    if (!jobDescription) {
+
+      alert("Please enter Job Description");
+
+      return;
+
     }
 
     setLoading(true);
@@ -26,7 +39,7 @@ export default function ATSAnalyzer() {
             "Content-Type": "application/json"
           },
           body: JSON.stringify({
-            resume,
+            token,
             job_description: jobDescription
           })
         }
@@ -34,11 +47,32 @@ export default function ATSAnalyzer() {
 
       const data = await response.json();
 
+      if (!response.ok) {
+
+    	  console.error(data);
+
+	  alert(data.detail || data.message || JSON.stringify(data));
+
+	  return;
+
+      }
+
+      if (data.success === false) {
+
+	  alert(data.message);
+
+	  return;
+
+      }
+
       setResult(data);
 
-    } catch {
+    }
+    catch (err) {
 
-      alert("Unable to analyze.");
+      console.error(err);
+
+      alert(err.message);
 
     }
 
@@ -50,254 +84,270 @@ export default function ATSAnalyzer() {
 
   return (
 
-    <div
-      style={{
-        maxWidth: "1100px",
-        margin: "40px auto",
-        background: "#fff",
-        padding: "35px",
-        borderRadius: "20px",
-        boxShadow: "0 15px 35px rgba(0,0,0,.08)"
-      }}
-    >
+    <Layout>
 
-      <h1>ATS Resume Analyzer</h1>
-
-      <p style={{color:"#6b7280"}}>
-
-        Analyze your resume against any Job Description.
-
-      </p>
-
-      <textarea
-        rows="10"
-        value={resume}
-        placeholder="Paste Resume..."
-        onChange={(e)=>setResume(e.target.value)}
+      <div
         style={{
-          width:"100%",
-          marginTop:"25px",
-          padding:"15px",
-          borderRadius:"12px"
+          maxWidth: "1100px",
+          margin: "40px auto",
+          background: "#fff",
+          padding: "35px",
+          borderRadius: "20px",
+          boxShadow: "0 15px 35px rgba(0,0,0,.08)"
         }}
-      />
-
-      <textarea
-        rows="10"
-        value={jobDescription}
-        placeholder="Paste Job Description..."
-        onChange={(e)=>setJobDescription(e.target.value)}
-        style={{
-          width:"100%",
-          marginTop:"20px",
-          padding:"15px",
-          borderRadius:"12px"
-        }}
-      />
-
-      <button
-
-        onClick={analyze}
-
-        disabled={loading}
-
-        style={{
-
-          marginTop:"25px",
-
-          width:"100%",
-
-          padding:"16px",
-
-          border:"none",
-
-          borderRadius:"12px",
-
-          background:"#2563eb",
-
-          color:"#fff",
-
-          fontSize:"17px"
-
-        }}
-
       >
+
+        <h1>
+
+          ATS Resume Analyzer
+
+        </h1>
+
+        <p
+          style={{
+            color: "#6b7280"
+          }}
+        >
+
+          Analyze your uploaded resume against any Job Description.
+
+        </p>
+
+        <textarea
+          rows="10"
+          value={jobDescription}
+          placeholder="Paste Job Description..."
+          onChange={(e)=>setJobDescription(e.target.value)}
+          style={{
+            width:"100%",
+            marginTop:"25px",
+            padding:"15px",
+            borderRadius:"12px"
+          }}
+        />
+
+        <button
+
+          onClick={analyze}
+
+          disabled={loading}
+
+          style={{
+
+            marginTop:"25px",
+
+            width:"100%",
+
+            padding:"16px",
+
+            border:"none",
+
+            borderRadius:"12px",
+
+            background:"#2563eb",
+
+            color:"#fff",
+
+            fontSize:"17px",
+
+            cursor:"pointer"
+
+          }}
+
+        >
+
+          {
+
+            loading
+
+            ?
+
+            "Analyzing..."
+
+            :
+
+            "Check ATS Score"
+
+          }
+
+        </button>
 
         {
 
-          loading
-
-          ?
-
-          "Analyzing..."
-
-          :
-
-          "Analyze Resume"
-
-        }
-
-      </button>
-
-      {
-
-        result && (
-
-          <div
-
-            style={{
-
-              marginTop:"40px"
-
-            }}
-
-          >
-
-            <h2>
-
-              ATS Score
-
-            </h2>
+          result && (
 
             <div
 
               style={{
 
-                fontSize:"70px",
-
-                fontWeight:"bold",
-
-                color:"#2563eb"
+                marginTop:"40px"
 
               }}
 
             >
 
-              {score}%
+              <h2>
 
-            </div>
+                ATS Score
 
-            <div
-
-              style={{
-
-                width:"100%",
-
-                height:"15px",
-
-                background:"#e5e7eb",
-
-                borderRadius:"20px",
-
-                overflow:"hidden",
-
-                marginTop:"20px"
-
-              }}
-
-            >
+              </h2>
 
               <div
 
                 style={{
 
-                  width:`${score}%`,
+                  fontSize:"70px",
 
-                  height:"15px",
+                  fontWeight:"bold",
 
-                  background:
-
-                    score>=80
-
-                    ?"green"
-
-                    :
-
-                    score>=60
-
-                    ?"orange"
-
-                    :
-
-                    "red"
+                  color:"#2563eb"
 
                 }}
 
-              />
+              >
 
-            </div>
+                {score}%
 
-            <h3
+              </div>
 
-              style={{
+              <div
 
-                marginTop:"35px"
+                style={{
 
-              }}
+                  width:"100%",
 
-            >
+                  height:"15px",
 
-              Missing Skills
+                  background:"#e5e7eb",
 
-            </h3>
+                  borderRadius:"20px",
 
-            <div
+                  overflow:"hidden",
 
-              style={{
+                  marginTop:"20px"
 
-                display:"flex",
+                }}
 
-                flexWrap:"wrap",
+              >
 
-                gap:"12px"
+                <div
 
-              }}
+                  style={{
 
-            >
+                    width:`${score}%`,
 
-              {
+                    height:"15px",
 
-                result.missing_skills?.map(
+                    background:
 
-                  (skill,index)=>(
+                      score>=80
 
-                    <span
+                      ?"green"
 
-                      key={index}
+                      :
 
-                      style={{
+                      score>=60
 
-                        background:"#fee2e2",
+                      ?"orange"
 
-                        color:"#991b1b",
+                      :
 
-                        padding:"8px 15px",
+                      "red"
 
-                        borderRadius:"25px"
+                  }}
 
-                      }}
+                />
 
-                    >
+              </div>
 
-                      {skill}
+              <h3
 
-                    </span>
+                style={{
+
+                  marginTop:"35px"
+
+                }}
+
+              >
+
+                Missing Skills
+
+              </h3>
+
+              <div
+
+                style={{
+
+                  display:"flex",
+
+                  flexWrap:"wrap",
+
+                  gap:"12px"
+
+                }}
+
+              >
+
+                {
+
+                  result.missing_skills?.length
+
+                  ?
+
+                  result.missing_skills.map(
+
+                    (skill,index)=>(
+
+                      <span
+
+                        key={index}
+
+                        style={{
+
+                          background:"#fee2e2",
+
+                          color:"#991b1b",
+
+                          padding:"8px 15px",
+
+                          borderRadius:"25px"
+
+                        }}
+
+                      >
+
+                        {skill}
+
+                      </span>
+
+                    )
 
                   )
 
-                )
+                  :
 
-              }
+                  <span
+                    style={{
+                      color:"green",
+                      fontWeight:"bold"
+                    }}
+                  >
+                    No Missing Skills 🎉
+                  </span>
+
+                }
+
+              </div>
 
             </div>
 
-          </div>
+          )
 
-        )
+        }
 
-      }
+      </div>
 
-    </div>
+    </Layout>
 
   );
 

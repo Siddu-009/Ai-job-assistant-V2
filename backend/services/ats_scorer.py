@@ -1,69 +1,140 @@
-KNOWN_SKILLS = [
-    "aws",
-    "docker",
-    "kubernetes",
-    "terraform",
-    "jenkins",
-    "ansible",
-    "linux",
-    "github actions",
-    "git",
-    "python",
-    "prometheus",
-    "grafana",
-    "eks",
-    "ec2",
-    "s3",
-    "iam",
-    "route53",
-    "rds",
-    "argocd",
-    "helm",
-    "devops"
-]
+import re
+
+from services.ats_ai import extract_requirements
 
 
-def calculate_ats_score(
-    resume_text,
-    job_description
-):
+def normalize(text):
+    return re.sub(r"\s+", " ", text.lower())
 
-    resume_text = resume_text.lower()
-    job_description = job_description.lower()
+
+def exists(keyword, resume):
+
+    keyword = normalize(keyword)
+
+    resume = normalize(resume)
+
+    return keyword in resume
+
+
+def compare_list(items, resume):
 
     matched = []
     missing = []
 
-    for skill in KNOWN_SKILLS:
+    for item in items:
 
-        if skill in job_description:
+        if exists(item, resume):
 
-            if skill in resume_text:
-                matched.append(skill)
-            else:
-                missing.append(skill)
+            matched.append(item)
 
-    total = len(matched) + len(missing)
+        else:
 
-    score = 0
+            missing.append(item)
 
-    if total > 0:
-        score = int(
-            (len(matched) / total) * 100
-        )
+    return matched, missing
 
-    improvements = []
 
-    for skill in missing:
-        improvements.append(
-            f"Add project experience with {skill}"
-        )
+def calculate_ats_score(resume_text, job_description):
+
+    resume = normalize(resume_text)
+
+    requirements = extract_requirements(job_description)
+
+    matched = []
+    missing = []
+
+    sections = {}
+
+    total_items = 0
+
+    matched_items = 0
+
+    categories = [
+
+        "skills",
+        "tools",
+        "frameworks",
+        "soft_skills",
+        "certifications"
+
+    ]
+
+    for category in categories:
+
+        values = requirements.get(category, [])
+
+        m, ms = compare_list(values, resume)
+
+        sections[category] = {
+
+            "matched": m,
+
+            "missing": ms
+
+        }
+
+        matched.extend(m)
+
+        missing.extend(ms)
+
+        total_items += len(values)
+
+        matched_items += len(m)
+
+    if total_items == 0:
+
+        score = 0
+
+    else:
+
+        score = round((matched_items / total_items) * 100)
+
+    recommendations = []
+
+    for category in categories:
+
+        if sections[category]["missing"]:
+
+            recommendations.append(
+
+                f"Improve {category.replace('_',' ')}"
+
+            )
+
+    if score >= 90:
+
+        verdict = "Excellent ATS Match"
+
+    elif score >= 75:
+
+        verdict = "Good ATS Match"
+
+    elif score >= 60:
+
+        verdict = "Average ATS Match"
+
+    else:
+
+        verdict = "Needs Improvement"
 
     return {
+
+        "success": True,
+
+        "score": score,
+
         "ats_score": score,
+
+        "verdict": verdict,
+
         "matched_skills": matched,
+
         "missing_skills": missing,
-        "improvements": improvements,
-        "total_matched": len(matched),
-        "total_missing": len(missing)
+
+        "recommendations": recommendations,
+
+        "analysis": sections,
+
+        "requirements": requirements
+
     }

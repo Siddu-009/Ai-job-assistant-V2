@@ -22,7 +22,7 @@ export default function ResumeEnhancer() {
 
       const response = await fetch(
 
-        "/api/resume-recommend/",
+        "/api/ai-resume/",
 
         {
 
@@ -36,7 +36,10 @@ export default function ResumeEnhancer() {
 
           body: JSON.stringify({
 
-            resume
+            master_resume: resume,
+	    job_description:
+              "Improve this resume for ATS, readability, grammar, keywords and professional formatting."
+
 
           })
 
@@ -48,9 +51,7 @@ export default function ResumeEnhancer() {
 
       setEnhancedResume(
 
-        data.enhanced_resume ||
-
-        data.recommendations ||
+        data.optimized_resume ||
 
         JSON.stringify(data, null, 2)
 

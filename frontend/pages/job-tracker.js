@@ -1,282 +1,133 @@
 import { useEffect, useState } from "react";
+import Layout from "../components/Layout";
 
 export default function JobTracker() {
-
-  const [jobs, setJobs] = useState([]);
+  const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-
-    loadJobs();
-
+    loadApplications();
   }, []);
 
-  const loadJobs = async () => {
-
+  const loadApplications = async () => {
     try {
-
-      const token = localStorage.getItem("token");
-
-      const response = await fetch(
-
-        "/api/job-tracker/",
-
-        {
-
-          method: "POST",
-
-          headers: {
-
-            "Content-Type":"application/json"
-
-          },
-
-          body: JSON.stringify({
-
-            token
-
-          })
-
-        }
-
-      );
+      const response = await fetch("/api/job-tracker/list");
 
       const data = await response.json();
 
-      setJobs(
-
-        data.jobs ||
-
-        data ||
-
-        []
-
-      );
-
+      setApplications(Array.isArray(data) ? data : []);
+    } catch (err) {
+      console.error(err);
+      alert("Unable to load applications.");
+    } finally {
+      setLoading(false);
     }
-
-    catch{
-
-      alert("Unable to load Job Tracker.");
-
-    }
-
-    setLoading(false);
-
   };
 
-  const getColor=(status)=>{
-
-    switch(status){
-
+  const badgeColor = (status) => {
+    switch (status) {
       case "Applied":
         return "#2563eb";
 
-      case "Shortlisted":
-        return "#16a34a";
-
-      case "Interview":
+      case "Interview Scheduled":
         return "#f59e0b";
 
-      case "Offer":
-        return "#10b981";
+      case "Selected":
+        return "#16a34a";
 
       case "Rejected":
         return "#dc2626";
 
       default:
         return "#6b7280";
-
     }
-
   };
 
-  return(
-
-<div
-
-style={{
-
-maxWidth:"1300px",
-
-margin:"40px auto",
-
-background:"#fff",
-
-padding:"35px",
-
-borderRadius:"20px",
-
-boxShadow:"0 15px 35px rgba(0,0,0,.08)"
-
-}}
-
->
-
-<h1>
-
-Job Tracker
-
-</h1>
-
-<p
-
-style={{
-
-color:"#6b7280"
-
-}}
-
->
-
-Track every job application in one place.
-
-</p>
-
-{
-
-loading &&
-
-<p>
-
-Loading...
-
-</p>
-
-}
-
-{
-
-!loading && jobs.length===0 &&
-
-<p>
-
-No Applications Found.
-
-</p>
-
-}
-
-{
-
-jobs.map((job,index)=>(
-
-<div
-
-key={index}
-
-style={{
-
-marginTop:"25px",
-
-padding:"25px",
-
-border:"1px solid #e5e7eb",
-
-borderRadius:"15px"
-
-}}
-
->
-
-<div
-
-style={{
-
-display:"flex",
-
-justifyContent:"space-between",
-
-alignItems:"center"
-
-}}
-
->
-
-<div>
-
-<h2>
-
-{job.title}
-
-</h2>
-
-<p>
-
-🏢 {job.company}
-
-</p>
-
-<p>
-
-📍 {job.location}
-
-</p>
-
-</div>
-
-<div
-
-style={{
-
-padding:"10px 18px",
-
-borderRadius:"20px",
-
-background:getColor(job.status),
-
-color:"#fff",
-
-fontWeight:"bold"
-
-}}
-
->
-
-{job.status}
-
-</div>
-
-</div>
-
-<div
-
-style={{
-
-marginTop:"20px"
-
-}}
-
->
-
-<p>
-
-📅 Applied Date: {job.applied_date}
-
-</p>
-
-<p>
-
-📅 Next Interview: {job.interview_date || "Not Scheduled"}
-
-</p>
-
-<p>
-
-📝 Notes: {job.notes || "No Notes"}
-
-</p>
-
-</div>
-
-</div>
-
-))
-
-}
-
-</div>
-
-);
-
+  return (
+    <Layout>
+      <div
+        style={{
+          padding: "30px"
+        }}
+      >
+        <h1>Job Tracker</h1>
+
+        <p
+          style={{
+            color: "#6b7280",
+            marginBottom: "30px"
+          }}
+        >
+          Track all your job applications.
+        </p>
+
+        {loading && <p>Loading...</p>}
+
+        {!loading && applications.length === 0 && (
+          <p>No applications found.</p>
+        )}
+           {applications.map((app) => (
+          <div
+            key={app.application_id}
+            style={{
+              background: "#ffffff",
+              border: "1px solid #e5e7eb",
+              borderRadius: "15px",
+              padding: "20px",
+              marginBottom: "20px",
+              boxShadow: "0 8px 20px rgba(0,0,0,.05)"
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                flexWrap: "wrap",
+                gap: "15px"
+              }}
+            >
+              <div>
+                <h2
+                  style={{
+                    margin: 0
+                  }}
+                >
+                  {app.job_title}
+                </h2>
+
+                <p
+                  style={{
+                    marginTop: "8px"
+                  }}
+                >
+                  🏢 {app.company}
+                </p>
+
+                <p>
+                  📄 Resume: {app.resume}
+                </p>
+
+                <p>
+                  📅 Applied: {app.applied_at}
+                </p>
+              </div>
+
+              <span
+                style={{
+                  background: badgeColor(app.status),
+                  color: "#ffffff",
+                  padding: "10px 18px",
+                  borderRadius: "25px",
+                  fontWeight: "bold"
+                }}
+              >
+                {app.status}
+              </span>
+            </div>
+          </div>
+        ))}
+      </div>
+    </Layout>
+  );
 }

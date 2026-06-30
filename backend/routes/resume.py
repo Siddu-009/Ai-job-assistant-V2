@@ -1,6 +1,7 @@
-from fastapi import APIRouter, UploadFile, File
+from fastapi import APIRouter, UploadFile, File, Form, HTTPException
 from services.parser import extract_text_from_pdf
 from services.skills import extract_skills
+from services.token_service import decode_token
 from database import SessionLocal
 from sqlalchemy import text
 import os
@@ -12,36 +13,81 @@ os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 
 @router.post("/upload")
-async def upload_resume(file: UploadFile = File(...)):
-    filepath = os.path.join(UPLOAD_DIR, file.filename)
+async def upload_resume(
+    token: str = Form(...),
+    file: UploadFile = File(...)
+):
+
+    payload = decode_token(token)
+
+    if not payload:
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid or expired token"
+        )
+
+    user_id = payload["user_id"]
+
+    filepath = os.path.join(
+        UPLOAD_DIR,
+        file.filename
+    )
 
     with open(filepath, "wb") as buffer:
         buffer.write(await file.read())
 
     resume_text = extract_text_from_pdf(filepath)
+
     skills = extract_skills(resume_text)
 
     db = SessionLocal()
 
-    db.execute(
-        text(
-            """
-            INSERT INTO resumes (filename, resume_text, skills)
-            VALUES (:filename, :resume_text, :skills)
-            """
-        ),
-        {
+    try:
+
+        db.execute(
+            text("""
+                INSERT INTO resumes
+                (
+                    user_id,
+                    filename,
+                    resume_text,
+                    skills
+                )
+                VALUES
+                (
+                    :user_id,
+                    :filename,
+                    :resume_text,
+                    :skills
+                )
+            """),
+            {
+                "user_id": user_id,
+                "filename": file.filename,
+                "resume_text": resume_text,
+                "skills": ",".join(skills)
+            }
+        )
+
+        db.commit()
+
+        return {
+            "success": True,
+            "message": "Resume uploaded successfully",
             "filename": file.filename,
             "resume_text": resume_text,
-            "skills": ",".join(skills)
+            "skills": skills
         }
-    )
 
-    db.commit()
-    db.close()
+    except Exception as e:
 
-    return {
-        "filename": file.filename,
-        "skills": skills,
-        "message": "Resume saved successfully"
-    }
+        db.rollback()
+
+        raise HTTPException(
+            status_code=500,
+            detail=str(e)
+        )
+
+    finally:
+
+        db.close()

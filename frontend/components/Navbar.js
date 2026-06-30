@@ -104,8 +104,8 @@ export default function Navbar({
   const toggleCollapsed = () => setCollapsed((v) => !v);
 
   const logout = () => {
-    localStorage.removeItem("token");
-    router.push("/login");
+    localStorage.clear();
+    router.replace("/login");
   };
 
   return (

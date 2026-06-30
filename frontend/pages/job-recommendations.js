@@ -38,10 +38,6 @@ export default function JobRecommendations() {
 
           body: JSON.stringify({
 
-            token,
-
-            search,
-
             location
 
           })
@@ -51,6 +47,14 @@ export default function JobRecommendations() {
       );
 
       const data = await response.json();
+
+      if (!response.ok) {
+
+	  alert(data.message || "Unable to load jobs");
+
+	  return;
+
+      }
 
       setJobs(data.recommended_jobs || []);
 

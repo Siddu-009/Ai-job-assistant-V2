@@ -17,6 +17,14 @@ export default function Applications() {
 
       const token = localStorage.getItem("token");
 
+      if (!token) {
+
+ 	  window.location.href = "/login";
+
+	  return;
+
+      }
+
       const response = await fetch(
 
         "/api/applications/my-applications",
@@ -43,7 +51,17 @@ export default function Applications() {
 
       const data = await response.json();
 
-      setApplications(data || []);
+      if (!response.ok) {
+
+	  console.error(data);
+
+	  setApplications([]);
+
+	  return;
+
+      }
+
+      setApplications(data);
 
     }
 
@@ -263,7 +281,7 @@ export default function Applications() {
 
                 >
 
-                  {app.title}
+		  {app.job_title}
 
                 </h3>
 

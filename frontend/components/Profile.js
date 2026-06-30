@@ -43,6 +43,12 @@ export default function Profile() {
 
       const data = await response.json();
 
+      if (!response.ok) {
+	  alert(data.detail || data.message || "Unable to load profile.");
+	  return;
+      }
+
+      setProfile(data);
       setProfile(data);
 
     }

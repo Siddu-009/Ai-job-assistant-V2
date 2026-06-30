@@ -17,6 +17,14 @@ export default function SavedJobs() {
 
       const token = localStorage.getItem("token");
 
+      if (!token) {
+
+ 	  window.location.href = "/login";
+
+	  return;
+
+      }
+
       const response = await fetch(
 
         `/api/saved-jobs/${token}`
@@ -25,7 +33,17 @@ export default function SavedJobs() {
 
       const data = await response.json();
 
-      setJobs(data || []);
+      if (!response.ok) {
+
+	  console.error(data);
+
+	  setJobs([]);
+
+	  return;
+
+      }
+
+      setJobs(data);
 
     }
 

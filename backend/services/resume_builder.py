@@ -1,10 +1,8 @@
 from reportlab.platypus import (
     SimpleDocTemplate,
     Paragraph,
-    Spacer,
-    PageBreak
+    Spacer
 )
-
 from reportlab.lib.styles import getSampleStyleSheet
 
 
@@ -12,13 +10,12 @@ def build_resume(
     name,
     email,
     phone,
-    linkedin,
-    github,
+    location,
     summary,
     skills,
-    projects,
-    certifications,
     education,
+    experience,
+    projects,
     output_file
 ):
 
@@ -32,177 +29,123 @@ def build_resume(
 
     styles = getSampleStyleSheet()
 
-    content = []
+    story = []
 
-    # HEADER
+    # Header
 
-    content.append(
+    story.append(
         Paragraph(
-            f"<b>{name}</b>",
+            f"<b><font size=18>{name}</font></b>",
             styles["Title"]
         )
     )
 
-    content.append(
+    story.append(
         Paragraph(
             f"{email} | {phone}",
             styles["Normal"]
         )
     )
 
-    content.append(
-        Paragraph(
-            linkedin,
-            styles["Normal"]
+    if location:
+
+        story.append(
+            Paragraph(
+                location,
+                styles["Normal"]
+            )
         )
-    )
 
-    content.append(
-        Paragraph(
-            github,
-            styles["Normal"]
-        )
-    )
+    story.append(Spacer(1, 12))
 
-    content.append(
-        Spacer(1, 10)
-    )
+    # Summary
 
-    # SUMMARY
-
-    content.append(
+    story.append(
         Paragraph(
             "<b>PROFESSIONAL SUMMARY</b>",
             styles["Heading2"]
         )
     )
 
-    content.append(
+    story.append(
         Paragraph(
-            summary,
+            summary.replace("\n", "<br/>"),
             styles["Normal"]
         )
     )
 
-    content.append(
-        Spacer(1, 8)
-    )
+    story.append(Spacer(1, 10))
 
-    # SKILLS
+    # Skills
 
-    content.append(
+    story.append(
         Paragraph(
             "<b>TECHNICAL SKILLS</b>",
             styles["Heading2"]
         )
     )
 
-    skills_text = """
-<b>DevOps & CI/CD:</b> Jenkins, Git, GitHub, Maven, SonarQube, Nexus, ArgoCD<br/><br/>
-
-<b>Cloud Platform:</b> AWS (EC2, S3, IAM, VPC, RDS, Route53, EKS, CloudWatch)<br/><br/>
-
-<b>Containers:</b> Docker, Kubernetes, Helm, Kustomize<br/><br/>
-
-<b>Infrastructure as Code:</b> Terraform, Ansible<br/><br/>
-
-<b>Monitoring:</b> Prometheus, Grafana, CloudWatch<br/><br/>
-
-<b>Operating Systems:</b> Linux (Ubuntu, RHEL), Bash Scripting
-"""
-
-    content.append(
+    story.append(
         Paragraph(
-            skills_text,
+            skills.replace("\n", "<br/>"),
             styles["Normal"]
         )
     )
 
-    content.append(
-        Spacer(1, 8)
-    )
+    story.append(Spacer(1, 10))
 
-    # PROJECTS
+    # Experience
 
-    content.append(
+    if experience.strip():
+
+        story.append(
+            Paragraph(
+                "<b>EXPERIENCE</b>",
+                styles["Heading2"]
+            )
+        )
+
+        story.append(
+            Paragraph(
+                experience.replace("\n", "<br/>"),
+                styles["Normal"]
+            )
+        )
+
+        story.append(Spacer(1, 10))
+
+    # Projects
+
+    story.append(
         Paragraph(
             "<b>PROJECTS</b>",
             styles["Heading2"]
         )
     )
 
-    project_1 = """
-<b>CI/CD Pipeline for E-Commerce Application</b><br/>
-• Built Jenkins CI/CD pipeline for automated deployments<br/>
-• Automated AWS infrastructure using Terraform<br/>
-• Configured Ansible deployments on Linux servers<br/>
-• Implemented Prometheus & Grafana monitoring
-"""
-
-    project_2 = """
-<b>Kubernetes-based Microservices Deployment</b><br/>
-• Provisioned AWS EKS cluster using Terraform<br/>
-• Built and deployed Docker-based microservices<br/>
-• Implemented Helm and ArgoCD GitOps workflows<br/>
-• Configured Kubernetes autoscaling and monitoring
-"""
-
-    content.append(
+    story.append(
         Paragraph(
-            project_1,
+            projects.replace("\n", "<br/>"),
             styles["Normal"]
         )
     )
 
-    content.append(
-        Spacer(1, 5)
-    )
+    story.append(Spacer(1, 10))
 
-    content.append(
-        Paragraph(
-            project_2,
-            styles["Normal"]
-        )
-    )
+    # Education
 
-    content.append(
-        Spacer(1, 8)
-    )
-
-    # EDUCATION
-
-    content.append(
+    story.append(
         Paragraph(
             "<b>EDUCATION</b>",
             styles["Heading2"]
         )
     )
 
-    content.append(
+    story.append(
         Paragraph(
-            education,
+            education.replace("\n", "<br/>"),
             styles["Normal"]
         )
     )
 
-    content.append(
-        Spacer(1, 8)
-    )
-
-    # CERTIFICATIONS
-
-    content.append(
-        Paragraph(
-            "<b>CERTIFICATIONS</b>",
-            styles["Heading2"]
-        )
-    )
-
-    content.append(
-        Paragraph(
-            certifications,
-            styles["Normal"]
-        )
-    )
-
-    doc.build(content)
+    doc.build(story)

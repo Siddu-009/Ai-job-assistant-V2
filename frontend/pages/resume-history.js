@@ -6,36 +6,18 @@ export default function ResumeHistory() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+
     loadHistory();
+
   }, []);
 
   const loadHistory = async () => {
 
     try {
 
-      const token = localStorage.getItem("token");
-
       const response = await fetch(
 
-        "/api/resume-history/",
-
-        {
-
-          method: "POST",
-
-          headers: {
-
-            "Content-Type":"application/json"
-
-          },
-
-          body: JSON.stringify({
-
-            token
-
-          })
-
-        }
+        "/api/resume-history/"
 
       );
 
@@ -43,23 +25,31 @@ export default function ResumeHistory() {
 
       setHistory(
 
-        data.history || data || []
+        Array.isArray(data)
+
+        ? data
+
+        : data.history || []
 
       );
 
     }
 
-    catch{
+    catch {
 
       alert("Unable to load history.");
 
     }
 
-    setLoading(false);
+    finally {
+
+      setLoading(false);
+
+    }
 
   };
 
-  const openResume = (id)=>{
+  const openResume = (id) => {
 
     window.open(
 
@@ -71,182 +61,181 @@ export default function ResumeHistory() {
 
   };
 
-  return(
+  return (
 
-<div
+    <div
 
-style={{
+      style={{
 
-maxWidth:"1200px",
+        maxWidth:"1200px",
 
-margin:"40px auto",
+        margin:"40px auto",
 
-background:"#fff",
+        background:"#fff",
 
-padding:"35px",
+        padding:"35px",
 
-borderRadius:"20px",
+        borderRadius:"20px",
 
-boxShadow:"0 15px 35px rgba(0,0,0,.08)"
+        boxShadow:"0 15px 35px rgba(0,0,0,.08)"
 
-}}
+      }}
 
->
+    >
 
-<h1>
+      <h1>
 
-Resume History
+        Resume History
 
-</h1>
+      </h1>
 
-<p
+      <p
 
-style={{
+        style={{
 
-color:"#6b7280"
+          color:"#6b7280"
 
-}}
+        }}
 
->
+      >
 
-All Generated Resumes
+        All Generated Resumes
 
-</p>
+      </p>
 
-{
+      {
 
-loading &&
+        loading &&
 
-<p>
+        <p>
 
-Loading...
+          Loading...
 
-</p>
+        </p>
 
-}
+      }
 
-{
+      {
 
-!loading && history.length===0 &&
+        !loading && history.length===0 &&
 
-<p>
+        <p>
 
-No Resume History Found
+          No Resume History Found
 
-</p>
+        </p>
 
-}
+      }
 
-{
+      {
 
-history.map((resume)=>(
+        history.map((resume)=>(
 
-<div
+          <div
 
-key={resume.id}
+            key={resume.id}
 
-style={{
+            style={{
 
-border:"1px solid #e5e7eb",
+              border:"1px solid #e5e7eb",
 
-borderRadius:"15px",
+              borderRadius:"15px",
 
-padding:"20px",
+              padding:"20px",
 
-marginTop:"20px"
+              marginTop:"20px"
 
-}}
+            }}
 
->
+          >
 
-<div
+            <div
 
-style={{
+              style={{
 
-display:"flex",
+                display:"flex",
 
-justifyContent:"space-between",
+                justifyContent:"space-between",
 
-alignItems:"center"
+                alignItems:"center"
 
-}}
+              }}
 
->
+            >
 
-<div>
+              <div>
 
-<h3>
+                <h3>
 
-{resume.title || "Generated Resume"}
+                  {resume.filename || "Resume"}
 
-</h3>
+                </h3>
 
-<p>
+                <p>
 
-Version:
+                  Skills:
 
-{" "}
+                  {" "}
 
-{resume.version || 1}
+                  {resume.skills || "N/A"}
 
-</p>
+                </p>
 
-<p>
+                <p>
 
-Created:
+                  Created:
 
-{" "}
+                  {" "}
 
-{resume.created_at}
+                  {resume.created_at}
 
-</p>
+                </p>
 
-</div>
+              </div>
+              <button
 
-<button
+                onClick={() =>
 
-onClick={()=>
+                  openResume(
 
-openResume(
+                    resume.id
 
-resume.id
+                  )
 
-)
+                }
 
-}
+                style={{
 
-style={{
+                  padding:"12px 20px",
 
-padding:"12px 20px",
+                  border:"none",
 
-border:"none",
+                  background:"#2563eb",
 
-background:"#2563eb",
+                  color:"#fff",
 
-color:"#fff",
+                  borderRadius:"10px",
 
-borderRadius:"10px",
+                  cursor:"pointer"
 
-cursor:"pointer"
+                }}
 
-}}
+              >
 
->
+                View Resume
 
-View Resume
+              </button>
 
-</button>
+            </div>
 
-</div>
+          </div>
 
-</div>
+        ))
 
-))
+      }
 
-}
+    </div>
 
-</div>
-
-);
+  );
 
 }

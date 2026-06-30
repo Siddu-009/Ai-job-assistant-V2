@@ -124,8 +124,8 @@ href:"/interview-questions",
 icon:ClipboardList
 },
 {
-label:"Mock Interview",
-href:"/mock-interview",
+label:"Mock Test",
+href:"/mock-test",
 icon:ClipboardList
 },
 {

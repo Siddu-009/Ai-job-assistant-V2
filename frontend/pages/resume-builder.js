@@ -19,6 +19,10 @@ export default function ResumeBuilder() {
   const [loading,setLoading]=useState(false);
 
   const [message,setMessage]=useState("");
+  
+  const [viewUrl, setViewUrl] = useState("");
+
+  const [downloadUrl, setDownloadUrl] = useState("");
 
   const update=(key,value)=>{
 
@@ -61,14 +65,12 @@ export default function ResumeBuilder() {
       );
 
       const data=await response.json();
+      
+      setMessage(data.message);
 
-      setMessage(
+      setViewUrl(data.view_url);
 
-        data.message ||
-
-        "Resume Generated Successfully"
-
-      );
+      setDownloadUrl(data.download_url);
 
     }
 
@@ -273,28 +275,72 @@ loading
 </button>
 
 {
-
 message &&
 
 <div
-
 style={{
-
 marginTop:"20px",
-
-padding:"15px",
-
+padding:"20px",
 background:"#dcfce7",
-
-borderRadius:"12px",
-
-color:"#166534"
-
+borderRadius:"12px"
 }}
+>
 
+<div
+style={{
+fontWeight:"600",
+color:"#166534",
+marginBottom:"15px"
+}}
 >
 
 {message}
+
+</div>
+
+<div
+style={{
+display:"flex",
+gap:"15px"
+}}
+>
+
+<a
+href={viewUrl}
+target="_blank"
+rel="noopener noreferrer"
+style={{
+padding:"12px 24px",
+background:"#2563eb",
+color:"#fff",
+borderRadius:"10px",
+textDecoration:"none",
+fontWeight:"600"
+}}
+>
+
+View Resume
+
+</a>
+
+<a
+href={downloadUrl}
+download
+style={{
+padding:"12px 24px",
+background:"#16a34a",
+color:"#fff",
+borderRadius:"10px",
+textDecoration:"none",
+fontWeight:"600"
+}}
+>
+
+Download Resume
+
+</a>
+
+</div>
 
 </div>
 

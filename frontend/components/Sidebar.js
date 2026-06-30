@@ -40,8 +40,8 @@ export default function Sidebar({ collapsed, setCollapsed }) {
   };
 
   const logout = () => {
-    localStorage.removeItem("token");
-    router.push("/login");
+    localStorage.clear();
+    router.replace("/login");
   };
 
   // Shared icon-button style

@@ -47,6 +47,16 @@ export default function RecommendedJobs() {
 
       const data = await response.json();
 
+      if (!response.ok) {
+
+ 	  console.error(data);
+
+	  setJobs([]);
+
+	  return;
+
+      }
+
       setJobs(
 
         data.recommended_jobs || []
@@ -58,8 +68,6 @@ export default function RecommendedJobs() {
     catch (error) {
 
       console.error(error);
-
-      alert("Unable to load recommended jobs.");
 
     }
 

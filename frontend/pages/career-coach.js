@@ -22,7 +22,7 @@ export default function CareerCoach() {
 
       const res = await fetch(
 
-        "/api/career-roadmap/",
+        "/api/career-coach/",
 
         {
 

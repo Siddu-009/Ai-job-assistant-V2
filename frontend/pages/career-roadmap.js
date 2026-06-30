@@ -3,15 +3,24 @@ import { useState } from "react";
 export default function CareerRoadmap() {
 
   const [role, setRole] = useState("");
-  const [skills, setSkills] = useState("");
   const [roadmap, setRoadmap] = useState(null);
   const [loading, setLoading] = useState(false);
 
   const generateRoadmap = async () => {
 
-    if (!role || !skills) {
+    if (!role) {
 
-      alert("Please enter your target role and current skills.");
+      alert("Please enter your target role.");
+
+      return;
+
+    }
+
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+
+      window.location.href = "/login";
 
       return;
 
@@ -37,9 +46,11 @@ export default function CareerRoadmap() {
 
           body: JSON.stringify({
 
-            role,
+            token,
 
-            skills
+            resume_id: 3,
+
+            target_role: role
 
           })
 
@@ -49,17 +60,25 @@ export default function CareerRoadmap() {
 
       const data = await response.json();
 
+      console.log(data);
+
       setRoadmap(data);
 
     }
 
-    catch {
+    catch (err) {
+
+      console.error(err);
 
       alert("Unable to generate roadmap.");
 
     }
 
-    setLoading(false);
+    finally {
+
+      setLoading(false);
+
+    }
 
   };
 
@@ -83,22 +102,14 @@ export default function CareerRoadmap() {
           color: "#6b7280"
         }}
       >
-        Generate your personalized learning roadmap.
+        Generate your personalized AI career roadmap based on your uploaded resume.
       </p>
 
       <input
         placeholder="Target Role (Example: DevOps Engineer)"
         value={role}
-        onChange={(e)=>setRole(e.target.value)}
+        onChange={(e) => setRole(e.target.value)}
         style={input}
-      />
-
-      <textarea
-        rows="6"
-        placeholder="Current Skills (comma separated)"
-        value={skills}
-        onChange={(e)=>setSkills(e.target.value)}
-        style={textarea}
       />
 
       <button
@@ -106,42 +117,70 @@ export default function CareerRoadmap() {
         disabled={loading}
         style={button}
       >
-        {loading ? "Generating..." : "Generate Roadmap"}
+
+        {
+
+          loading
+
+            ? "Generating..."
+
+            : "Generate Roadmap"
+
+        }
+
       </button>
 
-      {roadmap && (
+      {
 
-        <div
-          style={{
-            marginTop: "35px"
-          }}
-        >
-
-          <h2>Your Career Roadmap</h2>
+        roadmap && (
 
           <div
             style={{
-              marginTop: "20px",
-              background: "#f8fafc",
-              padding: "20px",
-              borderRadius: "12px"
+              marginTop: "35px"
             }}
           >
 
-            <pre
+            <h2>Your Career Roadmap</h2>
+
+            <div
               style={{
-                whiteSpace: "pre-wrap",
-                fontFamily: "inherit"
+                marginTop: "20px",
+                background: "#f8fafc",
+                padding: "20px",
+                borderRadius: "12px",
+                border: "1px solid #e5e7eb"
               }}
             >
-              {JSON.stringify(roadmap, null, 2)}
-            </pre>
+
+              <pre
+                style={{
+                  whiteSpace: "pre-wrap",
+                  wordBreak: "break-word",
+                  fontFamily: "inherit",
+                  fontSize: "15px",
+                  lineHeight: "1.7"
+                }}
+              >
+
+                {
+
+                  roadmap.roadmap
+
+                    ? roadmap.roadmap
+
+                    : JSON.stringify(roadmap, null, 2)
+
+                }
+
+              </pre>
+
+            </div>
 
           </div>
 
-        </div>
+        )
 
-      )}
+      }
 
     </div>
 
@@ -159,21 +198,9 @@ const input = {
 
   borderRadius: "10px",
 
-  border: "1px solid #d1d5db"
+  border: "1px solid #d1d5db",
 
-};
-
-const textarea = {
-
-  width: "100%",
-
-  padding: "14px",
-
-  marginTop: "20px",
-
-  borderRadius: "10px",
-
-  border: "1px solid #d1d5db"
+  fontSize: "15px"
 
 };
 

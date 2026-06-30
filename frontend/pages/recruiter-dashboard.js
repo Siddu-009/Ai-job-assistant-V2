@@ -1,186 +1,198 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import Layout from "../components/Layout";
 
 export default function RecruiterDashboard() {
+  const [stats, setStats] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  const [query, setQuery] = useState("");
-  const [candidates, setCandidates] = useState([]);
-  const [loading, setLoading] = useState(false);
+  useEffect(() => {
+    loadDashboard();
+  }, []);
 
-  const searchCandidates = async () => {
-
-    if (!query) {
-      alert("Enter skill or job title");
-      return;
-    }
-
-    setLoading(true);
-
+  const loadDashboard = async () => {
     try {
-
-      const response = await fetch(
-
-        "/api/recruiter-search/",
-
-        {
-
-          method: "POST",
-
-          headers: {
-
-            "Content-Type":"application/json"
-
-          },
-
-          body: JSON.stringify({
-
-            search: query
-
-          })
-
-        }
-
-      );
+      const response = await fetch("/api/recruiter-dashboard/");
 
       const data = await response.json();
 
-      setCandidates(data.results || data || []);
-
+      setStats(data);
+    } catch (error) {
+      console.error(error);
+      alert("Unable to load recruiter dashboard.");
+    } finally {
+      setLoading(false);
     }
-
-    catch{
-
-      alert("Search Failed");
-
-    }
-
-    setLoading(false);
-
   };
 
-  return(
+  const Card = ({ title, value, color }) => (
+    <div
+      style={{
+        background: "#ffffff",
+        padding: "25px",
+        borderRadius: "18px",
+        boxShadow: "0 10px 25px rgba(0,0,0,.08)",
+        borderTop: `5px solid ${color}`
+      }}
+    >
+      <h3
+        style={{
+          margin: 0,
+          color: "#6b7280",
+          fontWeight: 500
+        }}
+      >
+        {title}
+      </h3>
 
-<div
-style={{
-maxWidth:"1200px",
-margin:"40px auto",
-background:"#fff",
-padding:"35px",
-borderRadius:"20px",
-boxShadow:"0 15px 35px rgba(0,0,0,.08)"
-}}
->
+      <h1
+        style={{
+          marginTop: "20px",
+          color,
+          fontSize: "42px"
+        }}
+      >
+        {value}
+      </h1>
+    </div>
+  );
 
-<h1>
+  return (
+    <Layout>
+      <div
+        style={{
+          padding: "30px"
+        }}
+      >
+        <h1>Recruiter Dashboard</h1>
 
-Recruiter Dashboard
+        <p
+          style={{
+            color: "#6b7280",
+            marginBottom: "30px"
+          }}
+        >
+          View recruitment statistics.
+        </p>
 
-</h1>
+        {loading && <p>Loading...</p>}
 
-<p
-style={{
-color:"#6b7280"
-}}
->
+        {!loading && stats && (
+          <>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns:
+                  "repeat(auto-fit,minmax(220px,1fr))",
+                gap: "20px"
+              }}
+            >
+              <Card
+                title="Total Resumes"
+                value={stats.total_resumes}
+                color="#2563eb"
+              />
 
-Search candidates by skills.
+              <Card
+                title="Total Jobs"
+                value={stats.total_jobs}
+                color="#16a34a"
+              />
 
-</p>
+              <Card
+                title="Applications"
+                value={stats.total_applications}
+                color="#7c3aed"
+              />
+	                  <Card
+                title="Applied"
+                value={stats.applied}
+                color="#f59e0b"
+              />
 
-<div
-style={{
-display:"flex",
-gap:"15px",
-marginTop:"25px"
-}}
->
+              <Card
+                title="Interview Scheduled"
+                value={stats.interview_scheduled}
+                color="#8b5cf6"
+              />
 
-<input
+              <Card
+                title="Selected"
+                value={stats.selected}
+                color="#10b981"
+              />
 
-placeholder="AWS, Docker, Kubernetes..."
+              <Card
+                title="Rejected"
+                value={stats.rejected}
+                color="#dc2626"
+              />
+            </div>
 
-value={query}
+            <div
+              style={{
+                marginTop: "40px",
+                background: "#ffffff",
+                padding: "30px",
+                borderRadius: "18px",
+                boxShadow: "0 10px 25px rgba(0,0,0,.08)"
+              }}
+            >
+              <h2>Recruitment Summary</h2>
 
-onChange={(e)=>setQuery(e.target.value)}
+              <table
+                style={{
+                  width: "100%",
+                  borderCollapse: "collapse",
+                  marginTop: "25px"
+                }}
+              >
+                <tbody>
+                  <tr>
+                    <td style={cell}>Total Resumes</td>
+                    <td style={cell}>{stats.total_resumes}</td>
+                  </tr>
 
-style={{
-flex:1,
-padding:"14px",
-borderRadius:"10px",
-border:"1px solid #d1d5db"
-}}
+                  <tr>
+                    <td style={cell}>Total Jobs</td>
+                    <td style={cell}>{stats.total_jobs}</td>
+                  </tr>
 
-/>
+                  <tr>
+                    <td style={cell}>Applications</td>
+                    <td style={cell}>{stats.total_applications}</td>
+                  </tr>
 
-<button
+                  <tr>
+                    <td style={cell}>Applied</td>
+                    <td style={cell}>{stats.applied}</td>
+                  </tr>
 
-onClick={searchCandidates}
+                  <tr>
+                    <td style={cell}>Interview Scheduled</td>
+                    <td style={cell}>{stats.interview_scheduled}</td>
+                  </tr>
 
-style={{
-padding:"14px 25px",
-background:"#2563eb",
-color:"#fff",
-border:"none",
-borderRadius:"10px",
-cursor:"pointer"
-}}
+                  <tr>
+                    <td style={cell}>Selected</td>
+                    <td style={cell}>{stats.selected}</td>
+                  </tr>
 
->
-
-{loading?"Searching...":"Search"}
-
-</button>
-
-</div>
-
-{
-
-candidates.map((candidate,index)=>(
-
-<div
-
-key={index}
-
-style={{
-marginTop:"25px",
-padding:"20px",
-border:"1px solid #e5e7eb",
-borderRadius:"15px"
-}}
-
->
-
-<h2>
-
-{candidate.name}
-
-</h2>
-
-<p>
-
-📧 {candidate.email}
-
-</p>
-
-<p>
-
-💼 {candidate.skills}
-
-</p>
-
-<p>
-
-⭐ Match Score: {candidate.match_score}%
-
-</p>
-
-</div>
-
-))
-
+                  <tr>
+                    <td style={cell}>Rejected</td>
+                    <td style={cell}>{stats.rejected}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </>
+        )}
+      </div>
+    </Layout>
+  );
 }
 
-</div>
-
-);
-
-}
+const cell = {
+  padding: "15px",
+  borderBottom: "1px solid #e5e7eb",
+  fontSize: "15px"
+};

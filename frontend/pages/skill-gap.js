@@ -2,16 +2,16 @@ import { useState } from "react";
 
 export default function SkillGap() {
 
-  const [role, setRole] = useState("");
-  const [skills, setSkills] = useState("");
+  const [resume, setResume] = useState("");
+  const [jobDescription, setJobDescription] = useState("");
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
 
   const analyze = async () => {
 
-    if (!role || !skills) {
+    if (!resume || !jobDescription) {
 
-      alert("Please enter target role and current skills.");
+      alert("Please paste Resume and Job Description.");
 
       return;
 
@@ -31,15 +31,15 @@ export default function SkillGap() {
 
           headers: {
 
-            "Content-Type":"application/json"
+            "Content-Type": "application/json"
 
           },
 
           body: JSON.stringify({
 
-            target_role: role,
+            resume_text: resume,
 
-            current_skills: skills
+            job_description: jobDescription
 
           })
 
@@ -49,282 +49,165 @@ export default function SkillGap() {
 
       const data = await response.json();
 
+      console.log(data);
+
       setResult(data);
 
     }
 
-    catch{
+    catch (err) {
+
+      console.error(err);
 
       alert("Unable to analyze skill gap.");
 
     }
 
-    setLoading(false);
+    finally {
+
+      setLoading(false);
+
+    }
 
   };
 
-  return(
+  return (
 
-<div
+    <div
+      style={{
+        maxWidth: "1100px",
+        margin: "40px auto",
+        background: "#fff",
+        padding: "35px",
+        borderRadius: "20px",
+        boxShadow: "0 15px 35px rgba(0,0,0,.08)"
+      }}
+    >
 
-style={{
+      <h1>AI Skill Gap Analyzer</h1>
 
-maxWidth:"1100px",
+      <p
+        style={{
+          color:"#6b7280"
+        }}
+      >
+        Compare your resume against a Job Description.
+      </p>
 
-margin:"40px auto",
+      <textarea
+        rows="10"
+        placeholder="Paste Resume Here..."
+        value={resume}
+        onChange={(e)=>setResume(e.target.value)}
+        style={textarea}
+      />
 
-background:"#fff",
+      <textarea
+        rows="10"
+        placeholder="Paste Job Description Here..."
+        value={jobDescription}
+        onChange={(e)=>setJobDescription(e.target.value)}
+        style={textarea}
+      />
 
-padding:"35px",
+      <button
+        onClick={analyze}
+        disabled={loading}
+        style={button}
+      >
 
-borderRadius:"20px",
+        {
 
-boxShadow:"0 15px 35px rgba(0,0,0,.08)"
+          loading
 
-}}
+            ? "Analyzing..."
 
->
+            : "Analyze Skill Gap"
 
-<h1>
+        }
 
-AI Skill Gap Analyzer
+      </button>
 
-</h1>
+      {
 
-<p
+        result &&
 
-style={{
+        <div
+          style={{
+            marginTop:"35px"
+          }}
+        >
 
-color:"#6b7280"
+          <h2>Skill Gap Result</h2>
 
-}}
+          <div
+            style={{
+              background:"#f8fafc",
+              padding:"20px",
+              borderRadius:"12px",
+              border:"1px solid #e5e7eb"
+            }}
+          >
 
->
+            <pre
+              style={{
+                whiteSpace:"pre-wrap",
+                wordBreak:"break-word",
+                fontFamily:"inherit",
+                lineHeight:"1.7"
+              }}
+            >
 
-Compare your skills with your dream job.
+              {JSON.stringify(result,null,2)}
 
-</p>
+            </pre>
 
-<input
+          </div>
 
-placeholder="Target Role"
+        </div>
 
-value={role}
+      }
 
-onChange={(e)=>setRole(e.target.value)}
+    </div>
 
-style={input}
-
-/>
-
-<textarea
-
-rows="6"
-
-placeholder="Current Skills (comma separated)"
-
-value={skills}
-
-onChange={(e)=>setSkills(e.target.value)}
-
-style={textarea}
-
-/>
-
-<button
-
-onClick={analyze}
-
-disabled={loading}
-
-style={button}
-
->
-
-{
-
-loading
-
-?
-
-"Analyzing..."
-
-:
-
-"Analyze Skill Gap"
+  );
 
 }
-
-</button>
-
-{
-
-result &&
-
-<div
-
-style={{
-
-marginTop:"35px"
-
-}}
-
->
-
-<h2>
-
-Missing Skills
-
-</h2>
-
-<div
-
-style={{
-
-display:"flex",
-
-flexWrap:"wrap",
-
-gap:"10px"
-
-}}
-
->
-
-{
-
-(result.missing_skills || []).map((skill,index)=>(
-
-<span
-
-key={index}
-
-style={{
-
-background:"#fee2e2",
-
-color:"#991b1b",
-
-padding:"8px 15px",
-
-borderRadius:"25px"
-
-}}
-
->
-
-{skill}
-
-</span>
-
-))
-
-}
-
-</div>
-
-<h2
-
-style={{
-
-marginTop:"30px"
-
-}}
-
->
-
-Learning Suggestions
-
-</h2>
-
-<div
-
-style={{
-
-background:"#f8fafc",
-
-padding:"20px",
-
-borderRadius:"12px"
-
-}}
-
->
-
-<pre
-
-style={{
-
-whiteSpace:"pre-wrap",
-
-fontFamily:"inherit"
-
-}}
-
->
-
-{JSON.stringify(result.learning_path || result.suggestions || result, null, 2)}
-
-</pre>
-
-</div>
-
-</div>
-
-}
-
-</div>
-
-);
-
-}
-
-const input={
-
-width:"100%",
-
-padding:"14px",
-
-marginTop:"20px",
-
-borderRadius:"10px",
-
-border:"1px solid #d1d5db"
-
-};
 
 const textarea={
 
-width:"100%",
+  width:"100%",
 
-padding:"14px",
+  padding:"14px",
 
-marginTop:"20px",
+  marginTop:"20px",
 
-borderRadius:"10px",
+  borderRadius:"10px",
 
-border:"1px solid #d1d5db"
+  border:"1px solid #d1d5db",
+
+  fontSize:"15px"
 
 };
 
 const button={
 
-width:"100%",
+  width:"100%",
 
-padding:"16px",
+  padding:"16px",
 
-marginTop:"25px",
+  marginTop:"25px",
 
-border:"none",
+  border:"none",
 
-borderRadius:"12px",
+  borderRadius:"12px",
 
-background:"#2563eb",
+  background:"#2563eb",
 
-color:"#fff",
+  color:"#fff",
 
-fontSize:"17px",
+  fontSize:"17px",
 
-cursor:"pointer"
+  cursor:"pointer"
 
 };

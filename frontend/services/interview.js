@@ -1,5 +1,5 @@
 import api from "./api";
 
-export const mockInterview = (data) =>
+export const mockTest = (data) =>
 
-  api.post("/mock-interview", data);
+  api.post("/mock-test", data);

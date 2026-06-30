@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter
 from pydantic import BaseModel
 from sqlalchemy import text
 
@@ -14,29 +14,19 @@ class RecommendRequest(BaseModel):
 
 
 SKILLS = [
-
     "aws",
-
     "docker",
-
     "kubernetes",
-
     "terraform",
-
     "jenkins",
-
     "ansible",
-
     "linux",
-
     "prometheus",
-
     "grafana",
-
     "git",
-
-    "github"
-
+    "github",
+    "helm",
+    "argocd",
 ]
 
 
@@ -46,91 +36,71 @@ def recommend(req: RecommendRequest):
     payload = decode_token(req.token)
 
     if not payload:
+        return {
+            "recommended_jobs": [],
+            "skills_found": [],
+            "message": "Invalid token"
+        }
 
-        raise HTTPException(
-
-            status_code=401,
-
-            detail="Invalid or expired token"
-
-        )
-
-    user_id = payload.get("user_id")
-
-    if not user_id:
-
-        raise HTTPException(
-
-            status_code=401,
-
-            detail="Invalid token payload"
-
-        )
+    user_id = payload["user_id"]
 
     db = SessionLocal()
 
     try:
 
-        row = db.execute(
-
+        resume = db.execute(
             text("""
-
                 SELECT generated_resume
-
                 FROM generated_resumes
-
                 WHERE user_id=:id
-
                 ORDER BY id DESC
-
                 LIMIT 1
-
             """),
-
             {
-
                 "id": user_id
-
             }
-
         ).fetchone()
 
-        if not row:
+        if resume:
 
-            raise HTTPException(
+            resume_text = resume[0]
 
-                status_code=404,
+        else:
 
-                detail="No generated resume found"
+            resume = db.execute(
+                text("""
+                    SELECT resume_text
+                    FROM resumes
+                    ORDER BY id DESC
+                    LIMIT 1
+                """)
+            ).fetchone()
 
-            )
+            if not resume:
 
-        resume_text = row[0].lower()
+                return {
+                    "recommended_jobs": [],
+                    "skills_found": [],
+                    "message": "No resume found"
+                }
 
-        found_skills = [
+            resume_text = resume[0]
 
-            skill
+        resume_text = resume_text.lower()
 
-            for skill in SKILLS
+        found_skills = []
 
-            if skill in resume_text
+        for skill in SKILLS:
 
-        ]
+            if skill in resume_text:
+                found_skills.append(skill)
 
-        recommendations = recommend_jobs(
-
-            found_skills
-
-        )
+        jobs = recommend_jobs(found_skills)
 
         return {
-
-            "skills_found": found_skills,
-
-            "recommended_jobs": recommendations[:10]
-
+            "recommended_jobs": jobs[:10],
+            "skills_found": found_skills
         }
 
     finally:
-
         db.close()

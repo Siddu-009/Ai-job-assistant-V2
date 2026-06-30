@@ -32,14 +32,13 @@ from routes.ai_resume import router as ai_resume_router
 from routes.resume_dashboard import router as resume_dashboard_router
 from routes.resume_history import router as resume_history_router
 from routes.resume_view import router as resume_view_router
-from routes.ats_analyzer import router as ats_analyzer_router
 from routes.resume_recommend import router as resume_recommend_router
 from routes.job_tracker import router as job_tracker_router
 from routes.application_workflow import router as application_workflow_router
 from routes.recruiter_dashboard import router as recruiter_dashboard_router
 from routes.skill_analytics import router as skill_analytics_router
-from routes.interview_questions import router as interview_questions_router
-from routes.mock_interview import router as mock_interview_router
+from routes.interview_questions import router as interview_router
+from routes.mock_test import router as mock_test_router
 from routes.career_roadmap import router as career_roadmap_router
 from routes.cover_letter import router as cover_letter_router
 from routes.resume_versions import router as resume_versions_router
@@ -50,6 +49,12 @@ from routes.activity_timeline import router as activity_timeline_router
 from routes.email_notifications import router as email_notifications_router
 from routes.health import router as health_router
 from fastapi import FastAPI
+from routes.career_coach import router as career_coach_router
+from routes.learning_recommendations import router as learning_router
+from routes.resume_tailoring import router as resume_tailoring_router
+from routes.interview_roles import router as interview_roles_router
+from routes.ats_review import router as ats_review_router
+from routes.job_match import router as job_match_router
 
 from fastapi.exceptions import RequestValidationError
 from starlette.exceptions import HTTPException as StarletteHTTPException
@@ -248,12 +253,6 @@ app.include_router(
 )
 
 app.include_router(
-    ats_analyzer_router,
-    prefix="/ats-analyzer",
-    tags=["Real ATS Analyzer"]
-)
-
-app.include_router(
     resume_recommend_router,
     prefix="/resume-recommend",
     tags=["Resume Recommendations"]
@@ -284,15 +283,15 @@ app.include_router(
 )
 
 app.include_router(
-    interview_questions_router,
+    interview_router,
     prefix="/interview-questions",
-    tags=["AI Interview Questions"]
+    tags=["Interview Questions"]
 )
 
 app.include_router(
-    mock_interview_router,
-    prefix="/mock-interview",
-    tags=["Mock Interview"]
+    mock_test_router,
+    prefix="/mock-test",
+    tags=["Mock Test"]
 )
 
 app.include_router(
@@ -347,6 +346,42 @@ app.include_router(
     health_router,
     prefix="/health",
     tags=["Health"]
+)
+
+app.include_router(
+    career_coach_router,
+    prefix="/career-coach",
+    tags=["Career Coach"]
+)
+
+app.include_router(
+    learning_router,
+    prefix="/learning-recommendations",
+    tags=["Learning Recommendations"]
+)
+
+app.include_router(
+    resume_tailoring_router,
+    prefix="/resume-tailoring",
+    tags=["Resume Tailoring"]
+)
+
+app.include_router(
+    interview_roles_router,
+    prefix="/interview-roles",
+    tags=["Interview Roles"]
+)
+
+app.include_router(
+    ats_review_router,
+    prefix="/ats-review",
+    tags=["ATS Review"]
+)
+
+app.include_router(
+    job_match_router,
+    prefix="/job-match",
+    tags=["Job Match"]
 )
 
 @app.get("/")

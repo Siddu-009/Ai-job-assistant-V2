@@ -3,15 +3,24 @@ import { useState } from "react";
 export default function LearningRecommendations() {
 
   const [role, setRole] = useState("");
-  const [skills, setSkills] = useState("");
   const [loading, setLoading] = useState(false);
   const [recommendations, setRecommendations] = useState(null);
 
   const generateRecommendations = async () => {
 
-    if (!role || !skills) {
+    if (!role) {
 
-      alert("Please enter target role and current skills.");
+      alert("Please enter target role.");
+
+      return;
+
+    }
+
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+
+      window.location.href = "/login";
 
       return;
 
@@ -23,7 +32,7 @@ export default function LearningRecommendations() {
 
       const response = await fetch(
 
-        "/api/career-roadmap/",
+        "/api/learning-recommendations/",
 
         {
 
@@ -36,10 +45,8 @@ export default function LearningRecommendations() {
           },
 
           body: JSON.stringify({
-
-            target_role: role,
-
-            current_skills: skills
+	   
+            role
 
           })
 
@@ -49,214 +56,161 @@ export default function LearningRecommendations() {
 
       const data = await response.json();
 
+      console.log(data);
+
       setRecommendations(data);
 
     }
 
-    catch {
+    catch (err) {
+
+      console.error(err);
 
       alert("Unable to generate recommendations.");
 
     }
 
-    setLoading(false);
+    finally {
+
+      setLoading(false);
+
+    }
 
   };
 
   return (
 
-<div
+    <div
+      style={{
+        maxWidth:"1200px",
+        margin:"40px auto",
+        padding:"35px",
+        background:"#fff",
+        borderRadius:"20px",
+        boxShadow:"0 15px 35px rgba(0,0,0,.08)"
+      }}
+    >
 
-style={{
+      <h1>Learning Recommendations</h1>
 
-maxWidth:"1200px",
+      <input
 
-margin:"40px auto",
+        type="text"
 
-padding:"35px",
+        placeholder="Target Role"
 
-background:"#fff",
+        value={role}
 
-borderRadius:"20px",
+        onChange={(e)=>setRole(e.target.value)}
 
-boxShadow:"0 15px 35px rgba(0,0,0,.08)"
+        style={input}
 
-}}
+      />
 
->
+      <button
 
-<h1>
+        onClick={generateRecommendations}
 
-Learning Recommendations
+        disabled={loading}
 
-</h1>
+        style={button}
 
-<p
+      >
 
-style={{
+        {
 
-color:"#6b7280"
+          loading
 
-}}
+            ? "Generating..."
 
->
+            : "Generate Recommendations"
 
-Get AI-powered learning recommendations based on your target career.
+        }
 
-</p>
+      </button>
 
-<input
+      {
 
-type="text"
+        recommendations &&
 
-placeholder="Target Role"
+        <div style={{marginTop:"40px"}}>
 
-value={role}
+          <h2>Learning Plan</h2>
 
-onChange={(e)=>setRole(e.target.value)}
+          <pre
 
-style={input}
+            style={{
 
-/>
+              background:"#f8fafc",
 
-<textarea
+              padding:"20px",
 
-rows="5"
+              borderRadius:"10px",
 
-placeholder="Current Skills (comma separated)"
+              whiteSpace:"pre-wrap",
 
-value={skills}
+              wordBreak:"break-word",
 
-onChange={(e)=>setSkills(e.target.value)}
+              fontFamily:"inherit"
 
-style={textarea}
+            }}
 
-/>
+          >
 
-<button
+            {
 
-onClick={generateRecommendations}
+              recommendations.roadmap
 
-disabled={loading}
+                ? recommendations.roadmap
 
-style={button}
+                : JSON.stringify(recommendations,null,2)
 
->
+            }
 
-{
+          </pre>
 
-loading
+        </div>
 
-?
+      }
 
-"Generating..."
+    </div>
 
-:
-
-"Generate Recommendations"
-
-}
-
-</button>
-
-{
-
-recommendations &&
-
-<div
-
-style={{
-
-marginTop:"40px"
-
-}}
-
->
-
-<h2>
-
-Learning Plan
-
-</h2>
-
-<pre
-
-style={{
-
-background:"#f8fafc",
-
-padding:"20px",
-
-borderRadius:"10px",
-
-whiteSpace:"pre-wrap",
-
-fontFamily:"inherit"
-
-}}
-
->
-
-{JSON.stringify(recommendations,null,2)}
-
-</pre>
-
-</div>
-
-}
-
-</div>
-
-);
+  );
 
 }
 
 const input={
 
-width:"100%",
+  width:"100%",
 
-padding:"14px",
+  padding:"14px",
 
-marginTop:"20px",
+  marginTop:"20px",
 
-border:"1px solid #d1d5db",
+  border:"1px solid #d1d5db",
 
-borderRadius:"10px"
-
-};
-
-const textarea={
-
-width:"100%",
-
-padding:"14px",
-
-marginTop:"20px",
-
-border:"1px solid #d1d5db",
-
-borderRadius:"10px"
+  borderRadius:"10px"
 
 };
 
 const button={
 
-width:"100%",
+  width:"100%",
 
-padding:"15px",
+  padding:"15px",
 
-marginTop:"20px",
+  marginTop:"20px",
 
-border:"none",
+  border:"none",
 
-borderRadius:"10px",
+  borderRadius:"10px",
 
-background:"#2563eb",
+  background:"#2563eb",
 
-color:"#fff",
+  color:"#fff",
 
-fontSize:"16px",
+  fontSize:"16px",
 
-cursor:"pointer"
+  cursor:"pointer"
 
 };

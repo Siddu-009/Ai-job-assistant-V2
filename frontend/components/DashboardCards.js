@@ -229,7 +229,7 @@ export default function DashboardCards() {
       if (e.key === "theme") setDarkMode(e.newValue === "dark");
     };
     const onCustom = () => setDarkMode(localStorage.getItem("theme") === "dark");
-
+  
     window.addEventListener("storage",     onStorage);
     window.addEventListener("themechange", onCustom);
 
@@ -244,18 +244,50 @@ export default function DashboardCards() {
     }
 
     Promise.all([
-      fetch(`/dashboard/${token}`).then((r) => {
-        if (!r.ok) throw new Error("dashboard fetch failed");
-        return r.json();
+
+      fetch("/api/dashboard", {
+	method: "POST",
+    	headers: {
+      	  "Content-Type": "application/json"
+    	},
+    	body: JSON.stringify({ token })
+      }).then(async (r) => {
+    	if (!r.ok) return {};
+    	return r.json();
       }),
-      fetch(`/ats-score/${token}`).then((r) => r.json()).catch(() => ({})),
-      fetch(`/recommend-jobs/${token}`).then((r) => r.json()).catch(() => []),
+
+      fetch("/api/ats-score", {
+    	method: "POST",
+    	headers: {
+      	  "Content-Type": "application/json"
+  	},
+	body: JSON.stringify({ token })
+      }).then(async (r) => {
+    	if (!r.ok) return {};
+    	return r.json();
+      }),
+
+     fetch("/api/recommend-jobs/", {
+    	method: "POST",
+    	headers: {
+      	  "Content-Type": "application/json"
+  	},
+    	body: JSON.stringify({ token })
+      }).then(async (r) => {
+    	if (!r.ok) return {
+          recommended_jobs: []
+    	};
+    	return r.json();
+      })
+
     ])
       .then(([dashboard, ats, jobs]) => {
         setStats({
           ats:          ats.score              ?? 92,
           resumes:      dashboard.resume_count  ?? 1,
-          jobs:         Array.isArray(jobs) ? jobs.length : 0,
+          jobs: jobs.recommended_jobs
+  	    ? jobs.recommended_jobs.length
+  	    : 0,
           applications: dashboard.applications  ?? 0,
           interviews:   dashboard.interviews    ?? 0,
           selected:     dashboard.selected      ?? 0,

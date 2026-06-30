@@ -150,6 +150,7 @@ export default function Layout({
   onLogout,
   title    = "Dashboard",
   subtitle = "Welcome back to AI Job Assistant",
+  dashboard = false
 }) {
   const [darkMode, setDarkMode] = useState(false);
   const [mounted,  setMounted]  = useState(false);
@@ -232,21 +233,34 @@ export default function Layout({
           </div>
 
           {/* ── Page content (children) ── */}
-          {children && (
-            <div
-              style={{
-                background:   colors.card,
-                border:       colors.borderStyle,
-                borderRadius: "18px",
-                padding:      "25px",
-                color:        colors.text,
-                boxShadow:    "0 10px 25px rgba(0,0,0,0.08)",
-              }}
-            >
-              <h2 style={{ marginTop: 0, marginBottom: "25px" }}>Workspace</h2>
-              {children}
-            </div>
-          )}
+	  {dashboard ? (
+
+    	  children && (
+
+	  <div
+	  style={{
+	  background: colors.card,
+	  border: colors.borderStyle,
+	  borderRadius: "18px",
+	  padding: "25px",
+	  color: colors.text,
+	  boxShadow: "0 10px 25px rgba(0,0,0,0.08)"
+	  }}
+	  >
+
+	  <h2 style={{marginTop:0}}>Workspace</h2>
+
+	  {children}
+
+	  </div>
+
+	  )
+
+	  ) : (
+
+	  children
+
+	  )}
 
         </div>
       </main>
