@@ -18,6 +18,13 @@ export default function SkillGap() {
     }
 
     setLoading(true);
+      const token = localStorage.getItem("token");
+
+      if (!token) {
+        alert("Please login.");
+        setLoading(false);
+        return;
+      }
 
     try {
 
@@ -36,6 +43,8 @@ export default function SkillGap() {
           },
 
           body: JSON.stringify({
+
+            token,
 
             resume_text: resume,
 

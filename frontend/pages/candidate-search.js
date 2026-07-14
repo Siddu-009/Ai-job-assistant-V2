@@ -5,10 +5,10 @@ export default function CandidateSearch() {
   const [skill, setSkill] = useState("");
   const [experience, setExperience] = useState("");
   const [atsScore, setAtsScore] = useState("");
-  const [candidates, setCandidates] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [candidates, setCandidates] = useState([]);
 
-  const searchCandidates = async () => {
+  async function searchCandidates() {
 
     setLoading(true);
 
@@ -34,7 +34,7 @@ export default function CandidateSearch() {
 
             experience,
 
-            ats_score: atsScore
+            ats_score: Number(atsScore) || 0
 
           })
 
@@ -44,15 +44,7 @@ export default function CandidateSearch() {
 
       const data = await response.json();
 
-      setCandidates(
-
-        data.candidates ||
-
-        data.results ||
-
-        []
-
-      );
+      setCandidates(data.candidates || []);
 
     }
 
@@ -64,108 +56,72 @@ export default function CandidateSearch() {
 
     setLoading(false);
 
-  };
+  }
 
   return (
 
 <div
-
 style={{
-
-maxWidth:"1300px",
-
+maxWidth:"1400px",
 margin:"40px auto",
-
-background:"#fff",
-
-padding:"35px",
-
-borderRadius:"20px",
-
-boxShadow:"0 15px 35px rgba(0,0,0,.08)"
-
+padding:"20px"
 }}
-
 >
 
-<h1>
+<h1
+style={{
+fontSize:"34px",
+fontWeight:"700"
+}}
+>
 
-Candidate Search
+🔍 AI Recruiter Search
 
 </h1>
 
 <p
-
 style={{
-
-color:"#6b7280"
-
+color:"#6b7280",
+marginBottom:"25px"
 }}
-
 >
 
-Search candidates using AI filters.
+Search resumes using AI ranking.
 
 </p>
 
 <div
-
 style={{
-
 display:"grid",
-
 gridTemplateColumns:"1fr 1fr 1fr auto",
-
-gap:"15px",
-
-marginTop:"25px"
-
+gap:"15px"
 }}
-
 >
 
 <input
-
-placeholder="Skill"
-
+placeholder="Skill (Docker)"
 value={skill}
-
 onChange={(e)=>setSkill(e.target.value)}
-
 style={input}
-
 />
 
 <input
-
 placeholder="Experience"
-
 value={experience}
-
 onChange={(e)=>setExperience(e.target.value)}
-
 style={input}
-
 />
 
 <input
-
-placeholder="Minimum ATS Score"
-
+placeholder="Minimum Match Score"
 value={atsScore}
-
 onChange={(e)=>setAtsScore(e.target.value)}
-
 style={input}
-
 />
 
 <button
-
 onClick={searchCandidates}
-
 style={button}
-
 >
 
 {
@@ -188,29 +144,46 @@ loading
 
 {
 
+candidates.length===0
+
+?
+
+<p
+style={{
+marginTop:"40px",
+color:"#6b7280"
+}}
+>
+
+No candidates found.
+
+</p>
+
+:
+
 candidates.map((candidate,index)=>(
 
 <div
 
 key={index}
 
-style={{
-
-marginTop:"25px",
-
-padding:"25px",
-
-border:"1px solid #e5e7eb",
-
-borderRadius:"15px"
-
-}}
+style={card}
 
 >
 
+<div
+style={{
+display:"flex",
+justifyContent:"space-between",
+alignItems:"center"
+}}
+>
+
+<div>
+
 <h2>
 
-{candidate.name}
+👤 {candidate.name}
 
 </h2>
 
@@ -220,55 +193,157 @@ borderRadius:"15px"
 
 </p>
 
+</div>
+
+<div
+style={{
+textAlign:"center"
+}}
+>
+
+<div
+style={circle}
+>
+
+{candidate.match_score}%
+
+</div>
+
 <p>
 
-💼 Experience: {candidate.experience}
+AI Match
+
+</p>
+
+</div>
+
+</div>
+
+<div
+style={{
+marginTop:"20px"
+}}
+>
+
+<p>
+
+⭐ ATS Score
+
+<b>
+
+ {candidate.ats_score}
+
+</b>
 
 </p>
 
 <p>
 
-⭐ ATS Score: {candidate.ats_score}
+💼 Experience
+
+<b>
+
+ {candidate.experience||"Not Available"}
+
+</b>
 
 </p>
 
 <p>
 
-🛠 Skills: {candidate.skills}
+🛠 Skills
 
 </p>
 
 <div
-
 style={{
-
 display:"flex",
-
-gap:"15px",
-
-marginTop:"20px"
-
+flexWrap:"wrap",
+gap:"10px"
 }}
+>
+
+{
+
+(candidate.skills || "")
+
+.split(",")
+
+.filter(Boolean)
+
+.map((skill,index)=>(
+
+<span
+
+key={index}
+
+style={chip}
 
 >
 
-<button
+{skill.trim()}
 
-style={greenButton}
+</span>
 
+))
+
+}
+
+</div>
+
+</div>
+
+<div
+style={{
+marginTop:"20px",
+background:"#f8fafc",
+padding:"18px",
+borderRadius:"10px"
+}}
 >
 
-View Resume
+<h3>
+
+🤖 AI Analysis
+
+</h3>
+
+<pre
+style={{
+whiteSpace:"pre-wrap",
+fontFamily:"inherit"
+}}
+>
+
+{candidate.ai_reason}
+
+</pre>
+
+</div>
+
+<div
+style={{
+display:"flex",
+gap:"15px",
+marginTop:"20px"
+}}
+>
+
+<button style={greenButton}>
+
+📄 View Resume
 
 </button>
 
-<button
+<button style={blueButton}>
 
-style={blueButton}
+📧 Contact
 
->
+</button>
 
-Contact
+<button style={orangeButton}>
+
+⭐ Shortlist
 
 </button>
 
@@ -288,17 +363,17 @@ Contact
 
 const input={
 
-padding:"14px",
+padding:"15px",
+
+border:"1px solid #d1d5db",
 
 borderRadius:"10px",
 
-border:"1px solid #d1d5db"
+fontSize:"15px"
 
 };
 
 const button={
-
-padding:"14px 25px",
 
 background:"#2563eb",
 
@@ -308,7 +383,61 @@ border:"none",
 
 borderRadius:"10px",
 
+padding:"15px 30px",
+
 cursor:"pointer"
+
+};
+
+const card={
+
+marginTop:"30px",
+
+padding:"25px",
+
+background:"#fff",
+
+borderRadius:"15px",
+
+boxShadow:"0 8px 25px rgba(0,0,0,.08)"
+
+};
+
+const chip={
+
+background:"#2563eb",
+
+color:"#fff",
+
+padding:"6px 12px",
+
+borderRadius:"20px",
+
+fontSize:"13px"
+
+};
+
+const circle={
+
+width:"75px",
+
+height:"75px",
+
+borderRadius:"50%",
+
+background:"#16a34a",
+
+display:"flex",
+
+justifyContent:"center",
+
+alignItems:"center",
+
+fontSize:"20px",
+
+fontWeight:"700",
+
+color:"#fff"
 
 };
 
@@ -316,13 +445,13 @@ const greenButton={
 
 flex:1,
 
-padding:"14px",
-
 background:"#16a34a",
 
 color:"#fff",
 
 border:"none",
+
+padding:"14px",
 
 borderRadius:"10px",
 
@@ -334,13 +463,31 @@ const blueButton={
 
 flex:1,
 
-padding:"14px",
-
 background:"#2563eb",
 
 color:"#fff",
 
 border:"none",
+
+padding:"14px",
+
+borderRadius:"10px",
+
+cursor:"pointer"
+
+};
+
+const orangeButton={
+
+flex:1,
+
+background:"#f59e0b",
+
+color:"#fff",
+
+border:"none",
+
+padding:"14px",
 
 borderRadius:"10px",
 

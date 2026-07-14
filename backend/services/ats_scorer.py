@@ -1,120 +1,67 @@
 import re
 
-from services.ats_ai import extract_requirements
+from services.skill_gap_analyzer import extract_skills
 
 
 def normalize(text):
+    if not text:
+        return ""
     return re.sub(r"\s+", " ", text.lower())
-
-
-def exists(keyword, resume):
-
-    keyword = normalize(keyword)
-
-    resume = normalize(resume)
-
-    return keyword in resume
-
-
-def compare_list(items, resume):
-
-    matched = []
-    missing = []
-
-    for item in items:
-
-        if exists(item, resume):
-
-            matched.append(item)
-
-        else:
-
-            missing.append(item)
-
-    return matched, missing
 
 
 def calculate_ats_score(resume_text, job_description):
 
-    resume = normalize(resume_text)
+    resume_skills = extract_skills(resume_text)
+    jd_skills = extract_skills(job_description)
 
-    requirements = extract_requirements(job_description)
+    matched = sorted(
+        list(resume_skills.intersection(jd_skills))
+    )
 
-    matched = []
-    missing = []
+    missing = sorted(
+        list(jd_skills.difference(resume_skills))
+    )
 
-    sections = {}
-
-    total_items = 0
-
-    matched_items = 0
-
-    categories = [
-
-        "skills",
-        "tools",
-        "frameworks",
-        "soft_skills",
-        "certifications"
-
-    ]
-
-    for category in categories:
-
-        values = requirements.get(category, [])
-
-        m, ms = compare_list(values, resume)
-
-        sections[category] = {
-
-            "matched": m,
-
-            "missing": ms
-
-        }
-
-        matched.extend(m)
-
-        missing.extend(ms)
-
-        total_items += len(values)
-
-        matched_items += len(m)
-
-    if total_items == 0:
-
+    if len(jd_skills) == 0:
         score = 0
-
     else:
-
-        score = round((matched_items / total_items) * 100)
+        score = round(
+            (len(matched) / len(jd_skills)) * 100
+        )
 
     recommendations = []
 
-    for category in categories:
+    if missing:
+        recommendations.append(
+            "Add the missing technical skills where applicable."
+        )
 
-        if sections[category]["missing"]:
+    if score < 75:
+        recommendations.append(
+            "Improve project descriptions using stronger action verbs."
+        )
 
-            recommendations.append(
+    recommendations.append(
+        "Include measurable achievements."
+    )
 
-                f"Improve {category.replace('_',' ')}"
+    recommendations.append(
+        "Use ATS-friendly section headings."
+    )
 
-            )
+    recommendations.append(
+        "Keep the resume concise and keyword optimized."
+    )
+
+    recommendations = recommendations[:5]
 
     if score >= 90:
-
         verdict = "Excellent ATS Match"
-
     elif score >= 75:
-
         verdict = "Good ATS Match"
-
     elif score >= 60:
-
         verdict = "Average ATS Match"
-
     else:
-
         verdict = "Needs Improvement"
 
     return {
@@ -133,8 +80,9 @@ def calculate_ats_score(resume_text, job_description):
 
         "recommendations": recommendations,
 
-        "analysis": sections,
-
-        "requirements": requirements
+        "analysis": {
+            "matched": matched,
+            "missing": missing
+        }
 
     }

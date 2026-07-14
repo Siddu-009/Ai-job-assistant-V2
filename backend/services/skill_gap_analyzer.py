@@ -1,50 +1,85 @@
-from services.ai_service import ai_chat
 import json
 import re
 
+from services.ai_service import ai_chat
 
-def extract_skills(text):
 
-    prompt = f"""
-Extract all technical skills from the following text.
+COMMON_SKILLS = {
+    # Programming Languages
+    "python", "java", "javascript", "typescript", "c", "c++", "c#", "go",
+    "golang", "rust", "php", "ruby", "kotlin", "swift", "scala", "r",
 
-Include programming languages, cloud, DevOps, databases,
-frameworks, operating systems, engineering software,
-mechanical tools, electrical tools, civil software,
-testing tools, networking tools, AI/ML, ERP, SAP,
-cybersecurity, embedded systems and every professional skill.
+    # Frontend
+    "html", "css", "bootstrap", "tailwind", "react", "nextjs", "next.js",
+    "angular", "vue", "svelte", "jquery",
 
-Return ONLY JSON.
+    # Backend
+    "node", "nodejs", "express", "django", "flask", "fastapi",
+    "spring", "spring boot", "laravel",
 
-Format:
+    # Databases
+    "mysql", "postgresql", "mongodb", "redis", "sqlite",
+    "oracle", "sql server", "cassandra", "dynamodb",
 
-{{
-    "skills":[
-        "Python",
-        "AWS",
-        "Docker"
-    ]
-}}
+    # Cloud
+    "aws", "azure", "gcp", "ec2", "s3", "iam", "vpc",
+    "eks", "ecs", "rds", "lambda", "cloudfront",
+    "route53", "cloudwatch", "elasticache",
 
-Text:
+    # DevOps
+    "docker", "kubernetes", "terraform", "ansible",
+    "jenkins", "gitlab", "github actions",
+    "argocd", "helm", "prometheus", "grafana",
+    "sonarqube", "nexus", "trivy",
 
-{text}
-"""
+    # Linux
+    "linux", "ubuntu", "centos", "redhat", "bash",
+    "shell", "cron", "systemd",
 
-    response = ai_chat(prompt)
+    # Networking
+    "tcp", "udp", "http", "https", "dns",
+    "load balancer", "nginx", "apache", "tomcat",
 
-    try:
+    # APIs
+    "rest", "rest api", "graphql",
 
-        match = re.search(r"\{.*\}", response, re.DOTALL)
+    # Containers
+    "container", "containers", "microservices",
 
-        if match:
-            return json.loads(match.group())["skills"]
+    # Testing
+    "testing", "pytest", "junit", "selenium",
 
-    except Exception:
-        return []
+    # AI
+    "machine learning", "deep learning", "ai", "llm",
+    "ollama", "openai", "langchain",
 
-    return []
+    # Methodologies
+    "devops", "agile", "scrum", "kanban",
 
+    # Misc
+    "git", "github", "gitlab", "jira", "maven",
+    "gradle", "ci/cd", "debugging"
+}
+
+
+def extract_skills(text: str):
+
+    if not text:
+        return set()
+
+    text = text.lower()
+
+    found = set()
+
+    for skill in COMMON_SKILLS:
+
+        pattern = r"\b" + re.escape(skill) + r"\b"
+
+        if re.search(pattern, text):
+
+            found.add(skill)
+
+    return found
 
 def analyze_skill_gap(resume_text, job_description):
 
@@ -52,67 +87,183 @@ def analyze_skill_gap(resume_text, job_description):
 
     job_skills = extract_skills(job_description)
 
-    resume_set = set(s.lower() for s in resume_skills)
-    job_set = set(s.lower() for s in job_skills)
-
     matched = sorted(
-        list(resume_set & job_set)
+        list(
+            resume_skills.intersection(job_skills)
+        )
     )
 
     missing = sorted(
-        list(job_set - resume_set)
+        list(
+            job_skills.difference(resume_skills)
+        )
     )
 
-    score = 0
+    if len(job_skills) == 0:
 
-    if len(job_set) > 0:
+        score = 0
+
+    else:
+
         score = round(
-            len(matched) / len(job_set) * 100,
-            2
+
+            (
+                len(matched)
+                /
+                len(job_skills)
+            ) * 100
+
         )
 
-    recommendation_prompt = f"""
-The candidate is missing these skills:
+    # Prevent unrealistic 100% scores
+    if score == 100 and len(job_skills) > len(matched):
 
-{', '.join(missing)}
+        score = 95
 
-Suggest:
+    # Improve score slightly for strong resumes
+    elif score >= 70:
 
-1. Learning roadmap
-2. Best certifications
-3. Best online courses
-4. Interview topics
+        score = min(score + 5, 95)
 
-Return JSON only.
+    prompt = f"""
+You are an Expert Career Coach and ATS Resume Analyzer.
 
-Format:
+Candidate matched these skills:
+
+{matched}
+
+Candidate is missing these skills:
+
+{missing}
+
+Your job is ONLY to recommend improvements.
+
+Return ONLY valid JSON.
 
 {{
-"recommendations":[],
-"courses":[],
-"certifications":[],
-"interview_topics":[],
-"learning_path":[]
+    "recommendations": [],
+    "courses": [],
+    "certifications": [],
+    "interview_topics": [],
+    "learning_path": []
 }}
-"""
 
-    ai = ai_chat(recommendation_prompt)
+Rules:
+
+1. Do NOT calculate score.
+2. Do NOT calculate matched skills.
+3. Do NOT calculate missing skills.
+4. Give exactly FIVE recommendations.
+5. Give exactly FIVE courses.
+6. Give exactly FIVE certifications.
+7. Give exactly FIVE interview topics.
+8. Give exactly FIVE learning path items.
+9. Return JSON only.
+"""
+    
+    response = ai_chat(prompt)
+
+    print("\n================ AI RESPONSE ================\n")
+    print(response)
+    print("\n=============================================\n")
+
+    recommendations = {
+        "recommendations": [],
+        "courses": [],
+        "certifications": [],
+        "interview_topics": [],
+        "learning_path": []
+    }
 
     try:
 
-        match = re.search(r"\{.*\}", ai, re.DOTALL)
+        cleaned = response.strip()
 
-        if match:
+        # Extract JSON if surrounded by extra text
+        start = cleaned.find("{")
+        end = cleaned.rfind("}")
 
-            extra = json.loads(match.group())
+        if start != -1 and end != -1:
+            cleaned = cleaned[start:end + 1]
 
-        else:
+        # If Ollama forgot the last brace
+        elif cleaned.startswith("{") and not cleaned.endswith("}"):
+            cleaned += "\n}"
 
-            extra = {}
+        recommendations = json.loads(cleaned)
 
-    except Exception:
+    except Exception as e:
 
-        extra = {}
+        print("JSON Parse Error:", e)
+        print(response)
+
+            # ---------- Default Values ----------
+
+    recommendations.setdefault("recommendations", [])
+    recommendations.setdefault("courses", [])
+    recommendations.setdefault("certifications", [])
+    recommendations.setdefault("interview_topics", [])
+    recommendations.setdefault("learning_path", [])
+
+    if not recommendations["recommendations"]:
+
+        recommendations["recommendations"] = [
+
+            "Strengthen the missing technical skills identified in the job description.",
+            "Build at least two real-world projects using the required technologies.",
+            "Practice coding and problem-solving regularly.",
+            "Improve resume keywords for ATS compatibility.",
+            "Prepare scenario-based interview questions."
+
+        ]
+
+    if not recommendations["courses"]:
+
+        recommendations["courses"] = [
+
+            "AWS Cloud Practitioner",
+            "Docker & Kubernetes Bootcamp",
+            "Terraform for Beginners",
+            "Python Advanced Programming",
+            "Jenkins CI/CD Pipeline"
+
+        ]
+
+    if not recommendations["certifications"]:
+
+        recommendations["certifications"] = [
+
+            "AWS Certified Cloud Practitioner",
+            "AWS Certified Developer Associate",
+            "Docker Certified Associate",
+            "Certified Kubernetes Administrator (CKA)",
+            "HashiCorp Terraform Associate"
+
+        ]
+
+    if not recommendations["interview_topics"]:
+
+        recommendations["interview_topics"] = [
+
+            "Python Programming",
+            "Docker",
+            "Kubernetes",
+            "Terraform",
+            "AWS Services"
+
+        ]
+
+    if not recommendations["learning_path"]:
+
+        recommendations["learning_path"] = [
+
+            "Linux Fundamentals",
+            "Git & GitHub",
+            "Docker",
+            "Kubernetes",
+            "AWS"
+
+        ]
 
     return {
 
@@ -122,14 +273,29 @@ Format:
 
         "missing_skills": missing,
 
-        "recommendations": extra.get("recommendations", []),
+        "recommendations": recommendations.get(
+            "recommendations",
+            []
+        ),
 
-        "courses": extra.get("courses", []),
+        "courses": recommendations.get(
+            "courses",
+            []
+        ),
 
-        "certifications": extra.get("certifications", []),
+        "certifications": recommendations.get(
+            "certifications",
+            []
+        ),
 
-        "interview_topics": extra.get("interview_topics", []),
+        "interview_topics": recommendations.get(
+            "interview_topics",
+            []
+        ),
 
-        "learning_path": extra.get("learning_path", [])
+        "learning_path": recommendations.get(
+            "learning_path",
+            []
+        )
 
     }

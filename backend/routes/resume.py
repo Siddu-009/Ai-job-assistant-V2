@@ -4,6 +4,7 @@ from services.skills import extract_skills
 from services.token_service import decode_token
 from database import SessionLocal
 from sqlalchemy import text
+from services.notification_service import create_notification
 import os
 
 router = APIRouter()
@@ -70,6 +71,13 @@ async def upload_resume(
         )
 
         db.commit()
+
+        create_notification(
+            user_id=user_id,
+            title="📄 Resume Uploaded",
+            message=f"{file.filename} uploaded successfully.",
+            notification_type="resume"
+        )
 
         return {
             "success": True,

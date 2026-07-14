@@ -7,6 +7,7 @@ from database import SessionLocal
 
 from services.ats_scorer import calculate_ats_score
 from services.token_service import decode_token
+from services.notification_service import create_notification
 
 router = APIRouter()
 
@@ -73,13 +74,19 @@ def ats_score(req: ATSRequest):
 
             }
 
-        return calculate_ats_score(
-
+        result = calculate_ats_score(
             row[0],
-
             req.job_description
-
         )
+
+        create_notification(
+            user_id=user_id,
+            title="🎯 ATS Score Generated",
+            message=f"ATS Score: {result.get('ats_score', 0)}%",
+            notification_type="ats"
+        )
+
+        return result
 
     finally:
 

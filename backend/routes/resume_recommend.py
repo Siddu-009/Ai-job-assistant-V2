@@ -4,11 +4,18 @@ from pydantic import BaseModel
 from database import SessionLocal
 from sqlalchemy import text
 
+from services.ai_service import ai_chat
+
 router = APIRouter()
 
 
 class ResumeRecommendRequest(BaseModel):
     resume_id: int
+
+
+class ResumeCompareRequest(BaseModel):
+    resume_one: str
+    resume_two: str
 
 
 @router.post("/")
@@ -43,8 +50,6 @@ def recommend(req: ResumeRecommendRequest):
                 if skill.strip()
             ]
 
-        print("Resume Skills:", resume_skills)
-
         jobs = db.execute(
             text("""
                 SELECT
@@ -56,8 +61,6 @@ def recommend(req: ResumeRecommendRequest):
                 FROM jobs
             """)
         ).fetchall()
-
-        print("Jobs Found:", len(jobs))
 
         recommendations = []
 
@@ -111,3 +114,50 @@ def recommend(req: ResumeRecommendRequest):
 
     finally:
         db.close()
+
+
+@router.post("/compare")
+def compare_resumes(req: ResumeCompareRequest):
+
+    prompt = f"""
+You are an ATS Resume Expert.
+
+Compare the following two resumes.
+
+Resume 1
+
+{req.resume_one}
+
+Resume 2
+
+{req.resume_two}
+
+Provide:
+
+1. Overall Winner
+
+2. ATS Score Resume 1 (0-100)
+
+3. ATS Score Resume 2 (0-100)
+
+4. Strengths of Resume 1
+
+5. Strengths of Resume 2
+
+6. Weaknesses of Resume 1
+
+7. Weaknesses of Resume 2
+
+8. Missing Skills
+
+9. Final Recommendation
+
+Return only the comparison.
+"""
+
+    result = ai_chat(prompt)
+
+    return {
+        "success": True,
+        "comparison": result
+    }

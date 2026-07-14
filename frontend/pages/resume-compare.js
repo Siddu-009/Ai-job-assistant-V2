@@ -4,7 +4,7 @@ export default function ResumeCompare() {
 
   const [resume1, setResume1] = useState("");
   const [resume2, setResume2] = useState("");
-  const [comparison, setComparison] = useState(null);
+  const [comparison, setComparison] = useState("");
   const [loading, setLoading] = useState(false);
 
   const compareResumes = async () => {
@@ -18,37 +18,22 @@ export default function ResumeCompare() {
 
     try {
 
-      const response = await fetch(
-
-        "/api/resume-recommend/compare",
-
-        {
-
-          method: "POST",
-
-          headers: {
-            "Content-Type": "application/json"
-          },
-
-          body: JSON.stringify({
-
-            resume_one: resume1,
-
-            resume_two: resume2
-
-          })
-
-        }
-
-      );
+      const response = await fetch("/api/resume-recommend/compare", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          resume_one: resume1,
+          resume_two: resume2
+        })
+      });
 
       const data = await response.json();
 
-      setComparison(data);
+      setComparison(data.comparison || "No comparison generated.");
 
-    }
-
-    catch {
+    } catch {
 
       alert("Unable to compare resumes.");
 
@@ -58,165 +43,179 @@ export default function ResumeCompare() {
 
   };
 
+  const section = (title) => {
+
+    if (!comparison) return "";
+
+    const regex = new RegExp(
+      `${title}[\\s\\S]*?(?=\\n\\d+\\.|$)`,
+      "i"
+    );
+
+    const match = comparison.match(regex);
+
+    if (!match) return "";
+
+    return match[0]
+      .replace(title, "")
+      .trim();
+
+  };
+
   return (
 
 <div
-
 style={{
-
 maxWidth:"1300px",
-
 margin:"40px auto",
-
 background:"#fff",
-
 padding:"35px",
-
 borderRadius:"20px",
-
 boxShadow:"0 15px 35px rgba(0,0,0,.08)"
-
 }}
-
 >
 
-<h1>
+<h1>Resume Comparison</h1>
 
-Resume Comparison
-
-</h1>
-
-<p
-
-style={{
-
-color:"#6b7280"
-
-}}
-
->
-
+<p style={{color:"#6b7280"}}>
 Compare two resumes and identify the stronger profile.
-
 </p>
 
 <div
-
 style={{
-
 display:"grid",
-
 gridTemplateColumns:"1fr 1fr",
-
 gap:"20px",
-
 marginTop:"20px"
-
 }}
-
 >
 
 <textarea
-
 rows="14"
-
 placeholder="Resume 1"
-
 value={resume1}
-
 onChange={(e)=>setResume1(e.target.value)}
-
 style={textarea}
-
 />
 
 <textarea
-
 rows="14"
-
 placeholder="Resume 2"
-
 value={resume2}
-
 onChange={(e)=>setResume2(e.target.value)}
-
 style={textarea}
-
 />
 
 </div>
 
 <button
-
 onClick={compareResumes}
-
 disabled={loading}
-
 style={button}
-
 >
 
-{
-
-loading
-
-?
-
-"Comparing..."
-
-:
-
-"Compare Resumes"
-
-}
+{loading ? "Comparing..." : "Compare Resumes"}
 
 </button>
 
-{
-
-comparison &&
+{comparison && (
 
 <div
-
 style={{
-
-marginTop:"40px",
-
-background:"#f8fafc",
-
-padding:"25px",
-
-borderRadius:"15px"
-
+marginTop:"40px"
 }}
-
 >
 
-<h2>
+<Card
+title="🏆 Overall Winner"
+content={section("1. Overall Winner:")}
+/>
 
-Comparison Result
-
-</h2>
-
-<pre
-
+<div
 style={{
-
-whiteSpace:"pre-wrap",
-
-fontFamily:"inherit"
-
+display:"grid",
+gridTemplateColumns:"1fr 1fr",
+gap:"20px"
 }}
-
 >
 
-{JSON.stringify(comparison,null,2)}
+<Card
+title="📊 Resume 1 ATS Score"
+content={section("2. ATS Score Resume 1:")}
+/>
 
-</pre>
+<Card
+title="📊 Resume 2 ATS Score"
+content={section("3. ATS Score Resume 2:")}
+/>
 
 </div>
 
+<Card
+title="✅ Resume 1 Strengths"
+content={section("4. Strengths of Resume 1:")}
+/>
+
+<Card
+title="✅ Resume 2 Strengths"
+content={section("5. Strengths of Resume 2:")}
+/>
+
+<Card
+title="⚠ Resume 1 Weaknesses"
+content={section("6. Weaknesses of Resume 1:")}
+/>
+
+<Card
+title="⚠ Resume 2 Weaknesses"
+content={section("7. Weaknesses of Resume 2:")}
+/>
+
+<Card
+title="❌ Missing Skills"
+content={section("8. Missing Skills:")}
+/>
+
+<Card
+title="💡 Final Recommendation"
+content={section("9. Final Recommendation:")}
+/>
+
+</div>
+
+)}
+
+</div>
+
+);
+
 }
+
+function Card({title,content}){
+
+return(
+
+<div
+style={{
+background:"#f8fafc",
+padding:"20px",
+borderRadius:"15px",
+marginTop:"20px",
+border:"1px solid #e5e7eb"
+}}
+>
+
+<h3>{title}</h3>
+
+<pre
+style={{
+whiteSpace:"pre-wrap",
+fontFamily:"inherit",
+margin:0
+}}
+>
+{content}
+</pre>
 
 </div>
 
@@ -225,33 +224,20 @@ fontFamily:"inherit"
 }
 
 const textarea={
-
 width:"100%",
-
 padding:"15px",
-
 borderRadius:"12px",
-
 border:"1px solid #d1d5db"
-
 };
 
 const button={
-
 width:"100%",
-
 padding:"15px",
-
 marginTop:"25px",
-
 background:"#2563eb",
-
 color:"#fff",
-
 border:"none",
-
 borderRadius:"12px",
-
-cursor:"pointer"
-
+cursor:"pointer",
+fontSize:"16px"
 };
