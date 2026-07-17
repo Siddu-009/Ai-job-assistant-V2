@@ -11,7 +11,6 @@ router = APIRouter()
 
 class RoadmapRequest(BaseModel):
     token: str
-    resume_id: int
     target_role: str
 
 
@@ -40,13 +39,13 @@ def create_roadmap(req: RoadmapRequest):
 
         row = db.execute(
             text("""
-                SELECT skills
+                SELECT id, skills
                 FROM resumes
-                WHERE id=:resume_id
-                AND user_id=:user_id
+                WHERE user_id=:user_id
+                ORDER BY id DESC
+                LIMIT 1
             """),
             {
-                "resume_id": req.resume_id,
                 "user_id": user_id
             }
         ).fetchone()
@@ -57,10 +56,10 @@ def create_roadmap(req: RoadmapRequest):
                 detail="Resume not found"
             )
 
-        skills = row[0]
+        resume_id = row[0]
+        skills = row[1]
 
         roadmap = generate_roadmap(
-            skills,
             req.target_role
         )
 
@@ -80,7 +79,7 @@ def create_roadmap(req: RoadmapRequest):
                 )
             """),
             {
-                "resume_id": req.resume_id,
+                "resume_id": resume_id,
                 "target_role": req.target_role,
                 "roadmap": roadmap
             }
@@ -89,7 +88,7 @@ def create_roadmap(req: RoadmapRequest):
         db.commit()
 
         return {
-            "resume_id": req.resume_id,
+            "resume_id": resume_id,
             "target_role": req.target_role,
             "roadmap": roadmap
         }

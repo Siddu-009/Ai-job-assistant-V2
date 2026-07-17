@@ -1,36 +1,62 @@
 import json
-import random
-from pathlib import Path
+import re
 
-DATA_FILE = Path(__file__).parent.parent / "data" / "interview_questions.json"
-
-
-def load_questions():
-    with open(DATA_FILE, "r", encoding="utf-8") as f:
-        return json.load(f)
+from services.ai_service import ai_chat
 
 
-def get_question(role, experience, difficulty, asked_ids=None):
+def get_question(role, experience, difficulty, asked_questions=None):
 
-    if asked_ids is None:
-        asked_ids = []
+    if asked_questions is None:
+        asked_questions = []
 
-    data = load_questions()
+    prompt = f"""
+You are an expert technical interviewer.
 
-    if role not in data:
-        return None
+Generate EXACTLY ONE interview question.
 
-    if experience not in data[role]:
-        return None
+Role:
+{role}
 
-    questions = data[role][experience].get(difficulty, [])
+Experience:
+{experience}
 
-    available = [
-        q for q in questions
-        if q["id"] not in asked_ids
-    ]
+Difficulty:
+{difficulty}
 
-    if not available:
-        return None
+Already asked questions:
+{asked_questions}
 
-    return random.choice(available)
+Rules:
+
+1. Do NOT repeat previous questions.
+2. Make the question specific to the selected role.
+3. Difficulty must match.
+4. Return ONLY JSON.
+5. No explanation.
+
+Format:
+
+{{
+    "id": 1,
+    "question": "..."
+}}
+"""
+
+    response = ai_chat(prompt)
+
+    try:
+
+        match = re.search(r"\{.*\}", response, re.S)
+
+        if match:
+
+            return json.loads(match.group())
+
+    except Exception:
+
+        pass
+
+    return {
+        "id": 1,
+        "question": f"Explain the fundamentals of {role}."
+    }

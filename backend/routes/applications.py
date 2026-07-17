@@ -15,6 +15,7 @@ class ApplyRequest(BaseModel):
 
 @router.post("/apply")
 def apply(req: ApplyRequest):
+    print("Received token:", req.token)
 
     payload = decode_token(req.token)
 

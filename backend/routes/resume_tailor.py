@@ -1,48 +1,30 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from sqlalchemy import text
 
 from database import SessionLocal
 from services.token_service import decode_token
-
-from services.recommendation_engine import get_recommended_jobs
+from services.resume_tailor import tailor_resume
+from services.resume_formatter import format_resume
 
 router = APIRouter()
 
 
-class RecommendRequest(BaseModel):
+class TailorRequest(BaseModel):
     token: str
-    location: str = ""
-    keyword: str = ""
-
-
-SKILLS = [
-    "aws",
-    "docker",
-    "kubernetes",
-    "terraform",
-    "jenkins",
-    "ansible",
-    "linux",
-    "prometheus",
-    "grafana",
-    "git",
-    "github",
-    "helm",
-    "argocd",
-]
+    job: dict
 
 
 @router.post("/")
-async def recommend(req: RecommendRequest):
+def tailor(req: TailorRequest):
+
     payload = decode_token(req.token)
 
     if not payload:
-        return {
-            "recommended_jobs": [],
-            "skills_found": [],
-            "message": "Invalid token"
-        }
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid token"
+        )
 
     user_id = payload["user_id"]
 
@@ -73,31 +55,43 @@ async def recommend(req: RecommendRequest):
                 text("""
                     SELECT resume_text
                     FROM resumes
+                    WHERE user_id=:id
                     ORDER BY id DESC
                     LIMIT 1
-                """)
+                """),
+                {
+                    "id": user_id
+                }
             ).fetchone()
 
             if not resume:
 
-                return {
-                    "recommended_jobs": [],
-                    "skills_found": [],
-                    "message": "No resume found"
-                }
+                raise HTTPException(
+                    status_code=404,
+                    detail="Resume not found"
+                )
 
             resume_text = resume[0]
 
-        recommended_jobs, skills = await get_recommended_jobs(
+        from services.resume_writer import build_resume
+
+        tailored_resume = build_resume(
             resume_text,
-            req.keyword,
-            req.location
+            req.job
+        )
+
+        formatted_resume = format_resume(
+            tailored_resume
         )
 
         return {
-            "recommended_jobs": recommended_jobs,
-            "skills_found": skills
+
+            "success":True,
+
+            "resume":formatted_resume
+
         }
 
     finally:
+
         db.close()

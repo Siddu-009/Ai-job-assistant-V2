@@ -19,6 +19,7 @@ class DeleteJobRequest(BaseModel):
 
 @router.post("/add")
 def save_job(req: SaveJobRequest):
+    print("Received token:", req.token)
 
     payload = decode_token(req.token)
 

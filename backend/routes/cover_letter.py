@@ -11,9 +11,9 @@ router = APIRouter()
 
 class CoverLetterRequest(BaseModel):
     token: str
-    resume_id: int
     company: str
     job_title: str
+    job_description: str
 
 
 @router.post("/")
@@ -35,16 +35,19 @@ def create_cover_letter(req: CoverLetterRequest):
 
         row = db.execute(
             text("""
-                SELECT resume_text
+                SELECT id, resume_text
                 FROM resumes
-                WHERE id=:resume_id
-                AND user_id=:user_id
+                WHERE user_id=:user_id
+                ORDER BY id DESC
+                LIMIT 1
             """),
             {
-                "resume_id": req.resume_id,
                 "user_id": user_id
             }
         ).fetchone()
+
+        resume_id = row[0]
+        resume_text = row[1]
 
         if not row:
             raise HTTPException(
@@ -57,7 +60,8 @@ def create_cover_letter(req: CoverLetterRequest):
         cover_letter = generate_cover_letter(
             resume_text,
             req.company,
-            req.job_title
+            req.job_title,
+            req.job_description
         )
 
         db.execute(
@@ -78,7 +82,7 @@ def create_cover_letter(req: CoverLetterRequest):
                 )
             """),
             {
-                "resume_id": req.resume_id,
+                "resume_id": resume_id,
                 "company": req.company,
                 "job_title": req.job_title,
                 "cover_letter": cover_letter
@@ -88,7 +92,7 @@ def create_cover_letter(req: CoverLetterRequest):
         db.commit()
 
         return {
-            "resume_id": req.resume_id,
+            "resume_id": resume_id,
             "company": req.company,
             "job_title": req.job_title,
             "cover_letter": cover_letter

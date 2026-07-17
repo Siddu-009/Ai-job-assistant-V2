@@ -22,27 +22,31 @@ export default function JobRecommendations() {
 
       const token = localStorage.getItem("token");
 
+      console.log("TOKEN:", token);
+
       const response = await fetch(
 
-        "/api/recommend-jobs/",
+          "/api/recommend-jobs/",
 
-        {
+          {
 
-          method: "POST",
+              method: "POST",
 
-          headers: {
+              headers: {
 
-            "Content-Type": "application/json"
+                  "Content-Type": "application/json"
 
-          },
+              },
 
-          body: JSON.stringify({
+              body: JSON.stringify({
 
-            location
+                  token,
+                  keyword: search,
+                  location
 
-          })
+              })
 
-        }
+          }
 
       );
 
@@ -70,73 +74,111 @@ export default function JobRecommendations() {
 
   };
 
-  const saveJob = async(id)=>{
+  const saveJob = async (job) => {
 
     const token = localStorage.getItem("token");
 
-    await fetch(
+    // First add the job to the jobs table
+    const addResponse = await fetch("/api/jobs/add", {
 
-      "/api/saved-jobs/add",
+        method: "POST",
 
-      {
+        headers: {
 
-        method:"POST",
-
-        headers:{
-
-          "Content-Type":"application/json"
+            "Content-Type": "application/json"
 
         },
 
-        body:JSON.stringify({
+        body: JSON.stringify({
 
-          token,
-
-          job_id:id
+            title: job.title,
+            company: job.company,
+            location: job.location,
+            skills: job.skills || "",
+            apply_url: job.apply_url
 
         })
 
-      }
+    });
 
-    );
+    const addedJob = await addResponse.json();
+
+    // Then save it for the user
+    await fetch("/api/saved-jobs/add", {
+
+        method: "POST",
+
+        headers: {
+
+            "Content-Type": "application/json"
+
+        },
+
+        body: JSON.stringify({
+
+            token,
+            job_id: addedJob.id
+
+        })
+
+    });
 
     alert("Job Saved");
 
-  };
+};
 
-  const applyJob = async(id)=>{
+  const applyJob = async (job) => {
 
     const token = localStorage.getItem("token");
 
-    await fetch(
+    // First add the job
+    const addResponse = await fetch("/api/jobs/add", {
 
-      "/api/applications/apply",
+        method: "POST",
 
-      {
+        headers: {
 
-        method:"POST",
-
-        headers:{
-
-          "Content-Type":"application/json"
+            "Content-Type": "application/json"
 
         },
 
-        body:JSON.stringify({
+        body: JSON.stringify({
 
-          token,
-
-          job_id:id
+            title: job.title,
+            company: job.company,
+            location: job.location,
+            skills: job.skills || "",
+            apply_url: job.apply_url
 
         })
 
-      }
+    });
 
-    );
+    const addedJob = await addResponse.json();
+
+    // Then apply
+    await fetch("/api/applications/apply", {
+
+        method: "POST",
+
+        headers: {
+
+            "Content-Type": "application/json"
+
+        },
+
+        body: JSON.stringify({
+
+            token,
+            job_id: addedJob.id
+
+        })
+
+    });
 
     alert("Application Submitted");
 
-  };
+};
 
   return(
 
@@ -386,7 +428,7 @@ marginTop:"20px"
 
 <button
 
-onClick={()=>saveJob(job.job_id)}
+onClick={() => saveJob(job)}
 
 style={saveButton}
 
@@ -398,7 +440,7 @@ Save Job
 
 <button
 
-onClick={()=>applyJob(job.job_id)}
+onClick={() => applyJob(job)}
 
 style={applyButton}
 

@@ -55,6 +55,8 @@ from routes.resume_tailoring import router as resume_tailoring_router
 from routes.interview_roles import router as interview_roles_router
 from routes.ats_review import router as ats_review_router
 from routes.job_match import router as job_match_router
+from routes import resume_tailor
+from routes import job_details
 
 from fastapi.exceptions import RequestValidationError
 from starlette.exceptions import HTTPException as StarletteHTTPException
@@ -382,6 +384,18 @@ app.include_router(
     job_match_router,
     prefix="/job-match",
     tags=["Job Match"]
+)
+
+app.include_router(
+    resume_tailor.router,
+    prefix="/resume-tailor",
+    tags=["Resume Tailor"]
+)
+
+app.include_router(
+    job_details.router,
+    prefix="/jobs/details",
+    tags=["Job Details"]
 )
 
 @app.get("/")

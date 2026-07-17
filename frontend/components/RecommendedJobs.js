@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-
+import Link from "next/link";
 import Button from "./ui/Button";
 import Loader from "./ui/Loader";
 
@@ -8,6 +8,8 @@ export default function RecommendedJobs() {
   const [jobs, setJobs] = useState([]);
 
   const [loading, setLoading] = useState(true);
+
+  const [generatedResume,setGeneratedResume]=useState("");
 
   useEffect(() => {
 
@@ -187,6 +189,64 @@ export default function RecommendedJobs() {
 
   };
 
+  const tailorResume = async (job) => {
+
+    try {
+
+        const token = localStorage.getItem("token");
+
+        const response = await fetch(
+
+            "/api/resume-tailor/",
+
+            {
+
+                method: "POST",
+
+                headers: {
+
+                    "Content-Type": "application/json"
+
+                },
+
+                body: JSON.stringify({
+
+                    token,
+
+                    job
+
+                })
+
+            }
+
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+
+            alert(data.detail || "Unable to tailor resume");
+
+            return;
+
+        }
+
+        setGeneratedResume(
+            data.resume
+        );
+
+        alert("Resume Generated Successfully");
+
+    }
+
+    catch(err){
+
+        console.error(err);
+
+    }
+
+};
+
   return (
 
     <div
@@ -325,19 +385,21 @@ export default function RecommendedJobs() {
 
               <div>
 
-                <h3
-
-                  style={{
-
-                    margin: 0
-
-                  }}
-
+                <Link
+                    href={`/job/${job.job_id}`}
+                    style={{
+                        textDecoration: "none",
+                        color: "#2563eb"
+                    }}
                 >
-
-                  {job.title}
-
-                </h3>
+                    <h3
+                        style={{
+                            margin: 0
+                        }}
+                    >
+                        {job.title}
+                    </h3>
+                </Link>
 
                 <p
 
@@ -375,7 +437,25 @@ export default function RecommendedJobs() {
 
               >
 
-                {job.score || 0}% Match
+                ⭐ {job.score}% Match
+
+              </div>
+
+              <div
+              style={{
+              marginTop:"10px",
+              display:"inline-block",
+              background:"#dcfce7",
+              padding:"8px 14px",
+              borderRadius:"20px",
+              fontWeight:"600",
+              color:"#166534"
+              }}
+              >
+
+              📄 ATS Score
+
+              {job.ats_score ?? 0}%
 
               </div>
 
@@ -457,6 +537,201 @@ export default function RecommendedJobs() {
 
               </strong>
 
+                      <div
+            style={{
+                marginTop: "15px"
+            }}
+        >
+
+        <strong>
+
+        Matched Skills
+
+        </strong>
+
+        <div
+            style={{
+                display: "flex",
+                gap: "8px",
+                flexWrap: "wrap",
+                marginTop: "10px"
+            }}
+        >
+
+        {
+
+        (job.matched_skills || []).map(skill=>(
+
+        <span
+
+        key={skill}
+
+        style={{
+
+        background:"#dcfce7",
+
+        color:"#166534",
+
+        padding:"6px 12px",
+
+        borderRadius:"20px",
+
+        fontSize:"13px"
+
+        }}
+
+        >
+
+        ✓ {skill}
+
+        </span>
+
+        ))
+
+        }
+
+        </div>
+
+        </div>
+
+        <div
+            style={{
+                marginTop:"15px"
+            }}
+        >
+
+        <strong>
+
+        Missing Skills
+
+        </strong>
+
+        <div
+        style={{
+        marginTop:"20px"
+        }}
+        >
+
+        <strong>
+
+        Missing Resume Keywords
+
+        </strong>
+
+        <div
+        style={{
+        display:"flex",
+        gap:"8px",
+        flexWrap:"wrap",
+        marginTop:"10px"
+        }}
+        >
+
+        {
+
+        (job.ats_missing || []).map(skill=>(
+
+        <span
+
+        key={skill}
+
+        style={{
+
+        background:"#fee2e2",
+
+        padding:"6px 12px",
+
+        borderRadius:"20px"
+
+        }}
+
+        >
+
+        {skill}
+
+        </span>
+
+        ))
+
+        }
+
+        </div>
+
+        </div>
+
+        <div
+        style={{
+        marginTop:"18px",
+        padding:"15px",
+        background:"#f8fafc",
+        borderRadius:"10px"
+        }}
+        >
+
+        <strong>
+
+        📚 AI Recommendation
+
+        </strong>
+
+        <p
+        style={{
+        marginTop:"10px",
+        color:"#374151"
+        }}
+        >
+
+        {job.recommendation}
+
+        </p>
+
+        </div>
+
+        <div
+            style={{
+                display:"flex",
+                gap:"8px",
+                flexWrap:"wrap",
+                marginTop:"10px"
+            }}
+        >
+
+        {
+
+        (job.missing_skills || []).map(skill=>(
+
+        <span
+
+        key={skill}
+
+        style={{
+
+        background:"#fee2e2",
+
+        color:"#b91c1c",
+
+        padding:"6px 12px",
+
+        borderRadius:"20px",
+
+        fontSize:"13px"
+
+        }}
+
+        >
+
+        {skill}
+
+        </span>
+
+        ))
+
+        }
+
+        </div>
+
+        </div>
+
               <p
 
                 style={{
@@ -521,6 +796,30 @@ export default function RecommendedJobs() {
 
                 Apply Now
 
+              </Button>
+
+              <a
+                  href={job.apply_url}
+                  target="_blank"
+                  rel="noreferrer"
+                  style={{
+                      display: "inline-block",
+                      padding: "10px 18px",
+                      background: "#2563eb",
+                      color: "#fff",
+                      borderRadius: "8px",
+                      textDecoration: "none",
+                      fontWeight: "600"
+                  }}
+              >
+                  🔗 View Original Job
+              </a>
+
+              <Button
+                  variant="primary"
+                  onClick={() => tailorResume(job)}
+              >
+                  ✨ Generate Resume
               </Button>
 
             </div>
@@ -623,8 +922,33 @@ export default function RecommendedJobs() {
 
       }
 
-    </div>
+      {
+        generatedResume && (
+          <div
+            style={{
+              marginTop: "40px",
+              background: "#fff",
+              padding: "30px",
+              borderRadius: "15px",
+              border: "1px solid #ddd"
+            }}
+          >
+            <h2>Generated Resume</h2>
 
-  );
+            <pre
+              style={{
+                whiteSpace: "pre-wrap",
+                fontFamily: "inherit"
+              }}
+            >
+              {generatedResume}
+            </pre>
+          </div>
+        )
+      }
 
-}
+      </div>
+
+      );
+
+      }

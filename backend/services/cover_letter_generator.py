@@ -1,28 +1,44 @@
+from services.ai_service import ai_chat
+
+
 def generate_cover_letter(
     resume_text,
     company,
-    job_title
+    job_title,
+    job_description=""
 ):
 
-    return f"""
-Dear Hiring Manager,
+    prompt = f"""
+You are an expert HR Recruiter and Professional Resume Writer.
 
-I am excited to apply for the {job_title} position at {company}.
+Generate a professional ATS-friendly cover letter.
 
-My background includes experience with AWS, Docker, Kubernetes,
-Terraform, Linux, Jenkins, GitHub, Prometheus, Grafana and DevOps
-automation practices.
+Candidate Resume:
 
-I have hands-on experience building CI/CD pipelines, containerized
-applications, infrastructure automation, cloud deployments and
-monitoring solutions.
+{resume_text}
 
-I am confident that my technical skills and passion for cloud and
-DevOps engineering would make me a valuable addition to your team.
+Company:
 
-Thank you for your time and consideration.
+{company}
 
-Sincerely,
+Job Title:
 
-Candidate
+{job_title}
+
+Job Description:
+
+{job_description}
+
+Instructions:
+
+1. Write a professional cover letter.
+2. Mention ONLY the skills relevant to the Job Description.
+3. Do NOT mention technologies not present in the resume or JD.
+4. Mention why the candidate is suitable.
+5. Mention enthusiasm for joining {company}.
+6. Keep it between 300-450 words.
+7. Make it sound human.
+8. Return ONLY the cover letter.
 """
+
+    return ai_chat(prompt)
