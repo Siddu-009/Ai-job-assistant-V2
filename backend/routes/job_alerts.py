@@ -1,51 +1,103 @@
 from fastapi import APIRouter
 from pydantic import BaseModel
-
-from database import SessionLocal
 from sqlalchemy import text
 
+from database import SessionLocal
 from services.token_service import decode_token
-from services.email_service import send_email
 
-router = APIRouter()
+# IMPORTANT:
+# Do NOT use prefix="/job-alerts" here because main.py already adds it.
+router = APIRouter(tags=["Job Alerts"])
 
 
-class SubscribeRequest(BaseModel):
+class ListRequest(BaseModel):
     token: str
 
 
-@router.post("/subscribe")
-def subscribe(req: SubscribeRequest):
+@router.post("/")
+def list_alerts(req: ListRequest):
 
-    payload = decode_token(
-        req.token
-    )
+    payload = decode_token(req.token)
+
+    if not payload:
+        return {"alerts": []}
 
     user_id = payload["user_id"]
-    email = payload["email"]
+
+    db = SessionLocal()
+
+    rows = db.execute(
+        text("""
+            SELECT
+                id,
+                job_title,
+                company,
+                location,
+                apply_url
+            FROM job_alerts
+            WHERE user_id = :user_id
+            ORDER BY id DESC
+        """),
+        {"user_id": user_id}
+    ).fetchall()
+
+    db.close()
+
+    return {
+        "alerts": [
+            {
+                "id": row[0],
+                "role": row[1],
+                "salary": row[2],
+                "location": row[3],
+                "apply_url": row[4]
+            }
+            for row in rows
+        ]
+    }
+
+
+class CreateAlertRequest(BaseModel):
+    token: str
+    role: str
+    location: str = ""
+    salary: str = ""
+
+
+@router.post("/create")
+def create_alert(req: CreateAlertRequest):
+
+    payload = decode_token(req.token)
+
+    if not payload:
+        return {"message": "Invalid Token"}
+
+    user_id = payload["user_id"]
 
     db = SessionLocal()
 
     db.execute(
-        text(
-            """
-            INSERT INTO user_alerts
+        text("""
+            INSERT INTO job_alerts
             (
                 user_id,
-                email,
-                enabled
+                job_title,
+                company,
+                location
             )
             VALUES
             (
                 :user_id,
-                :email,
-                TRUE
+                :job_title,
+                :company,
+                :location
             )
-            """
-        ),
+        """),
         {
             "user_id": user_id,
-            "email": email
+            "job_title": req.role,
+            "company": req.salary,
+            "location": req.location
         }
     )
 
@@ -53,64 +105,30 @@ def subscribe(req: SubscribeRequest):
     db.close()
 
     return {
-        "message": "Email alerts enabled"
+        "message": "Job Alert Created Successfully"
     }
 
 
-class TestEmailRequest(BaseModel):
-    email: str
+class DeleteAlertRequest(BaseModel):
+    id: int
 
 
-@router.post("/send-test")
-def send_test(req: TestEmailRequest):
-
-    send_email(
-        req.email,
-        "AI Job Assistant Test",
-        "Email notifications are working."
-    )
-
-    return {
-        "message": "Test email sent"
-    }
-
-
-@router.get("/status/{token}")
-def status(token):
-
-    payload = decode_token(
-        token
-    )
-
-    user_id = payload["user_id"]
+@router.post("/delete")
+def delete_alert(req: DeleteAlertRequest):
 
     db = SessionLocal()
 
-    result = db.execute(
-        text(
-            """
-            SELECT enabled
-            FROM user_alerts
-            WHERE user_id = :user_id
-            ORDER BY id DESC
-            LIMIT 1
-            """
-        ),
-        {
-            "user_id": user_id
-        }
+    db.execute(
+        text("""
+            DELETE FROM job_alerts
+            WHERE id = :id
+        """),
+        {"id": req.id}
     )
 
-    row = result.fetchone()
-
+    db.commit()
     db.close()
 
-    if not row:
-
-        return {
-            "enabled": False
-        }
-
     return {
-        "enabled": row[0]
+        "message": "Alert Deleted Successfully"
     }

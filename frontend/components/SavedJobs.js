@@ -67,16 +67,19 @@ export default function SavedJobs() {
 
     try{
 
+      const token = localStorage.getItem("token");
+
       await fetch(
-
         `/api/saved-jobs/${savedId}`,
-
         {
-
-          method:"DELETE"
-
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            token: token
+          })
         }
-
       );
 
       loadSavedJobs();

@@ -281,7 +281,7 @@ export default function Applications() {
 
                 >
 
-		  {app.job_title}
+		  {app.title}
 
                 </h3>
 
@@ -365,7 +365,7 @@ export default function Applications() {
 
                 {" "}
 
-                {app.created_at || "N/A"}
+                {app.applied_at || "N/A"}
 
               </span>
 

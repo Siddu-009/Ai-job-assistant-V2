@@ -50,17 +50,12 @@ export default function JobAlerts() {
 
       const data = await response.json();
 
-      setAlerts(
-
-        data.alerts ||
-
-        data ||
-
-        []
-
-      );
-
-    }
+      if (Array.isArray(data.alerts)) {
+          setAlerts(data.alerts);
+      } else {
+          setAlerts([]);
+      }
+          }
 
     catch{
 

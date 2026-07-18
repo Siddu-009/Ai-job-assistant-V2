@@ -74,3 +74,56 @@ def download_ats_resume():
         media_type="application/pdf",
         filename="ats_resume.pdf"
     )
+
+# Download Cover Letter
+@router.get("/cover-letter")
+def download_cover_letter():
+
+    filepath = "generated/cover_letter.pdf"
+
+    if not os.path.exists(filepath):
+        return {
+            "error": "Cover Letter not found"
+        }
+
+    return FileResponse(
+        path=filepath,
+        media_type="application/pdf",
+        filename="cover_letter.pdf"
+    )
+
+
+# Download ATS Report
+@router.get("/ats-report")
+def download_ats_report():
+
+    filepath = "generated/ats_report.pdf"
+
+    if not os.path.exists(filepath):
+        return {
+            "error": "ATS Report not found"
+        }
+
+    return FileResponse(
+        path=filepath,
+        media_type="application/pdf",
+        filename="ats_report.pdf"
+    )
+
+
+# Download Career Roadmap
+@router.get("/career-roadmap")
+def download_career_roadmap():
+
+    filepath = "generated/career_roadmap.pdf"
+
+    if not os.path.exists(filepath):
+        return {
+            "error": "Career Roadmap not found"
+        }
+
+    return FileResponse(
+        path=filepath,
+        media_type="application/pdf",
+        filename="career_roadmap.pdf"
+    )

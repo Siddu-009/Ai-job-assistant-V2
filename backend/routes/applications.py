@@ -121,7 +121,7 @@ def my_applications(req: ApplicationHistoryRequest):
                     j.title,
                     j.company,
                     a.status,
-                    a.created_at
+                    a.applied_at
                 FROM applications a
                 JOIN jobs j
                     ON a.job_id = j.id
@@ -145,7 +145,7 @@ def my_applications(req: ApplicationHistoryRequest):
 
                 "status": row[3],
 
-                "created_at": str(row[4])
+                "applied_at": str(row[4])
 
             }
 

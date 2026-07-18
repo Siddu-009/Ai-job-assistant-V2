@@ -54,15 +54,11 @@ export default function ApplicationStatus() {
 
       const data = await response.json();
 
-      setApplications(
-
-        data.applications ||
-
-        data ||
-
-        []
-
-      );
+      if (Array.isArray(data.applications)) {
+          setApplications(data.applications);
+      } else {
+          setApplications([]);
+      }
 
     }
 

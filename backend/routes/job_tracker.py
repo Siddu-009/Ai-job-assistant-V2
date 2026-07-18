@@ -53,13 +53,13 @@ def application_list():
         text("""
         SELECT
             a.id,
-            r.filename,
+            COALESCE(r.filename, 'N/A') AS resume,
             j.title,
             j.company,
             a.status,
             a.applied_at
         FROM applications a
-        JOIN resumes r
+        LEFT JOIN resumes r
             ON a.resume_id = r.id
         JOIN jobs j
             ON a.job_id = j.id

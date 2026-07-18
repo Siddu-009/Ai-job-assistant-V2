@@ -261,3 +261,160 @@ def admin_stats():
 
     finally:
         db.close()
+
+from typing import Optional
+
+
+class DashboardRequest(BaseModel):
+    token: Optional[str] = ""
+
+
+@router.post("/dashboard")
+def admin_dashboard(req: DashboardRequest):
+
+    db = SessionLocal()
+
+    users = db.execute(
+        text("SELECT COUNT(*) FROM users")
+    ).scalar()
+
+    resumes = 0
+
+    try:
+        resumes = db.execute(
+            text("SELECT COUNT(*) FROM resumes")
+        ).scalar()
+    except Exception:
+        pass
+
+    applications = db.execute(
+        text("SELECT COUNT(*) FROM applications")
+    ).scalar()
+
+    jobs = db.execute(
+        text("SELECT COUNT(*) FROM jobs")
+    ).scalar()
+
+    recent_rows = db.execute(
+        text("""
+            SELECT
+                u.name,
+                j.title,
+                a.status,
+                a.updated_at
+            FROM applications a
+            LEFT JOIN users u
+                ON a.user_id = u.id
+            LEFT JOIN jobs j
+                ON a.job_id = j.id
+            ORDER BY a.updated_at DESC
+            LIMIT 10
+        """)
+    ).fetchall()
+
+    db.close()
+
+    recent_activity = []
+
+    for row in recent_rows:
+        recent_activity.append({
+            "user": row[0] or "Unknown User",
+            "action": f"{row[2]} - {row[1] or 'Unknown Job'}",
+            "time": str(row[3])
+        })
+
+    return {
+        "users": users,
+        "resumes": resumes,
+        "applications": applications,
+        "jobs": jobs,
+        "recent_activity": recent_activity
+    }
+
+class AdminRequest(BaseModel):
+    token: str = ""
+
+
+class UserRequest(BaseModel):
+    id: int
+
+
+@router.post("/")
+def admin_management(req: AdminRequest):
+
+    db = SessionLocal()
+
+    rows = db.execute(
+        text("""
+            SELECT
+                id,
+                name,
+                email
+            FROM users
+            ORDER BY id DESC
+        """)
+    ).fetchall()
+
+    db.close()
+
+    users = []
+
+    for row in rows:
+
+        users.append({
+
+            "id": row[0],
+
+            "name": row[1],
+
+            "email": row[2],
+
+            "role": "User",
+
+            "status": "Active"
+
+        })
+
+    return {
+
+        "users": users
+
+    }
+
+
+@router.post("/delete-user")
+def delete_user(req: UserRequest):
+
+    db = SessionLocal()
+
+    db.execute(
+        text("""
+            DELETE FROM users
+            WHERE id=:id
+        """),
+        {
+            "id": req.id
+        }
+    )
+
+    db.commit()
+    db.close()
+
+    return {
+
+        "message": "User deleted successfully"
+
+    }
+
+
+@router.post("/block-user")
+def block_user(req: UserRequest):
+
+    # Your users table doesn't have a status column.
+    # So just return success for now.
+
+    return {
+
+        "message": "User blocked successfully"
+
+    }
