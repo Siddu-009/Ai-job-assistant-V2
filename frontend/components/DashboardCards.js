@@ -245,7 +245,7 @@ export default function DashboardCards() {
 
     Promise.all([
 
-      fetch("/api/dashboard", {
+      fetch("/api/dashboard/", {
 	method: "POST",
     	headers: {
       	  "Content-Type": "application/json"
@@ -256,13 +256,18 @@ export default function DashboardCards() {
     	return r.json();
       }),
 
-      fetch("/api/ats-score", {
-    	method: "POST",
-    	headers: {
-      	  "Content-Type": "application/json"
-  	},
-	body: JSON.stringify({ token })
-      }).then(async (r) => {
+      fetch("/api/ats-score/", {
+          method: "POST",
+          headers: {
+              "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+              token,
+              job_description: ""
+          })
+      })
+      
+      .then(async (r) => {
     	if (!r.ok) return {};
     	return r.json();
       }),

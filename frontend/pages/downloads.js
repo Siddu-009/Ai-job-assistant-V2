@@ -5,49 +5,44 @@ export default function Downloads() {
   const [loading, setLoading] = useState(false);
 
   const downloadFile = async (endpoint, filename) => {
-
     setLoading(true);
 
     try {
-
       const response = await fetch(endpoint);
 
       if (!response.ok) {
-
         throw new Error("Download failed");
+      }
 
+      const contentType = response.headers.get("content-type");
+
+      if (contentType && contentType.includes("application/json")) {
+        const data = await response.json();
+        alert(data.error || "File not found");
+        return;
       }
 
       const blob = await response.blob();
 
-      const url = window.URL.createObjectURL(blob);
+      const url = URL.createObjectURL(blob);
 
       const a = document.createElement("a");
-
       a.href = url;
-
       a.download = filename;
 
       document.body.appendChild(a);
-
       a.click();
+      document.body.removeChild(a);
 
-      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
 
-      window.URL.revokeObjectURL(url);
-
-    }
-
-    catch {
-
+    } catch (err) {
+      console.error(err);
       alert("Unable to download file.");
-
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
-
   };
-
   const downloads = [
 
     {

@@ -99,3 +99,51 @@ async def upload_resume(
     finally:
 
         db.close()
+
+@router.get("/latest/{token}")
+def get_latest_resume(token: str):
+
+    payload = decode_token(token)
+
+    if not payload:
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid or expired token"
+        )
+
+    user_id = payload["user_id"]
+
+    db = SessionLocal()
+
+    try:
+
+        resume = db.execute(
+            text("""
+                SELECT filename,
+                       resume_text,
+                       skills
+                FROM resumes
+                WHERE user_id = :user_id
+                ORDER BY id DESC
+                LIMIT 1
+            """),
+            {
+                "user_id": user_id
+            }
+        ).fetchone()
+
+        if not resume:
+            raise HTTPException(
+                status_code=404,
+                detail="Resume not found"
+            )
+
+        return {
+            "success": True,
+            "filename": resume[0],
+            "resume_text": resume[1],
+            "skills": resume[2]
+        }
+
+    finally:
+        db.close()

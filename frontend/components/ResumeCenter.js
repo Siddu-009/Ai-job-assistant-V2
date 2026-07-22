@@ -9,91 +9,54 @@ export default function ResumeCenter() {
 
   const generateResume = async () => {
 
-    if (!jobDescription) {
-
+    if (!jobDescription.trim()) {
       alert("Please enter Job Description.");
-
       return;
-
     }
 
     const token = localStorage.getItem("token");
 
     if (!token) {
-
+      alert("Please login first.");
       window.location.href = "/login";
-
       return;
-
     }
 
     setLoading(true);
 
     try {
 
-      // Get latest uploaded resume
-      const resumeResponse = await fetch(
-        `/api/resume/latest/${token}`
-      );
-
-      const resumeData = await resumeResponse.json();
-
-      if (!resumeResponse.ok) {
-
-        alert(
-          resumeData.detail ||
-          "Please upload your resume first."
-        );
-
-        setLoading(false);
-
-        return;
-
-      }
-
-      // Generate AI Resume
-      const response = await fetch(
-        "/api/generate/",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            token,
-            resume: resumeData.resume_text,
-            job_description: jobDescription
-          })
-        }
-      );
+      const response = await fetch("/api/generate/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          token,
+          job_description: jobDescription
+        })
+      });
 
       const data = await response.json();
 
-      if (!response.ok) {
-
+      if (!response.ok || data.success === false) {
         alert(
-          data.detail ||
           data.message ||
+          data.detail ||
           "Resume generation failed."
         );
-
         return;
-
       }
 
       alert("Resume Generated Successfully.");
 
-    }
+    } catch (error) {
 
-    catch (error) {
-
-      console.error(error);
+      console.error("Generate Resume Error:", error);
 
       alert("Unable to generate resume.");
 
-    }
-
-    finally {
+    } finally {
 
       setLoading(false);
 
@@ -102,21 +65,11 @@ export default function ResumeCenter() {
   };
 
   const downloadTXT = () => {
-
-    window.open(
-      "/api/download/resume-txt",
-      "_blank"
-    );
-
+    window.open("/api/download/resume-txt", "_blank");
   };
 
   const downloadPDF = () => {
-
-    window.open(
-      "/api/download/resume-pdf",
-      "_blank"
-    );
-
+    window.open("/api/download/resume-pdf", "_blank");
   };
 
   return (
@@ -133,11 +86,7 @@ export default function ResumeCenter() {
 
       <h2>Resume Center</h2>
 
-      <p
-        style={{
-          color: "#6b7280"
-        }}
-      >
+      <p style={{ color: "#6b7280" }}>
         Generate an AI optimized resume using your latest uploaded resume.
       </p>
 
@@ -145,9 +94,7 @@ export default function ResumeCenter() {
         rows="10"
         placeholder="Paste Job Description Here..."
         value={jobDescription}
-        onChange={(e) =>
-          setJobDescription(e.target.value)
-        }
+        onChange={(e) => setJobDescription(e.target.value)}
         style={{
           width: "100%",
           padding: "15px",
@@ -159,26 +106,19 @@ export default function ResumeCenter() {
         }}
       />
 
-      <div
-        style={{
-          marginTop: "25px"
-        }}
-      >
+      <div style={{ marginTop: "25px" }}>
 
         {
-          loading ?
-
-          <Loader text="Generating Resume..." />
-
-          :
-
-          <Button
-            fullWidth
-            onClick={generateResume}
-          >
-            Generate Resume
-          </Button>
-
+          loading
+            ? <Loader text="Generating Resume..." />
+            : (
+              <Button
+                fullWidth
+                onClick={generateResume}
+              >
+                Generate Resume
+              </Button>
+            )
         }
 
       </div>

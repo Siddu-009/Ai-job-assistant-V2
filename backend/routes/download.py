@@ -1,129 +1,137 @@
 from fastapi import APIRouter
 from fastapi.responses import FileResponse
-import os
+from pathlib import Path
 
 router = APIRouter()
 
+# Base directory of the backend
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+# generated folder
+GENERATED_DIR = BASE_DIR / "generated"
+
+
+# -----------------------------
 # Download Generated TXT Resume
+# -----------------------------
 @router.get("/resume-txt")
 def download_txt():
 
-    filepath = "generated/generated_resume.txt"
+    filepath = GENERATED_DIR / "generated_resume.txt"
 
-    if not os.path.exists(filepath):
-        return {
-            "error": "TXT file not found"
-        }
+    if not filepath.exists():
+        return {"error": "TXT file not found"}
 
     return FileResponse(
-        path=filepath,
+        path=str(filepath),
         media_type="text/plain",
         filename="generated_resume.txt"
     )
 
 
+# -----------------------------
 # Download Generated PDF Resume
+# -----------------------------
 @router.get("/resume-pdf")
 def download_pdf():
 
-    filepath = "generated/generated_resume.pdf"
+    filepath = GENERATED_DIR / "generated_resume.pdf"
 
-    if not os.path.exists(filepath):
-        return {
-            "error": "PDF file not found"
-        }
+    if not filepath.exists():
+        return {"error": "PDF file not found"}
 
     return FileResponse(
-        path=filepath,
+        path=str(filepath),
         media_type="application/pdf",
         filename="generated_resume.pdf"
     )
 
 
-# Download Professional Resume
+# -----------------------------
+# Professional Resume
+# -----------------------------
 @router.get("/professional-resume")
 def download_professional_resume():
 
-    filepath = "generated/professional_resume.pdf"
+    filepath = GENERATED_DIR / "professional_resume.pdf"
 
-    if not os.path.exists(filepath):
-        return {
-            "error": "Professional Resume not found"
-        }
+    if not filepath.exists():
+        return {"error": "Professional Resume not found"}
 
     return FileResponse(
-        path=filepath,
+        path=str(filepath),
         media_type="application/pdf",
         filename="professional_resume.pdf"
     )
 
 
-# Download ATS Resume
+# -----------------------------
+# ATS Resume
+# -----------------------------
 @router.get("/ats-resume")
 def download_ats_resume():
 
-    filepath = "generated/ats_resume.pdf"
+    filepath = GENERATED_DIR / "ats_resume.pdf"
 
-    if not os.path.exists(filepath):
-        return {
-            "error": "ATS Resume not found"
-        }
+    if not filepath.exists():
+        return {"error": "ATS Resume not found"}
 
     return FileResponse(
-        path=filepath,
+        path=str(filepath),
         media_type="application/pdf",
         filename="ats_resume.pdf"
     )
 
-# Download Cover Letter
+
+# -----------------------------
+# Cover Letter
+# -----------------------------
 @router.get("/cover-letter")
 def download_cover_letter():
 
-    filepath = "generated/cover_letter.pdf"
+    filepath = GENERATED_DIR / "cover_letter.pdf"
 
-    if not os.path.exists(filepath):
-        return {
-            "error": "Cover Letter not found"
-        }
+    if not filepath.exists():
+        return {"error": "Cover Letter not found"}
 
     return FileResponse(
-        path=filepath,
+        path=str(filepath),
         media_type="application/pdf",
         filename="cover_letter.pdf"
     )
 
 
-# Download ATS Report
+# -----------------------------
+# ATS Report
+# -----------------------------
 @router.get("/ats-report")
 def download_ats_report():
 
-    filepath = "generated/ats_report.pdf"
+    filepath = GENERATED_DIR / "ats_report.pdf"
 
-    if not os.path.exists(filepath):
-        return {
-            "error": "ATS Report not found"
-        }
+    if not filepath.exists():
+        return {"error": "ATS Report not found"}
 
     return FileResponse(
-        path=filepath,
+        path=str(filepath),
         media_type="application/pdf",
         filename="ats_report.pdf"
     )
 
 
-# Download Career Roadmap
+# -----------------------------
+# Career Roadmap
+# -----------------------------
 @router.get("/career-roadmap")
 def download_career_roadmap():
 
-    filepath = "generated/career_roadmap.pdf"
+    filepath = GENERATED_DIR / "career_roadmap.pdf"
 
-    if not os.path.exists(filepath):
-        return {
-            "error": "Career Roadmap not found"
-        }
+    if not filepath.exists():
+        return {"error": "Career Roadmap not found"}
 
     return FileResponse(
-        path=filepath,
+        path=str(filepath),
         media_type="application/pdf",
         filename="career_roadmap.pdf"
     )
