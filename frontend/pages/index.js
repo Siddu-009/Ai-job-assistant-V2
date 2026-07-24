@@ -9,6 +9,7 @@ import ResumeCenter     from "../components/ResumeCenter";
 import RecommendedJobs  from "../components/RecommendedJobs";
 import SavedJobs        from "../components/SavedJobs";
 import Applications     from "../components/Applications";
+import { useTheme }     from "../context/ThemeContext";
 
 // ─── static data ──────────────────────────────────────────────────────────────
 
@@ -50,20 +51,20 @@ const INTERVIEWS = [
   { date: "05 July", company: "Capgemini", type: "Coding Test"     },
 ];
 
-// ─── shared card style ────────────────────────────────────────────────────────
-
-const CARD = {
-  background:   "#ffffff",
-  padding:      "25px",
-  borderRadius: "18px",
-  boxShadow:    "0 8px 25px rgba(0,0,0,0.06)",
-};
-
 // ─── sub-components ───────────────────────────────────────────────────────────
 
 function AiSuggestions() {
+  const { colors } = useTheme();
   return (
-    <div style={CARD}>
+    <div 
+    style={{
+      background: colors.card,
+      color: colors.text,
+      border: colors.borderStyle,
+      padding: "25px",
+      borderRadius: "18px",
+      boxShadow: "0 8px 25px rgba(0,0,0,0.06)",
+    }}>
       <h2 style={{ marginTop: 0 }}>AI Suggestions</h2>
       <ul style={{ marginTop: "16px", lineHeight: 2, paddingLeft: "20px" }}>
         {AI_SUGGESTIONS.map((s) => <li key={s} style={{ fontSize: "14px" }}>{s}</li>)}
@@ -73,8 +74,17 @@ function AiSuggestions() {
 }
 
 function WeeklyProgress() {
+  const { colors, darkMode } = useTheme();
   return (
-    <div style={CARD}>
+    <div 
+    style={{
+      background: colors.card,
+      color: colors.text,
+      border: colors.borderStyle,
+      padding: "25px",
+      borderRadius: "18px",
+      boxShadow: "0 8px 25px rgba(0,0,0,0.06)",
+    }}>
       <h2 style={{ marginTop: 0 }}>Weekly Progress</h2>
       <div style={{ marginTop: "16px", display: "flex", flexDirection: "column", gap: "20px" }}>
         {WEEKLY_PROGRESS.map(({ label, value }) => (
@@ -86,7 +96,7 @@ function WeeklyProgress() {
             {/* FIXED: native <progress> has inconsistent cross-browser styling and
                 can't be themed to match the design system. Replaced with a
                 custom bar that matches the rest of the codebase. */}
-            <div style={{ width: "100%", height: "10px", borderRadius: "10px", background: "#e5e7eb" }}>
+            <div style={{ width: "100%", height: "10px", borderRadius: "10px", background: darkMode ? "#334155" : "#e5e7eb" }}>
               <div
                 role="progressbar"
                 aria-valuenow={value}
@@ -110,8 +120,17 @@ function WeeklyProgress() {
 }
 
 function CareerRoadmap() {
+  const { colors } = useTheme();
   return (
-    <div style={CARD}>
+    <div 
+    style={{
+      background: colors.card,
+      color: colors.text,
+      border: colors.borderStyle,
+      padding: "25px",
+      borderRadius: "18px",
+      boxShadow: "0 8px 25px rgba(0,0,0,0.06)",
+    }}>
       <h2 style={{ marginTop: 0 }}>Career Roadmap</h2>
       <div style={{ marginTop: "16px", display: "flex", flexDirection: "column", gap: "12px" }}>
         {ROADMAP.map(({ done, label }) => (
@@ -122,7 +141,7 @@ function CareerRoadmap() {
               alignItems: "center",
               gap:        "10px",
               fontSize:   "14px",
-              color:      done ? "#111827" : "#6b7280",
+              color: done ? colors.text : colors.subText,
             }}
           >
             <span aria-hidden="true">{done ? "✅" : "⏳"}</span>
@@ -135,8 +154,17 @@ function CareerRoadmap() {
 }
 
 function UpcomingInterviews() {
+  const { colors, darkMode } = useTheme();
   return (
-    <div style={CARD}>
+    <div 
+    style={{
+      background: colors.card,
+      color: colors.text,
+      border: colors.borderStyle,
+      padding: "25px",
+      borderRadius: "18px",
+      boxShadow: "0 8px 25px rgba(0,0,0,0.06)",
+    }}>
       <h2 style={{ marginTop: 0 }}>Upcoming Interviews</h2>
       <div style={{ marginTop: "16px", display: "flex", flexDirection: "column", gap: "14px" }}>
         {INTERVIEWS.map(({ date, company, type }) => (
@@ -148,14 +176,14 @@ function UpcomingInterviews() {
               gap:          "12px",
               padding:      "12px 16px",
               borderRadius: "12px",
-              background:   "#f8fafc",
+              background: darkMode ? "#1e293b" : "#f8fafc",
               fontSize:     "14px",
             }}
           >
             <span aria-hidden="true">📅</span>
             <div>
               <span style={{ fontWeight: 600 }}>{company}</span>
-              <span style={{ color: "#6b7280" }}> — {date} — {type}</span>
+              <span style={{ color: colors.subText }}> — {date} — {type}</span>
             </div>
           </div>
         ))}
@@ -165,8 +193,19 @@ function UpcomingInterviews() {
 }
 
 function AiInsights() {
+  const { colors } = useTheme();
   return (
-    <div style={{ ...CARD, marginBottom: 0 }}>
+    <div
+      style={{
+        background: colors.card,
+        color: colors.text,
+        border: colors.borderStyle,
+        padding: "25px",
+        borderRadius: "18px",
+        boxShadow: "0 8px 25px rgba(0,0,0,0.06)",
+        marginBottom: 0,
+      }}
+    >
       <h2 style={{ marginTop: 0 }}>Latest AI Insights</h2>
       <ul style={{ marginTop: "16px", lineHeight: 2, paddingLeft: "20px" }}>
         {AI_INSIGHTS.map((s) => <li key={s} style={{ fontSize: "14px" }}>{s}</li>)}
@@ -197,6 +236,7 @@ function TwoCol({ children, style }) {
 // ─── Dashboard ────────────────────────────────────────────────────────────────
 
 export default function Dashboard() {
+
   return (
     <Layout dashboard={true}>
       {/* FIXED: padding & background on the inner wrapper duplicated what

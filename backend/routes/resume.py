@@ -74,9 +74,10 @@ async def upload_resume(
 
         create_notification(
             user_id=user_id,
-            title="📄 Resume Uploaded",
-            message=f"{file.filename} uploaded successfully.",
-            notification_type="resume"
+            title="Resume Generated",
+            message="Your resume is ready.",
+            notification_type="RESUME",
+            link="/resume-center"
         )
 
         return {

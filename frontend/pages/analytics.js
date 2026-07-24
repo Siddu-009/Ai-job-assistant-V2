@@ -3,6 +3,15 @@ import { useEffect, useState } from "react";
 import Layout from "../components/Layout";
 import Loader from "../components/ui/Loader";
 
+const colors = {
+    card: "#ffffff",
+    background: "#f5f7fb",
+    text: "#111827",
+    secondaryText: "#6b7280",
+    border: "#e5e7eb",
+    shadow: "0 10px 25px rgba(0,0,0,.06)"
+};
+
 export default function Analytics() {
 
   const [data, setData] = useState(null);
@@ -734,7 +743,7 @@ Track your resume performance and job search analytics.
 
               style={{
 
-                background:"#ffffff",
+                background: colors.card,
 
                 borderRadius:"18px",
 
@@ -914,7 +923,7 @@ Track your resume performance and job search analytics.
 
               style={{
 
-                background:"#ffffff",
+                background: colors.card,
 
                 borderRadius:"18px",
 
@@ -1016,7 +1025,7 @@ return(
 
 style={{
 
-background:"#ffffff",
+background: colors.card,
 
 padding:"25px",
 

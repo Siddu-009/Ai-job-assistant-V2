@@ -12,7 +12,7 @@ export default function ResumeReview({
 
       style={{
 
-        background:"#ffffff",
+        background: colors.card,
 
         borderRadius:"18px",
 

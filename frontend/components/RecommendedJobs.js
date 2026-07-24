@@ -2,8 +2,11 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import Button from "./ui/Button";
 import Loader from "./ui/Loader";
+import { useTheme } from "../context/ThemeContext";
 
 export default function RecommendedJobs() {
+
+  const { colors } = useTheme();
 
   const [jobs, setJobs] = useState([]);
 
@@ -255,7 +258,9 @@ export default function RecommendedJobs() {
 
         marginTop: "30px",
 
-        background: "#ffffff",
+        background: colors.card,
+        color: colors.text,
+        border: colors.borderStyle,
 
         borderRadius: "18px",
 
@@ -268,13 +273,10 @@ export default function RecommendedJobs() {
     >
 
       <h2
-
-        style={{
-
-          marginTop: 0
-
-        }}
-
+      style={{
+          marginTop:0,
+          color: colors.text
+      }}
       >
 
         Recommended Jobs
@@ -282,13 +284,9 @@ export default function RecommendedJobs() {
       </h2>
 
       <p
-
-        style={{
-
-          color: "#6b7280"
-
-        }}
-
+      style={{
+          color: colors.subText
+      }}
       >
 
         AI recommended jobs based on your resume and skills.

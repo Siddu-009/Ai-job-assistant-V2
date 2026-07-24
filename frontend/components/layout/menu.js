@@ -85,6 +85,11 @@ icon:History
 label:"Resume Versions",
 href:"/resume-versions",
 icon:Layers3
+},
+{
+    label: "Resume Center",
+    href: "/resume-center",
+    icon: FileText,
 }
 ]
 },

@@ -1,8 +1,11 @@
 import { useState } from "react";
 import Button from "./ui/Button";
 import Loader from "./ui/Loader";
+import { useTheme } from "../context/ThemeContext";
 
 export default function ResumeCenter() {
+
+  const { colors } = useTheme();
 
   const [jobDescription, setJobDescription] = useState("");
   const [loading, setLoading] = useState(false);
@@ -77,16 +80,20 @@ export default function ResumeCenter() {
     <div
       style={{
         marginTop: "30px",
-        background: "#ffffff",
+        background: colors.card,
+        color: colors.text,
+        border: colors.borderStyle,
         borderRadius: "18px",
         padding: "30px",
         boxShadow: "0 10px 30px rgba(0,0,0,.08)"
       }}
     >
 
-      <h2>Resume Center</h2>
+      <h2 style={{ color: colors.text }}>
+          Resume Center
+      </h2>
 
-      <p style={{ color: "#6b7280" }}>
+      <p style={{ color: colors.subText }}>
         Generate an AI optimized resume using your latest uploaded resume.
       </p>
 
@@ -131,7 +138,7 @@ export default function ResumeCenter() {
         }}
       >
 
-        <h3>Downloads</h3>
+        <h3 style={{ color: colors.text }}>Downloads</h3>
 
         <div
           style={{

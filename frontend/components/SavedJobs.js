@@ -2,8 +2,11 @@ import { useState } from "react";
 
 import Button from "./ui/Button";
 import Loader from "./ui/Loader";
+import { useTheme } from "../context/ThemeContext";
 
 export default function SavedJobs() {
+
+  const { colors } = useTheme();
 
   const [jobs, setJobs] = useState([]);
 
@@ -104,7 +107,9 @@ export default function SavedJobs() {
 
         marginTop:"30px",
 
-        background:"#ffffff",
+        background: colors.card,
+        color: colors.text,
+        border: colors.borderStyle,
 
         borderRadius:"18px",
 
@@ -134,7 +139,7 @@ export default function SavedJobs() {
 
         style={{
 
-          color:"#6b7280"
+          color: colors.subText
 
         }}
 
@@ -192,13 +197,14 @@ export default function SavedJobs() {
 
               padding: "25px",
 
-              background: "#f8fafc",
+              background: colors.background,
+              border: colors.borderStyle,
 
               borderRadius: "12px",
 
               textAlign: "center",
 
-              color: "#6b7280"
+              color: colors.subText
 
             }}
 
@@ -230,7 +236,9 @@ export default function SavedJobs() {
 
               padding: "20px",
 
-              background: "#ffffff",
+              background: colors.card,
+              color: colors.text,
+              border: colors.borderStyle,
 
               boxShadow: "0 5px 15px rgba(0,0,0,.05)"
 
@@ -278,7 +286,7 @@ export default function SavedJobs() {
 
                     marginTop: "8px",
 
-                    color: "#6b7280"
+                    color: colors.subText
 
                   }}
 
@@ -334,7 +342,8 @@ export default function SavedJobs() {
 
                 style={{
 
-                  background: "#f3f4f6",
+                  background: colors.background,
+                  color: colors.text,
 
                   padding: "8px 14px",
 
@@ -481,11 +490,10 @@ export default function SavedJobs() {
 
               padding: "20px",
 
-              background: "#f8fafc",
+              background: colors.background,
+              border: colors.borderStyle,
 
               borderRadius: "12px",
-
-              border: "1px solid #e5e7eb"
 
             }}
 
@@ -517,7 +525,7 @@ export default function SavedJobs() {
 
                 lineHeight: "1.9",
 
-                color: "#4b5563"
+                color: colors.subText
 
               }}
 

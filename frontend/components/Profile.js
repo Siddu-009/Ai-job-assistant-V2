@@ -2,8 +2,11 @@ import { useState } from "react";
 
 import Button from "./ui/Button";
 import Loader from "./ui/Loader";
+import { useTheme } from "../context/ThemeContext";
 
 export default function Profile() {
+
+  const { colors } = useTheme();
 
   const [profile, setProfile] = useState(null);
 
@@ -49,7 +52,6 @@ export default function Profile() {
       }
 
       setProfile(data);
-      setProfile(data);
 
     }
 
@@ -77,7 +79,9 @@ style={{
 
 marginTop:"30px",
 
-background:"#ffffff",
+background: colors.card,
+color: colors.text,
+border: colors.borderStyle,
 
 borderRadius:"18px",
 
@@ -99,7 +103,7 @@ My Profile
 
 style={{
 
-color:"#6b7280"
+color: colors.subText
 
 }}
 
@@ -155,13 +159,14 @@ Load Profile
 
               marginTop: "30px",
 
-              border: "1px solid #e5e7eb",
+              background: colors.background,
+              border: colors.borderStyle,
 
               borderRadius: "18px",
 
               padding: "30px",
 
-              background: "#ffffff",
+              color: colors.text,
 
               boxShadow: "0 5px 15px rgba(0,0,0,.05)"
 
@@ -251,7 +256,7 @@ Load Profile
 
                     marginTop: "8px",
 
-                    color: "#6b7280"
+                    color: colors.subText
 
                   }}
 
@@ -265,7 +270,7 @@ Load Profile
 
                   style={{
 
-                    color: "#9ca3af",
+                    color: colors.subText,
 
                     fontSize: "14px"
 
@@ -413,7 +418,7 @@ Load Profile
 
                   height: "14px",
 
-                  background: "#e5e7eb",
+                  background: colors.background,
 
                   borderRadius: "20px",
 
@@ -447,7 +452,7 @@ Load Profile
 
                   marginTop: "10px",
 
-                  color: "#6b7280"
+                  color: colors.subText
 
                 }}
 
@@ -467,11 +472,10 @@ Load Profile
 
                 padding: "20px",
 
-                background: "#f8fafc",
-
                 borderRadius: "12px",
 
-                border: "1px solid #e5e7eb"
+                background: colors.background,
+                border: colors.borderStyle
 
               }}
 
@@ -503,7 +507,7 @@ Load Profile
 
                   lineHeight: "1.9",
 
-                  color: "#4b5563"
+                  color: colors.subText
 
                 }}
 
@@ -587,7 +591,7 @@ Load Profile
 
                   lineHeight: "1.9",
 
-                  color: "#374151"
+                  color: colors.text
 
                 }}
 

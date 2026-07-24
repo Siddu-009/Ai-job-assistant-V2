@@ -57,22 +57,26 @@ def apply(req: ApplyRequest):
 
         db.execute(
             text("""
-                INSERT INTO applications
+                INSERT INTO notifications
                 (
                     user_id,
-                    job_id,
-                    status
+                    title,
+                    message,
+                    type
                 )
                 VALUES
                 (
                     :user_id,
-                    :job_id,
-                    'Applied'
+                    :title,
+                    :message,
+                    :type
                 )
             """),
             {
                 "user_id": user_id,
-                "job_id": req.job_id
+                "title": "Application Submitted",
+                "message": "Your application was submitted successfully.",
+                "type": "application"
             }
         )
 

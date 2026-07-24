@@ -1,6 +1,7 @@
 import "../styles/globals.css";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
+import { ThemeProvider } from "../context/ThemeContext";
 
 const PUBLIC_ROUTES = [
   "/login",
@@ -56,6 +57,10 @@ export default function App({ Component, pageProps }) {
 
   }
 
-  return <Component {...pageProps} />;
+  return (
+    <ThemeProvider>
+      <Component {...pageProps} />
+    </ThemeProvider>
+  );
 
 }

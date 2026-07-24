@@ -79,12 +79,7 @@ def ats_score(req: ATSRequest):
             req.job_description
         )
 
-        create_notification(
-            user_id=user_id,
-            title="🎯 ATS Score Generated",
-            message=f"ATS Score: {result.get('ats_score', 0)}%",
-            notification_type="ats"
-        )
+        print(result)
 
         return result
 

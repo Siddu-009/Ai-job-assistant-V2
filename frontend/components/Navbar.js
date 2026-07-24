@@ -7,15 +7,24 @@ import {
   User,
   Moon,
   Sun,
-  Menu,
   ChevronDown,
   LogOut,
 } from "lucide-react";
 
 // ─── constants ────────────────────────────────────────────────────────────────
 
-// FIXED: hardcoded personal email removed — pass user data via props
-const NOTIF_COUNT = 3;
+const MODULES = [
+  { name: "Dashboard", path: "/" },
+  { name: "Analytics", path: "/analytics" },
+  { name: "Notifications", path: "/notifications" },
+  { name: "Profile", path: "/profile" },
+  { name: "Settings", path: "/settings" },
+  { name: "Resume Center", path: "/resume-center" },
+  { name: "ATS Resume Analyzer", path: "/ats-score" },
+  { name: "Saved Jobs", path: "/saved-jobs" },
+  { name: "Applications", path: "/applications" },
+  { name: "Recommended Jobs", path: "/recommended-jobs" },
+];
 
 // FIXED: `transition: "0.25s"` is invalid — property name was missing.
 const menuItemStyle = {
@@ -40,6 +49,8 @@ const menuItemStyle = {
 export default function Navbar({
   collapsed,
   setCollapsed,
+  title,
+  subtitle,
   userName  = "Siddardha",
   userRole  = "DevOps Engineer",
   userEmail = "user@example.com",
@@ -52,6 +63,13 @@ export default function Navbar({
   const [showProfile, setShowProfile] = useState(false);
   const [showNotifs,  setShowNotifs]  = useState(false);
   const [currentTime, setCurrentTime] = useState("");
+  const [results,     setResults]     = useState([]);
+  const [notifications, setNotifications] = useState([]);
+
+  const unreadCount =
+  Array.isArray(notifications)
+      ? notifications.filter(item => !item.is_read).length
+      : 0;
 
   const profileRef = useRef(null);
   const notifRef   = useRef(null);
@@ -108,6 +126,154 @@ export default function Navbar({
     router.replace("/login");
   };
 
+const searchItems = [
+
+  // MAIN
+  { title: "Dashboard", path: "/" },
+  { title: "Analytics", path: "/analytics" },
+  { title: "Notifications", path: "/notifications" },
+
+  // RESUME
+  { title: "Resume Upload", path: "/resume-upload" },
+  { title: "Resume Builder", path: "/resume-builder" },
+  { title: "Resume Enhancer", path: "/resume-enhancer" },
+  { title: "Resume Tailoring", path: "/resume-tailoring" },
+  { title: "Resume Compare", path: "/resume-compare" },
+  { title: "Resume History", path: "/resume-history" },
+  { title: "Resume Versions", path: "/resume-versions" },
+  { title: "Resume Center", path: "/resume-center" },
+
+
+  // AI TOOLS
+  { title: "ATS Analyzer", path: "/ats-score" },
+  { title: "Skill Gap", path: "/skill-gap" },
+  { title: "Learning", path: "/learning" },
+  { title: "Career Coach", path: "/career-coach" },
+  { title: "Career Roadmap", path: "/career-roadmap" },
+  { title: "Interview Questions", path: "/interview-questions" },
+  { title: "Mock Test", path: "/mock-test" },
+  { title: "Cover Letter", path: "/cover-letter" },
+
+  // JOBS
+  { title: "Live Jobs", path: "/live-jobs" },
+  { title: "Recommendations", path: "/recommended-jobs" },
+  { title: "Saved Jobs", path: "/saved-jobs" },
+  { title: "Applications", path: "/applications" },
+  { title: "Job Tracker", path: "/job-tracker" },
+  { title: "Application Status", path: "/application-status" },
+  { title: "Job Alerts", path: "/job-alerts" },
+  { title: "Workflow", path: "/workflow" },
+
+  // RECRUITER
+  { title: "Recruiter Dashboard", path: "/recruiter-dashboard" },
+  { title: "Candidate Search", path: "/candidate-search" },
+  { title: "Recruiter Analytics", path: "/recruiter-analytics" },
+
+  // ADMIN
+  { title: "Admin Dashboard", path: "/admin-dashboard" },
+  { title: "Admin Management", path: "/admin-management" },
+  { title: "Downloads", path: "/downloads" },
+  { title: "Profile", path: "/profile" },
+  { title: "Settings", path: "/settings" }
+
+];
+
+const loadNotifications = async () => {
+    try {
+        const token = localStorage.getItem("token");
+
+        if (!token) {
+            setNotifications([]);
+            return;
+        }
+
+        const response = await fetch("/api/notifications/", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ token }),
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            setNotifications(data.notifications || []);
+        } else {
+            setNotifications([]);
+        }
+
+    } catch (err) {
+        console.error(err);
+        setNotifications([]);
+    }
+};
+
+useEffect(() => {
+
+    loadNotifications();
+
+    const interval = setInterval(() => {
+
+        loadNotifications();
+
+    }, 30000);
+
+    return () => clearInterval(interval);
+
+}, []);
+
+const markAsRead = async (id) => {
+
+    const token = localStorage.getItem("token");
+
+    await fetch(
+        `/api/notifications/${id}/read`,
+        {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                token
+            })
+        }
+    );
+
+    await loadNotifications();
+
+};
+
+const markAllRead = async () => {
+
+    const token = localStorage.getItem("token");
+
+    await fetch("/api/notifications/read-all", {
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ token })
+    });
+
+    await loadNotifications();
+};
+
+const clearAllNotifications = async () => {
+
+    const token = localStorage.getItem("token");
+
+    await fetch("/api/notifications/clear-all", {
+        method: "DELETE",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ token })
+    });
+
+    await loadNotifications();
+};
+
   return (
     <header
       style={{
@@ -125,6 +291,7 @@ export default function Navbar({
         gap:            "16px",
       }}
     >
+      
       {/* ── Left: toggle + search ── */}
       <div style={{ display: "flex", alignItems: "center", gap: "16px", minWidth: 0 }}>
 
@@ -141,9 +308,7 @@ export default function Navbar({
             placeItems:   "center",
             flexShrink:   0,
           }}
-        >
-          <Menu size={24} aria-hidden="true" />
-        </button>
+          ></button>
 
         {/* Search */}
         <label
@@ -164,7 +329,22 @@ export default function Navbar({
             type="search"
             placeholder="Search modules…"
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) => {
+                const value = e.target.value;
+
+                setSearch(value);
+
+                if (!value.trim()) {
+                    setResults([]);
+                    return;
+                }
+
+                const filtered = searchItems.filter(item =>
+                    item.title.toLowerCase().includes(value.toLowerCase())
+                );
+
+                setResults(filtered);
+            }}
             aria-label="Search modules"
             style={{
               width:        "320px",
@@ -177,6 +357,50 @@ export default function Navbar({
               boxSizing:    "border-box",
             }}
           />
+
+          {results.length > 0 && (
+
+          <div
+          style={{
+              position:"absolute",
+              top:"52px",
+              left:0,
+              width:"100%",
+              background:"#fff",
+              borderRadius:"10px",
+              border:"1px solid #ddd",
+              boxShadow:"0 10px 25px rgba(0,0,0,.15)",
+              zIndex:1000
+          }}
+          >
+
+          {results.map(item=>(
+
+          <div
+          key={item.path}
+          onClick={()=>{
+              router.push(item.path);
+              setSearch("");
+              setResults([]);
+          }}
+          style={{
+              padding:"12px 18px",
+              cursor:"pointer"
+          }}
+          onMouseEnter={(e)=>e.currentTarget.style.background="#f3f4f6"}
+          onMouseLeave={(e)=>e.currentTarget.style.background="#fff"}
+          >
+
+          {item.title}
+
+          </div>
+
+          ))}
+
+          </div>
+
+          )}
+
         </label>
       </div>
 
@@ -218,7 +442,7 @@ export default function Navbar({
         <div ref={notifRef} style={{ position: "relative" }}>
           <button
             onClick={() => { setShowNotifs((v) => !v); setShowProfile(false); }}
-            aria-label={`${NOTIF_COUNT} notifications`}
+            aria-label={`${unreadCount} notifications`}
             aria-expanded={showNotifs}
             style={{
               border:     "none",
@@ -249,7 +473,7 @@ export default function Navbar({
                 fontWeight:     700,
               }}
             >
-              {NOTIF_COUNT}
+              {unreadCount}
             </span>
           </button>
 
@@ -258,25 +482,136 @@ export default function Navbar({
               role="dialog"
               aria-label="Notifications"
               style={{
-                position:     "absolute",
-                top:          "48px",
-                right:        0,
-                width:        "280px",
-                background:   "#ffffff",
-                borderRadius: "15px",
-                boxShadow:    "0 10px 30px rgba(0,0,0,0.12)",
-                border:       "1px solid #e5e7eb",
-                zIndex:       999,
-                overflow:     "hidden",
+                  position:"absolute",
+                  top:"48px",
+                  right:0,
+                  width:"340px",
+                  maxHeight:"450px",
+                  overflowY:"auto",
+                  overflowX:"hidden",
+                  background:"#fff",
+                  borderRadius:"15px",
+                  boxShadow:"0 10px 30px rgba(0,0,0,.12)",
+                  border:"1px solid #e5e7eb",
+                  zIndex:999
               }}
             >
+              <div>
+
+              <div
+              style={{
+              maxHeight:"340px",
+              overflowY:"auto"
+              }}
+              >
+
+              </div>
+
+              </div>
               <p style={{ margin: 0, padding: "16px 20px", fontWeight: 700, borderBottom: "1px solid #f3f4f6", fontSize: "14px" }}>
                 Notifications
               </p>
-              {["New job matched: DevOps at AWS", "ATS Score improved to 92%", "Resume viewed by recruiter"].map((n) => (
-                <div key={n} style={{ padding: "14px 20px", borderBottom: "1px solid #f9fafb", fontSize: "13px", color: "#374151" }}>
-                  {n}
-                </div>
+
+              <div
+              style={{
+              display:"flex",
+              justifyContent:"space-between",
+              padding:"10px 16px",
+              borderBottom:"1px solid #eee",
+              background:"#fafafa"
+              }}
+              >
+
+              <button
+              onClick={markAllRead}
+              style={{
+              border:"none",
+              background:"none",
+              color:"#2563eb",
+              cursor:"pointer",
+              fontWeight:600
+              }}
+              >
+              Mark all as read
+              </button>
+
+              <button
+              onClick={clearAllNotifications}
+              style={{
+              border:"none",
+              background:"none",
+              color:"#ef4444",
+              cursor:"pointer",
+              fontWeight:600
+              }}
+              >
+              Clear all
+              </button>
+
+              </div>
+              {Array.isArray(notifications) &&
+              notifications.map((item) => (
+
+              <div
+              key={item.id}
+              onClick={async()=>{
+
+              await markAsRead(item.id);
+
+              setShowNotifs(false);
+
+              if(item.link){
+
+                console.log(item);
+
+              router.push(item.link);
+
+              }
+
+              }}
+              style={{
+                  padding:"14px 20px",
+                  cursor:"pointer",
+                  borderBottom:"1px solid #f3f4f6",
+                  background:item.is_read
+                  ? "#ffffff"
+                  : "#eff6ff"
+              }}
+              onMouseEnter={(e)=>e.currentTarget.style.background="#f9fafb"}
+              onMouseLeave={(e)=>
+              e.currentTarget.style.background=
+              item.is_read
+              ? "#ffffff"
+              : "#eff6ff"
+              }
+              >
+
+              <div style={{ fontWeight: 600 }}>
+                  {item.title}
+              </div>
+
+              <div
+              style={{
+                  fontSize: "13px",
+                  color: "#6b7280",
+                  marginTop: "4px"
+              }}
+              >
+                  {item.message}
+              </div>
+
+              <div
+              style={{
+                  fontSize: "11px",
+                  color: "#9ca3af",
+                  marginTop: "6px"
+              }}
+              >
+                  {item.created_at}
+              </div>
+
+              </div>
+
               ))}
             </div>
           )}
@@ -317,6 +652,7 @@ export default function Navbar({
                 flexShrink:     0,
               }}
             >
+
               {userInitial}
             </div>
             <div style={{ textAlign: "left" }}>

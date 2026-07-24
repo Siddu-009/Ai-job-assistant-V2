@@ -14,7 +14,7 @@ export default function Card({
 
       style={{
 
-        background:"#ffffff",
+        background: colors.card,
 
         borderRadius:"18px",
 

@@ -2,8 +2,11 @@ import { useState } from "react";
 
 import Button from "./ui/Button";
 import Loader from "./ui/Loader";
+import { useTheme } from "../context/ThemeContext";
 
 export default function Applications() {
+
+  const { colors } = useTheme();
 
   const [applications, setApplications] = useState([]);
 
@@ -117,7 +120,9 @@ export default function Applications() {
 
         marginTop: "30px",
 
-        background: "#ffffff",
+        background: colors.card,
+        color: colors.text,
+        border: colors.borderStyle,
 
         borderRadius: "18px",
 
@@ -147,7 +152,7 @@ export default function Applications() {
 
         style={{
 
-          color: "#6b7280"
+          color: colors.subText
 
         }}
 
@@ -205,13 +210,14 @@ export default function Applications() {
 
               padding: "25px",
 
-              background: "#f8fafc",
+              background: colors.background,
+              border: colors.borderStyle,
 
               borderRadius: "12px",
 
               textAlign: "center",
 
-              color: "#6b7280"
+              color: colors.subText
 
             }}
 
@@ -243,7 +249,9 @@ export default function Applications() {
 
               padding: "20px",
 
-              background: "#ffffff",
+              background: colors.card,
+              color: colors.text,
+              border: colors.borderStyle,
 
               boxShadow: "0 5px 15px rgba(0,0,0,.05)"
 
@@ -291,7 +299,7 @@ export default function Applications() {
 
                     marginTop: "8px",
 
-                    color: "#6b7280"
+                    color: colors.subText
 
                   }}
 
@@ -349,7 +357,8 @@ export default function Applications() {
 
                 style={{
 
-                  background: "#f3f4f6",
+                  background: colors.background,
+                  color: colors.text,
 
                   padding: "8px 14px",
 
@@ -452,12 +461,10 @@ export default function Applications() {
 
               padding: "20px",
 
-              background: "#f8fafc",
+              background: colors.background,
+              border: colors.borderStyle,
 
               borderRadius: "12px",
-
-              border: "1px solid #e5e7eb"
-
             }}
 
           >
@@ -488,7 +495,7 @@ export default function Applications() {
 
                 lineHeight: "1.9",
 
-                color: "#4b5563"
+                color: colors.subText
 
               }}
 

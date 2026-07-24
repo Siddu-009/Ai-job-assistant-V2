@@ -16,7 +16,7 @@ export default function JobMatch({
 
       style={{
 
-        background:"#ffffff",
+        background: colors.card,
 
         borderRadius:"18px",
 
@@ -307,7 +307,7 @@ function FeatureCard({title}){
 
       style={{
 
-        background:"#ffffff",
+        background: colors.card,
 
         padding:"16px",
 

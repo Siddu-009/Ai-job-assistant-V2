@@ -1,6 +1,9 @@
 import { useState } from "react";
+import { useTheme } from "../context/ThemeContext";
 
 export default function ATSScore() {
+
+  const { colors } = useTheme();
 
   const [jobDescription, setJobDescription] = useState("");
 
@@ -101,20 +104,27 @@ export default function ATSScore() {
     <div
       style={{
         marginTop: "30px",
-        background: "#ffffff",
+        background: colors.card,
+        color: colors.text,
+        border: colors.borderStyle,
         borderRadius: "18px",
         padding: "30px",
         boxShadow: "0 10px 30px rgba(0,0,0,.08)"
       }}
     >
 
-      <h2>ATS Resume Analyzer</h2>
-
-      <p
+      <h2
         style={{
-          color: "#6b7280"
+          color: colors.text,
+          marginBottom: "10px",
         }}
       >
+        ATS Resume Analyzer
+      </h2>
+
+      <p style={{ color: colors.subText }}>
+
+        
         Analyze your uploaded resume against a Job Description.
       </p>
 

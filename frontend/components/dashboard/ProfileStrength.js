@@ -1,79 +1,67 @@
-export default function ProfileStrength(){
+import { useTheme } from "../../context/ThemeContext";
 
-return(
+export default function ProfileStrength() {
 
-<div
+  const { colors } = useTheme();
 
-style={{
+  return (
 
-background:"#fff",
+    <div
+      style={{
+        background: colors.card,
+        color: colors.text,
+        border: colors.borderStyle,
+        padding: "25px",
+        borderRadius: "18px",
+        boxShadow: "0 8px 25px rgba(0,0,0,.06)"
+      }}
+    >
 
-padding:"25px",
+      <h2
+        style={{
+          marginTop: 0,
+          color: colors.text
+        }}
+      >
+        Profile Completion
+      </h2>
 
-borderRadius:"18px",
+      <div
+        style={{
+          marginTop: "20px",
+          height: "12px",
+          background: colors.background,
+          borderRadius: "20px"
+        }}
+      >
+        <div
+          style={{
+            width: "92%",
+            height: "100%",
+            background: "#16a34a",
+            borderRadius: "20px"
+          }}
+        />
+      </div>
 
-boxShadow:"0 8px 25px rgba(0,0,0,.06)"
+      <h3
+        style={{
+          marginTop: "18px",
+          color: colors.text
+        }}
+      >
+        92%
+      </h3>
 
-}}
+      <p
+        style={{
+          color: colors.subText
+        }}
+      >
+        Complete Certifications to reach 100%.
+      </p>
 
->
+    </div>
 
-<h2>
-
-Profile Completion
-
-</h2>
-
-<div
-
-style={{
-
-marginTop:"20px",
-
-height:"12px",
-
-background:"#ddd",
-
-borderRadius:"20px"
-
-}}
-
->
-
-<div
-
-style={{
-
-width:"92%",
-
-height:"100%",
-
-background:"#16a34a",
-
-borderRadius:"20px"
-
-}}
-
->
-
-</div>
-
-</div>
-
-<h3>
-
-92%
-
-</h3>
-
-<p>
-
-Complete Certifications to reach 100%.
-
-</p>
-
-</div>
-
-);
-
+  );
 }

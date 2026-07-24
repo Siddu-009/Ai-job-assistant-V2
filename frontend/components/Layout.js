@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Sidebar from "./Sidebar";
 import Navbar from "./Navbar";
+import { useTheme } from "../context/ThemeContext";
 
 // ─── constants ────────────────────────────────────────────────────────────────
 
@@ -152,43 +153,20 @@ export default function Layout({
   subtitle = "Welcome back to AI Job Assistant",
   dashboard = false
 }) {
-  const [darkMode, setDarkMode] = useState(false);
-  const [mounted,  setMounted]  = useState(false);
 
-  useEffect(() => {
-    // Read initial theme
-    setDarkMode(localStorage.getItem("theme") === "dark");
-    setMounted(true);
+  const { colors, darkMode, toggleTheme } = useTheme();
 
-    // Listen for theme changes made in other tabs or by the Sidebar
-    const handleStorage = (e) => {
-      if (e.key === "theme") {
-        setDarkMode(e.newValue === "dark");
-      }
-    };
-
-    // Also handle same-tab changes via a custom event dispatched by Sidebar
-    const handleCustomTheme = () => {
-      setDarkMode(localStorage.getItem("theme") === "dark");
-    };
-
-    window.addEventListener("storage",      handleStorage);
-    window.addEventListener("themechange",  handleCustomTheme);
-
-    return () => {
-      window.removeEventListener("storage",     handleStorage);
-      window.removeEventListener("themechange", handleCustomTheme);
-    };
-  }, []);
+  const [collapsed, setCollapsed] = useState(false);
 
   // Avoid SSR / hydration mismatch
-  if (!mounted) return null;
-
-  const colors = buildColors(darkMode);
 
   return (
     <div style={{ display: "flex", minHeight: "100vh", background: colors.background }}>
-      <Sidebar onLogout={onLogout} />
+      <Sidebar
+          collapsed={collapsed}
+          setCollapsed={setCollapsed}
+          onLogout={onLogout}
+      />
 
       <main
         style={{
@@ -199,7 +177,12 @@ export default function Layout({
           minWidth:      0, // prevents flex overflow
         }}
       >
-        <Navbar title={title} subtitle={subtitle} />
+        <Navbar
+            collapsed={collapsed}
+            setCollapsed={setCollapsed}
+            title={title}
+            subtitle={subtitle}
+        />
 
         <div style={{ padding: "30px", display: "flex", flexDirection: "column", gap: "20px" }}>
 
@@ -235,7 +218,7 @@ export default function Layout({
           {/* ── Page content (children) ── */}
 	  {dashboard ? (
 
-    	  children && (
+    	children && (
 
 	  <div
 	  style={{
@@ -249,9 +232,7 @@ export default function Layout({
 	  >
 
 	  <h2 style={{marginTop:0}}>Workspace</h2>
-
-	  {children}
-
+      {children}
 	  </div>
 
 	  )

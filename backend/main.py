@@ -55,6 +55,7 @@ from routes.resume_tailoring import router as resume_tailoring_router
 from routes.interview_roles import router as interview_roles_router
 from routes.ats_review import router as ats_review_router
 from routes.job_match import router as job_match_router
+from routes.notifications import router as notifications_router
 from routes import resume_tailor
 from routes import job_details
 
@@ -396,6 +397,12 @@ app.include_router(
     job_details.router,
     prefix="/jobs/details",
     tags=["Job Details"]
+)
+
+app.include_router(
+    notifications_router,
+    prefix="/notifications",
+    tags=["Notifications"]
 )
 
 @app.get("/")
