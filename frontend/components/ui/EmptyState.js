@@ -1,41 +1,25 @@
 export default function EmptyState({
-
-  title = "Nothing Found",
-
-  description = "No data available."
-
+  title,
+  description,
 }) {
-
   return (
-
     <div
-
       style={{
-
-        padding: "50px",
-
+        padding: 60,
         textAlign: "center",
-
-        color: "#6b7280"
-
+        background: "#fff",
+        borderRadius: 16,
       }}
-
     >
+      <h2>{title}</h2>
 
-      <h2>
-
-        {title}
-
-      </h2>
-
-      <p>
-
+      <p
+        style={{
+          color: "#6b7280",
+        }}
+      >
         {description}
-
       </p>
-
     </div>
-
   );
-
 }

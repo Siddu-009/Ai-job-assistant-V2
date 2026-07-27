@@ -1,21 +1,32 @@
 from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel
 from sqlalchemy import text
 
 from database import SessionLocal
 from services.token_service import decode_token
+from fastapi import APIRouter, HTTPException, Header
 
 router = APIRouter()
 
+@router.post("")
+def analytics_dashboard(
+    authorization: str = Header(None)
+):
 
-class AnalyticsRequest(BaseModel):
-    token: str
+    if not authorization:
+        raise HTTPException(
+            status_code=401,
+            detail="Authorization header missing"
+        )
 
+    if not authorization.startswith("Bearer "):
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid authorization header"
+        )
 
-@router.post("/")
-def analytics_dashboard(req: AnalyticsRequest):
+    token = authorization.replace("Bearer ", "")
 
-    payload = decode_token(req.token)
+    payload = decode_token(token)
 
     if not payload:
         raise HTTPException(

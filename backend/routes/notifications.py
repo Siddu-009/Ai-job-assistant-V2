@@ -117,6 +117,81 @@ def mark_as_read(notification_id: int, req: MarkReadRequest):
 class DeleteNotificationRequest(BaseModel):
     token: str
 
+class NotificationActionRequest(BaseModel):
+    token: str
+
+@router.put("/read-all")
+def mark_all_read(req: NotificationActionRequest):
+
+    payload = decode_token(req.token)
+
+    if not payload:
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid token"
+        )
+
+    user_id = payload["user_id"]
+
+    db = SessionLocal()
+
+    try:
+
+        db.execute(
+            text("""
+                UPDATE notifications
+                SET is_read = TRUE
+                WHERE user_id = :user_id
+            """),
+            {
+                "user_id": user_id
+            }
+        )
+
+        db.commit()
+
+        return {
+            "success": True
+        }
+
+    finally:
+        db.close()
+
+@router.delete("/clear-all")
+def clear_all_notifications(req: NotificationActionRequest):
+
+    payload = decode_token(req.token)
+
+    if not payload:
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid token"
+        )
+
+    user_id = payload["user_id"]
+
+    db = SessionLocal()
+
+    try:
+
+        db.execute(
+            text("""
+                DELETE FROM notifications
+                WHERE user_id = :user_id
+            """),
+            {
+                "user_id": user_id
+            }
+        )
+
+        db.commit()
+
+        return {
+            "success": True
+        }
+
+    finally:
+        db.close()
 
 @router.delete("/{notification_id}")
 def delete_notification(notification_id: int, req: DeleteNotificationRequest):

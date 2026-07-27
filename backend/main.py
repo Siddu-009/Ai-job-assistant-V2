@@ -58,6 +58,9 @@ from routes.job_match import router as job_match_router
 from routes.notifications import router as notifications_router
 from routes import resume_tailor
 from routes import job_details
+from routes.ats_resume import router as ats_resume_router
+from routes.document_generator import router as document_generator_router
+from routes.download_document import router as download_document_router
 
 from fastapi.exceptions import RequestValidationError
 from starlette.exceptions import HTTPException as StarletteHTTPException
@@ -403,6 +406,24 @@ app.include_router(
     notifications_router,
     prefix="/notifications",
     tags=["Notifications"]
+)
+
+app.include_router(
+    ats_resume_router,
+    prefix="/ats-resume-generator",
+    tags=["ATS Resume"]
+)
+
+app.include_router(
+    document_generator_router,
+    prefix="/generate-document",
+    tags=["Document Generator"]
+)
+
+app.include_router(
+    download_document_router,
+    prefix="/download-document",
+    tags=["Download Document"]
 )
 
 @app.get("/")

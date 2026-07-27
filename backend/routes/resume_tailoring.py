@@ -1,5 +1,6 @@
 from fastapi import APIRouter
 from pydantic import BaseModel
+from pathlib import Path
 from services.ai_service import ai_chat
 from services.notification_service import create_notification
 from services.token_service import decode_token
@@ -58,11 +59,22 @@ Return a professional resume only.
 
     result = ai_chat(prompt)
 
+    # Save the tailored resume as TXT
+    BASE_DIR = Path(__file__).resolve().parent.parent
+    GENERATED_DIR = BASE_DIR / "generated"
+    GENERATED_DIR.mkdir(exist_ok=True)
+
+    txt_path = GENERATED_DIR / "generated_resume.txt"
+
+    with open(txt_path, "w", encoding="utf-8") as f:
+        f.write(result)
+
     create_notification(
         user_id=user_id,
         title="📄 Resume Tailored",
         message="Your resume has been tailored successfully.",
-        notification_type="resume"
+        notification_type="resume",
+        link="/resume-tailoring"
     )
 
     return {

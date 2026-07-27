@@ -4,6 +4,8 @@ from sqlalchemy import text
 
 from database import SessionLocal
 from services.token_service import decode_token
+from services.notification_service import create_notification
+
 
 router = APIRouter()
 
@@ -201,6 +203,14 @@ def delete_saved_job(
                 status_code=404,
                 detail="Saved job not found"
             )
+
+        create_notification(
+            user_id=user_id,
+            title="💼 Job Saved",
+            message="Job saved successfully.",
+            notification_type="job",
+            link="/saved-jobs"
+        )
 
         return {
 

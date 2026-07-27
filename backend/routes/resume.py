@@ -12,7 +12,6 @@ router = APIRouter()
 UPLOAD_DIR = "uploads"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
-
 @router.post("/upload")
 async def upload_resume(
     token: str = Form(...),
@@ -144,6 +143,55 @@ def get_latest_resume(token: str):
             "filename": resume[0],
             "resume_text": resume[1],
             "skills": resume[2]
+        }
+
+    finally:
+        db.close()
+
+from sqlalchemy import text
+
+@router.get("/list/{token}")
+def list_resumes(token: str):
+
+    payload = decode_token(token)
+
+    if not payload:
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid or expired token"
+        )
+
+    user_id = payload["user_id"]
+
+    db = SessionLocal()
+
+    try:
+
+        resumes = db.execute(
+            text("""
+                SELECT
+                    id,
+                    filename,
+                    created_at
+                FROM resumes
+                WHERE user_id = :user_id
+                ORDER BY id DESC
+            """),
+            {
+                "user_id": user_id
+            }
+        ).fetchall()
+
+        return {
+            "success": True,
+            "resumes": [
+                {
+                    "id": row[0],
+                    "filename": row[1],
+                    "created_at": str(row[2])
+                }
+                for row in resumes
+            ]
         }
 
     finally:

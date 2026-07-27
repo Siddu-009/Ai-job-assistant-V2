@@ -66,6 +66,14 @@ def ats_score(req: ATSRequest):
 
         if not row:
 
+            create_notification(
+                user_id=user_id,
+                title="✅ ATS Score Generated",
+                message="Your ATS score has been generated.",
+                notification_type="ats",
+                link="/ats-score"
+            )
+
             return {
 
                 "success": False,

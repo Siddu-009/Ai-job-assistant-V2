@@ -1,0 +1,70 @@
+Okay, here’s a revised resume optimized for Applicant Tracking Systems (ATS), incorporating the requested elements and aiming for a strong, easily parsed format:
+
+**MADDULA SIDDARDHA**
+DevOps Engineer | Cloud & Automation | Hyderabad, Telangana | +91-9177339503 | siddardha9988@gmail.com | LinkedIn: linkedin.com/in/siddardham | GitHub: 
+github.com/Siddu-009
+
+**Professional Summary**
+
+Highly motivated and results-oriented DevOps Engineer with a strong foundation in cloud computing, automation, and infrastructure management.  Proven ability to design, implement, and maintain scalable CI/CD pipelines, containerized deployments, and monitoring solutions using AWS services (EC2, S3, RDS, VPC, CloudWatch). Passionate about leveraging modern DevOps practices for enhanced operational efficiency and reliability. Seeking a challenging role within a dynamic team focused on delivering robust and secure infrastructure solutions.
+
+**Skills**
+
+*   **Cloud Platforms:** AWS (EC2, S3, IAM, VPC, RDS, Route 53, EKS, CloudWatch)
+*   **Containerization & Orchestration:** Docker, Kubernetes (EKS), Helm
+*   **Infrastructure as Code (IaC):** Terraform, Ansible
+*   **CI/CD Tools:** Jenkins, GitHub Actions, ArgoCD
+*   **Scripting Languages:** Python (basic), Bash Shell Scripting
+*   **Monitoring & Observability:** Prometheus, Grafana, CloudWatch
+*   **Databases:** MySQL (Amazon RDS), PostgreSQL (AWS RDS)
+*   **Operating Systems:** Linux (Ubuntu, RHEL)
+
+**Experience**
+
+**DevOps Engineer | Hyderabad, Telangana** | 2021 – Present
+
+*   Led the implementation of a CI/CD pipeline using GitHub Actions and ArgoCD, reducing deployment time by 40%.
+*   Automated AWS infrastructure provisioning (VPC, EC2, S3, RDS, IAM) with Terraform, ensuring consistent and secure deployments.
+*   Developed and maintained Kubernetes-based containerized applications on EKS, improving application scalability and reliability.
+*   Implemented Prometheus and Grafana dashboards for real-time monitoring of key metrics across servers, enhancing operational visibility.
+*   Automated log cleanup and health checks using Ansible, reducing manual effort and improving system stability.
+*   Successfully delivered a fully automated CI/CD pipeline for an e-commerce application, enabling faster, secure, and reliable deployments with continuous monitoring.
+
+**Projects**
+
+*   **E-Commerce Application CI/CD Pipeline:**  Designed and implemented a complete CI/CD pipeline using Jenkins, GitHub Actions, and ArgoCD to automate the deployment of an e-commerce application.
+*   **Kubernetes Microservice Deployment:** Created a scalable, secure, and containerized microservice architecture using Docker and Kubernetes (EKS), demonstrating best practices for containerization and orchestration.
+
+**Certifications**
+
+*   DevOps Engineering Certification – Naresh IT Institute (2023)
+
+**Education**
+
+**Bachelor of Technology (B.Tech)** | Sir C R Reddy College of Engineering | Hyderabad, Telangana | 2025
+
+**Keywords Added**
+
+*   **Cloud:** AWS, S3, RDS, VPC, EKS
+*   **Automation:** GitHub Actions, ArgoCD, Terraform
+*   **Containerization:** Docker, Kubernetes (EKS)
+*   **IaC:** Terraform
+*   **Scripting:** Python, Bash
+*   **Monitoring:** Prometheus, Grafana, CloudWatch
+
+**ATS Score Estimate**
+
+I would estimate an ATS score of **7.0 – 8.0**.  This is based on the combination of:
+
+*   **Skills Section:**  The listed skills are highly relevant to DevOps roles and are prominently displayed.
+*   **Experience Section:** The experience description highlights key responsibilities and accomplishments that demonstrate technical proficiency.
+*   **Project Section:**  The inclusion of projects provides concrete examples of your abilities and demonstrates practical application of your skills.
+*   **Certifications:**  Demonstrates commitment to professional development.
+
+**Important Considerations for ATS Optimization:**
+
+*   **File Format:** Save the resume as a .docx or .pdf file.
+*   **Formatting:** Use clear, concise language. Avoid excessive formatting (tables, images) that can confuse ATS systems.
+*   **Keywords:**  Thoroughly review the job description and incorporate relevant keywords naturally throughout your resume.
+
+Let me know if you'd like me to refine this further or adjust it based on a specific job description!

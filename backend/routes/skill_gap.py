@@ -36,9 +36,10 @@ def skill_gap(req: SkillGapRequest):
 
         create_notification(
             user_id=user_id,
-            title="🧠 Skill Gap Completed",
-            message=f"Your match score is {result['match_score']}%.",
-            notification_type="skill_gap"
+            title="📊 Skill Gap Analysis",
+            message="Your skill gap analysis is ready.",
+            notification_type="skill_gap",
+            link="/skill-gap"
         )
 
         return result

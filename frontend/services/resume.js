@@ -10,6 +10,13 @@ export const atsScore = (resume, job_description) =>
 
   });
 
+export const getResumeList = async () => {
+
+    const token = localStorage.getItem("token");
+
+    return api.get(`/resume/list/${token}`);
+};
+
 export const generateResume = (
 
   filename,
@@ -25,3 +32,9 @@ export const generateResume = (
     job_description
 
   });
+
+export const getResumes = async () => {
+    const token = localStorage.getItem("token");
+
+    return api.get(`/resume/list/${token}`);
+}

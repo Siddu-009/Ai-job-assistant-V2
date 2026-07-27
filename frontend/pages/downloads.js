@@ -4,6 +4,11 @@ export default function Downloads() {
 
   const [loading, setLoading] = useState(false);
 
+  const token =
+  typeof window !== "undefined"
+    ? localStorage.getItem("token")
+    : "";
+
   const downloadFile = async (endpoint, filename) => {
     setLoading(true);
 
@@ -58,26 +63,26 @@ export default function Downloads() {
     },
 
     {
-      title:"ATS Resume",
-      endpoint:"/api/download/ats-resume",
-      filename:"ats_resume.pdf"
+      title: "ATS Resume",
+      endpoint: `/api/download-document/ats_resume/${token}`,
+      filename: "ats_resume.pdf",
     },
 
     {
       title:"Cover Letter",
-      endpoint:"/api/download/cover-letter",
+      endpoint: `/api/download-document/cover_letter/${token}`,
       filename:"cover_letter.pdf"
     },
 
     {
       title:"ATS Report",
-      endpoint:"/api/download/ats-report",
+      endpoint: `/api/download-document/ats_report/${token}`,
       filename:"ats_report.pdf"
     },
 
     {
       title:"Career Roadmap",
-      endpoint:"/api/download/career-roadmap",
+      endpoint: `/api/download-document/career_roadmap/${token}`,
       filename:"career_roadmap.pdf"
     }
 

@@ -1,6 +1,7 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 from fastapi.responses import FileResponse
 from pathlib import Path
+from services.token_service import decode_token
 
 router = APIRouter()
 
@@ -134,4 +135,35 @@ def download_career_roadmap():
         path=str(filepath),
         media_type="application/pdf",
         filename="career_roadmap.pdf"
+    )
+
+@router.get("/download-document/{document_type}/{token}")
+def download_document(document_type: str, token: str):
+
+    payload = decode_token(token)
+
+    if not payload:
+        raise HTTPException(status_code=401, detail="Invalid token")
+
+    user_id = payload["user_id"]
+
+    BASE_DIR = Path(__file__).resolve().parent.parent
+
+    file_path = (
+        BASE_DIR
+        / "generated"
+        / f"user_{user_id}"
+        / f"{document_type}.pdf"
+    )
+
+    if not file_path.exists():
+        raise HTTPException(
+            status_code=404,
+            detail=f"{document_type} not found"
+        )
+
+    return FileResponse(
+        path=str(file_path),
+        media_type="application/pdf",
+        filename=file_path.name
     )
