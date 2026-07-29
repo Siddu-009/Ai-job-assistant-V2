@@ -48,7 +48,6 @@ from routes.analytics_dashboard import router as analytics_dashboard_router
 from routes.activity_timeline import router as activity_timeline_router
 from routes.email_notifications import router as email_notifications_router
 from routes.health import router as health_router
-from fastapi import FastAPI
 from routes.career_coach import router as career_coach_router
 from routes.learning_recommendations import router as learning_router
 from routes.resume_tailoring import router as resume_tailoring_router
@@ -61,6 +60,10 @@ from routes import job_details
 from routes.ats_resume import router as ats_resume_router
 from routes.document_generator import router as document_generator_router
 from routes.download_document import router as download_document_router
+from routes import resume_converter
+from routes.resume_analyzer import router as resume_analyzer_router
+from routes.resume_optimizer import router as resume_optimizer_router
+from routes.interview_preparation import router as interview_preparation_router
 
 from fastapi.exceptions import RequestValidationError
 from starlette.exceptions import HTTPException as StarletteHTTPException
@@ -424,6 +427,30 @@ app.include_router(
     download_document_router,
     prefix="/download-document",
     tags=["Download Document"]
+)
+
+app.include_router(
+    resume_converter.router,
+    prefix="/resume-converter",
+    tags=["Resume Converter"]
+)
+
+app.include_router(
+    resume_analyzer_router,
+    prefix="/resume-analyzer",
+    tags=["Resume Analyzer"]
+)
+
+app.include_router(
+    resume_optimizer_router,
+    prefix="/resume-optimizer",
+    tags=["Resume Optimizer"]
+)
+
+app.include_router(
+    interview_preparation_router,
+    prefix="/interview-preparation",
+    tags=["Interview Preparation"]
 )
 
 @app.get("/")

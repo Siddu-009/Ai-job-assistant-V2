@@ -1,28 +1,70 @@
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
+@import "./layout.css";
+
+/* Reset */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-body{
-    font-family:Inter,Arial,sans-serif;
-    background:#f5f7fb;
-    color:#111827;
+/* Variables */
+
+:root {
+  --primary: #2563eb;
+  --primary-hover: #1d4ed8;
+  --background: #f8fafc;
+  --card: #ffffff;
+  --text: #0f172a;
+  --border: #e2e8f0;
+  --muted: #64748b;
+  --radius: 16px;
 }
 
-a{
-    text-decoration:none;
-    color:inherit;
+/* Body */
+
+body {
+  font-family: Inter, Arial, sans-serif;
+  background: linear-gradient(135deg, #f8fafc, #eef4ff);
+  color: var(--text);
+  min-height: 100vh;
 }
 
-button{
-    transition:.3s;
+/* Links */
+
+a {
+  text-decoration: none;
+  color: inherit;
 }
 
-button:hover{
-    opacity:.9;
+/* Inputs */
+
+input,
+textarea,
+select {
+  outline: none;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px;
+  font-size: 15px;
+  width: 100%;
+  transition: all .25s ease;
 }
 
-input,textarea{
-    outline:none;
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, .15);
+}
+
+/* Buttons */
+
+button {
+  cursor: pointer;
+  transition: all .25s ease;
+}
+
+button:hover {
+  transform: translateY(-2px);
 }

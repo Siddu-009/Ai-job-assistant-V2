@@ -2,6 +2,8 @@ import "../styles/globals.css";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { ThemeProvider } from "../context/ThemeContext";
+import "../styles/resume-converter.css";
+
 
 const PUBLIC_ROUTES = [
   "/login",

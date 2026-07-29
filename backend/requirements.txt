@@ -5,10 +5,13 @@ sqlalchemy
 psycopg2-binary
 python-dotenv
 openai
-pymupdf
 requests
 reportlab
 python-jose[cryptography]
 email-validator
 fastapi-mail
 httpx
+python-docx
+PyMuPDF
+docxtpl
+python-multipart

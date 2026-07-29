@@ -1,0 +1,11 @@
+from docx.shared import RGBColor
+
+PRIMARY = RGBColor(33, 97, 140)
+SECONDARY = RGBColor(80, 80, 80)
+
+FONT_NAME = "Calibri"
+
+TITLE_SIZE = 22
+SUBTITLE_SIZE = 12
+HEADING_SIZE = 13
+NORMAL_SIZE = 10

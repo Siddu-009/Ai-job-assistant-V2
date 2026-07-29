@@ -16,8 +16,7 @@ from services.ats_scorer import calculate_ats_score
 
 from services.resume_parser_ai import extract_resume_details
 from services.ats_resume_generator import generate_ats_content
-from services.resume_builder import build_resume
-
+from services.resume_builder.builder import build_resume
 router = APIRouter()
 
 BASE_DIR = Path(__file__).resolve().parent.parent

@@ -5,7 +5,7 @@ import os
 from services.parser import extract_text
 from services.resume_parser_ai import extract_resume_details
 from services.ats_resume_generator import generate_ats_content
-from services.resume_builder import build_resume
+from services.resume_builder.builder import build_resume
 
 router = APIRouter()
 

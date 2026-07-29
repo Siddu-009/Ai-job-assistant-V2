@@ -4,8 +4,7 @@ from pydantic import BaseModel
 import os
 import traceback
 
-from services.resume_builder import build_resume
-
+from services.resume_builder.builder import build_resume
 router = APIRouter()
 
 

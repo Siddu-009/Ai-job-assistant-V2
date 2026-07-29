@@ -10,7 +10,7 @@ OLLAMA_URL = (
 
 MODEL = os.getenv(
     "MODEL_NAME",
-    "gemma3:1b"
+    "llama3.2:latest"
 )
 
 
@@ -55,7 +55,7 @@ def ai_chat(prompt: str, history=None) -> str:
             "top_p": 0.9,
             "top_k": 40,
             "num_ctx": 4096,
-            "num_predict": 4096,
+            "num_predict": 2048,
             "repeat_penalty": 1.05
         }
     }

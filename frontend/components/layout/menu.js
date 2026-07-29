@@ -20,7 +20,8 @@ import {
   BarChart3,
   Download,
   User,
-  Settings
+  Settings,
+  FilePlus
 } from "lucide-react";
 
 const menu = [
@@ -82,14 +83,19 @@ href:"/resume-history",
 icon:History
 },
 {
+label:"Resume Center",
+href:"/resume-center",
+icon:FileText
+},
+{
+label:"AI Resume Converter",
+href:"/resume-converter",
+icon:FilePlus
+},
+{
 label:"Resume Versions",
 href:"/resume-versions",
 icon:Layers3
-},
-{
-    label: "Resume Center",
-    href: "/resume-center",
-    icon: FileText,
 }
 ]
 },
