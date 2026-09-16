@@ -14,11 +14,13 @@ def get_question(
         asked_questions = []
 
     # Convert previous questions into readable text
-    previous_questions = "\n".join(
+   previous_questions = "\n".join(
         [
             f"- {question}"
             if isinstance(question, str)
             else f"- {question.get('question', '')}"
+            if isinstance(question, dict)
+            else f"- {question}"
             for question in asked_questions
         ]
     )
