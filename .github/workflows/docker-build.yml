@@ -24,6 +24,7 @@ jobs:
       IMAGE_TAG: ${{ github.sha }}
 
     steps:
+
       # --------------------------------
       # 1. Checkout Repository
       # --------------------------------
@@ -42,10 +43,19 @@ jobs:
       - name: Validate Docker Hub Username
         shell: bash
         run: |
+          set -e
+
           if [ -z "$DOCKER_USERNAME" ]; then
             echo "ERROR: DOCKER_USERNAME secret is missing"
             exit 1
           fi
+
+          if [[ "$DOCKER_USERNAME" =~ [A-Z] ]]; then
+            echo "ERROR: DOCKER_USERNAME must be lowercase"
+            exit 1
+          fi
+
+          echo "Docker Hub username validated"
 
       # --------------------------------
       # 4. Login to Docker Hub
@@ -96,15 +106,19 @@ jobs:
           username: ubuntu
           key: ${{ secrets.EC2_SSH_KEY }}
           port: 22
-          script_stop: true
+          command_timeout: 30m
+
           script: |
             set -e
 
             echo "Starting deployment..."
 
-            cd ~/Ai-job-assistant
+            cd ~/Ai-job-assistant-V2
 
-            echo "Pulling latest images..."
+            echo "Pulling latest code..."
+            git pull --ff-only origin main
+
+            echo "Pulling latest Docker images..."
             docker compose pull
 
             echo "Starting containers..."
