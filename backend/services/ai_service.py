@@ -1,12 +1,19 @@
 import os
 import requests
+import asyncio
+
+
+OLLAMA_BASE_URL = os.getenv(
+    "OLLAMA_URL",
+    "http://host.docker.internal:11434"
+).rstrip("/")
+
 
 OLLAMA_URL = (
-    os.getenv(
-        "OLLAMA_URL",
-        "http://host.docker.internal:11434"
-    ).rstrip("/") + "/api/chat"
+    OLLAMA_BASE_URL +
+    "/api/chat"
 )
+
 
 MODEL = os.getenv(
     "MODEL_NAME",
@@ -14,7 +21,10 @@ MODEL = os.getenv(
 )
 
 
-def ai_chat(prompt: str, history=None) -> str:
+def ai_chat(
+    prompt: str,
+    history=None
+) -> str:
 
     if history is None:
         history = []
@@ -23,15 +33,14 @@ def ai_chat(prompt: str, history=None) -> str:
         {
             "role": "system",
             "content": (
-                "You are an expert AI Job Assistant and ATS Resume Expert.\n"
-                "You help users rewrite, tailor, improve and optimize resumes, "
-                "cover letters, interview answers and job applications.\n\n"
-                "The resume content provided belongs to the user who submitted it "
-                "and they have requested it to be rewritten or improved.\n"
-                "Do NOT refuse because the resume contains names, emails, phone numbers "
-                "or other personal information supplied by the user.\n"
-                "Rewrite and improve the content professionally while preserving the user's information.\n"
-                "Return only the requested result without explanations."
+                "You are an expert AI Job Assistant "
+                "and ATS Resume Expert. "
+                "Rewrite and optimize resumes professionally. "
+                "Preserve user-provided facts. "
+                "Do not invent companies, degrees, "
+                "certifications, job titles, dates, "
+                "or experience. "
+                "Return only the requested result."
             )
         }
     ]
@@ -60,6 +69,14 @@ def ai_chat(prompt: str, history=None) -> str:
         }
     }
 
+    print(
+        f"Calling Ollama: {OLLAMA_URL}"
+    )
+
+    print(
+        f"Ollama model: {MODEL}"
+    )
+
     try:
 
         response = requests.post(
@@ -68,20 +85,86 @@ def ai_chat(prompt: str, history=None) -> str:
             timeout=300
         )
 
+        print(
+            "Ollama HTTP status:",
+            response.status_code
+        )
+
         response.raise_for_status()
 
         data = response.json()
 
-        if "message" in data:
-            return data["message"]["content"].strip()
+        if "message" not in data:
 
-        return str(data)
+            raise Exception(
+                "Invalid response received from Ollama."
+            )
+
+        content = data["message"].get(
+            "content",
+            ""
+        ).strip()
+
+        if not content:
+
+            raise Exception(
+                "Ollama returned an empty response."
+            )
+
+        return content
 
     except requests.exceptions.Timeout:
-        return "The AI model took too long to respond."
 
-    except requests.exceptions.ConnectionError:
-        return "Unable to connect to Ollama."
+        print(
+            "Ollama request timed out."
+        )
+
+        return (
+            "The AI model took too long to respond."
+        )
+
+    except requests.exceptions.ConnectionError as e:
+
+        print(
+            "Unable to connect to Ollama:",
+            str(e)
+        )
+
+        return (
+            "Unable to connect to Ollama."
+        )
+
+    except requests.exceptions.HTTPError as e:
+
+        print(
+            "Ollama HTTP error:",
+            str(e)
+        )
+
+        return (
+            f"AI Error: Ollama returned "
+            f"HTTP {response.status_code}"
+        )
 
     except Exception as e:
-        return f"AI Error: {str(e)}"
+
+        print(
+            "AI Service Error:",
+            str(e)
+        )
+
+        return (
+            f"AI Error: {str(e)}"
+        )
+
+
+async def call_ai(
+    prompt: str,
+    history=None
+):
+
+    return await asyncio.to_thread(
+        ai_chat,
+        prompt,
+        history
+    )

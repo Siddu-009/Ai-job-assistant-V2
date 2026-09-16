@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { useTheme } from "../../context/ThemeContext";
 
 export default function AIToolCard({
   title,
@@ -6,10 +7,14 @@ export default function AIToolCard({
   icon,
   href,
 }) {
+  const { colors } = useTheme();
+
   return (
     <div
       style={{
-        background: "#fff",
+        background: colors.card,
+        color: colors.text,
+        border: colors.borderStyle,
         borderRadius: 18,
         padding: 25,
         boxShadow: "0 10px 25px rgba(0,0,0,.06)",
@@ -30,7 +35,7 @@ export default function AIToolCard({
 
       <p
         style={{
-          color: "#6b7280",
+          color: colors.subText,
           lineHeight: 1.7,
         }}
       >
@@ -45,7 +50,7 @@ export default function AIToolCard({
             border: "none",
             borderRadius: 10,
             background: "#2563eb",
-            color: "#fff",
+            color: "#ffffff",
             cursor: "pointer",
           }}
         >

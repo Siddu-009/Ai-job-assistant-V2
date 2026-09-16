@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { useRouter } from "next/router";
 import { login } from "../services/auth";
+import { useTheme } from "../context/ThemeContext";
 
 export default function Login() {
+    const { colors } = useTheme();
 
     const router = useRouter();
 
@@ -18,6 +20,11 @@ export default function Login() {
 
         e.preventDefault();
 
+        if (!email.trim() || !password.trim()) {
+            setError("Email and Password are required.");
+            return;
+        }
+
         setLoading(true);
 
         setError("");
@@ -25,7 +32,7 @@ export default function Login() {
         try {
 
             await login(
-                email,
+                email.trim(),
                 password
             );
 
@@ -35,8 +42,10 @@ export default function Login() {
 
         catch (err) {
 
+            console.error(err);
+
             setError(
-                err.message || "Login Failed"
+                err.message || "Invalid email or password."
             );
 
         }
@@ -65,7 +74,8 @@ export default function Login() {
                 onSubmit={handleLogin}
                 style={{
                     width: 420,
-                    background: "#fff",
+                    background: colors.card,
+border: colors.borderStyle,
                     padding: 40,
                     borderRadius: 12,
                     boxShadow: "0 8px 30px rgba(0,0,0,.08)"
@@ -73,10 +83,11 @@ export default function Login() {
             >
 
                 <h1
-                    style={{
-                        textAlign: "center",
-                        marginBottom: 10
-                    }}
+                style={{
+                textAlign: "center",
+                marginBottom: 10,
+                color: colors.text
+                }}
                 >
                     AI Job Assistant
                 </h1>
@@ -84,7 +95,7 @@ export default function Login() {
                 <p
                     style={{
                         textAlign: "center",
-                        color: "#666",
+                        color: colors.subText,
                         marginBottom: 30
                     }}
                 >

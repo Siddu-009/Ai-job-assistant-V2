@@ -1,191 +1,489 @@
-import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import menu from "./layout/menu";
-import { ChevronLeft, ChevronRight, LogOut, Moon, Sun } from "lucide-react";
-
-// ─── component ────────────────────────────────────────────────────────────────
+import {
+  ChevronLeft,
+  ChevronRight,
+  LogOut,
+  Moon,
+  Sun,
+} from "lucide-react";
+import { useTheme } from "../context/ThemeContext";
 
 export default function Sidebar({ collapsed, setCollapsed }) {
   const router = useRouter();
 
-  const [darkMode, setDarkMode] = useState(false);
-
-  // ── Hydrate theme from localStorage (don't rely on body.style) ────────────
-  useEffect(() => {
-    setDarkMode(localStorage.getItem("theme") === "dark");
-
-    const onStorage = (e) => {
-      if (e.key === "theme") setDarkMode(e.newValue === "dark");
-    };
-    const onCustom = () => setDarkMode(localStorage.getItem("theme") === "dark");
-
-    window.addEventListener("storage",     onStorage);
-    window.addEventListener("themechange", onCustom);
-    return () => {
-      window.removeEventListener("storage",     onStorage);
-      window.removeEventListener("themechange", onCustom);
-    };
-  }, []);
-
-  // FIXED: old toggleTheme mutated document.body.style directly, which:
-  //   1. Only changed the body background — nothing else in the UI updated.
-  //   2. Did not persist the theme to localStorage.
-  //   3. Used stale `darkMode` value in the condition (classic closure bug —
-  //      `!darkMode` inside setState would read the captured value, not current).
-  const toggleTheme = () => {
-    const next = !darkMode;
-    setDarkMode(next);
-    localStorage.setItem("theme", next ? "dark" : "light");
-    window.dispatchEvent(new CustomEvent("themechange"));
-  };
+  const { colors, darkMode, toggleTheme } = useTheme();
 
   const logout = () => {
-    localStorage.clear();
+    localStorage.removeItem("token");
+    localStorage.removeItem("theme");
     router.replace("/login");
   };
 
-  // Shared icon-button style
-  const footerBtn = (bg) => ({
-    display:        "flex",
-    alignItems:     "center",
+  /*
+   * Theme-aware colors
+   * ------------------
+   * We do NOT use fixed white/gray colors for normal
+   * sidebar content because those disappear in light mode.
+   */
+
+  const theme = {
+    sidebarBg: darkMode ? "#0f172a" : "#ffffff",
+
+    sidebarBorder: darkMode
+      ? "rgba(148, 163, 184, 0.18)"
+      : "rgba(15, 23, 42, 0.10)",
+
+    textPrimary: darkMode ? "#f8fafc" : "#0f172a",
+
+    textSecondary: darkMode ? "#cbd5e1" : "#475569",
+
+    textMuted: darkMode ? "#94a3b8" : "#64748b",
+
+    iconColor: darkMode ? "#cbd5e1" : "#475569",
+
+    hoverBg: darkMode
+      ? "rgba(255,255,255,0.08)"
+      : "rgba(37,99,235,0.07)",
+
+    activeBg: "#2563eb",
+
+    activeText: "#ffffff",
+
+    buttonBg: darkMode ? "#1e293b" : "#f1f5f9",
+
+    buttonBorder: darkMode
+      ? "rgba(148,163,184,0.20)"
+      : "rgba(15,23,42,0.10)",
+
+    buttonText: darkMode ? "#f8fafc" : "#1e293b",
+
+    divider: darkMode
+      ? "rgba(148,163,184,0.16)"
+      : "rgba(15,23,42,0.10)",
+  };
+
+  /*
+   * Footer button
+   */
+
+  const footerBtn = (background) => ({
+    display: "flex",
+    alignItems: "center",
     justifyContent: collapsed ? "center" : "flex-start",
-    gap:            "12px",
-    width:          "100%",
-    padding:        "12px 15px",
-    border:         "none",
-    borderRadius:   "12px",
-    background:     bg,
-    color:          "#ffffff",
-    cursor:         "pointer",
-    fontSize:       "14px",
-    fontWeight:     600,
-    // FIXED: `transition: ".25s"` is invalid — property name was missing.
-    transition:     "opacity 0.2s ease",
+
+    gap: "12px",
+
+    width: "100%",
+
+    minHeight: "46px",
+
+    padding: collapsed ? "10px" : "11px 14px",
+
+    border: "1px solid transparent",
+
+    borderRadius: "12px",
+
+    background,
+
+    color: "#ffffff",
+
+    cursor: "pointer",
+
+    fontSize: "14px",
+
+    fontWeight: 600,
+
+    lineHeight: 1,
+
+    transition:
+      "background 0.2s ease, transform 0.2s ease, opacity 0.2s ease",
+
+    boxSizing: "border-box",
   });
 
   return (
     <aside
       aria-label="Main navigation"
       style={{
-        width:         collapsed ? "90px" : "290px",
-        height:        "100vh",
-        background:    "#111827",
-        color:         "#ffffff",
-        display:       "flex",
+        width: collapsed ? "90px" : "290px",
+
+        height: "100vh",
+
+        background: theme.sidebarBg,
+
+        color: theme.textPrimary,
+
+        display: "flex",
+
         flexDirection: "column",
-        // FIXED: `transition: "0.3s"` is invalid — property name missing.
-        transition:    "width 0.3s ease",
-        position:      "sticky",
-        top:           0,
-        overflowY:     "auto",
-        boxShadow:     "4px 0 20px rgba(0,0,0,0.15)",
-        boxSizing:     "border-box",
-        flexShrink:    0,
+
+        position: "sticky",
+
+        top: 0,
+
+        overflow: "hidden",
+
+        boxSizing: "border-box",
+
+        flexShrink: 0,
+
+        borderRight: `1px solid ${theme.sidebarBorder}`,
+
+        boxShadow: darkMode
+          ? "4px 0 20px rgba(0,0,0,0.25)"
+          : "4px 0 20px rgba(15,23,42,0.06)",
+
+        transition:
+          "width 0.3s ease, background 0.3s ease, border-color 0.3s ease",
+
+        zIndex: 100,
       }}
     >
-      {/* ── Brand ── */}
+      {/* ============================================================
+          BRAND / COLLAPSE BUTTON
+          ============================================================ */}
+
       <div
         style={{
-          padding:        "25px",
-          borderBottom:   "1px solid rgba(255,255,255,0.08)",
-          display:        "flex",
-          justifyContent: collapsed ? "center" : "space-between",
-          alignItems:     "center",
-          gap:            "12px",
+          minHeight: "92px",
+
+          padding: collapsed ? "20px 15px" : "20px 20px",
+
+          borderBottom: `1px solid ${theme.divider}`,
+
+          display: "flex",
+
+          justifyContent: collapsed
+            ? "center"
+            : "space-between",
+
+          alignItems: "center",
+
+          gap: "12px",
+
+          boxSizing: "border-box",
         }}
       >
         {!collapsed && (
-          <div>
-            <h2 style={{ margin: 0, fontSize: "22px", fontWeight: 800 }}>AI Job</h2>
-            <p style={{ margin: "5px 0 0", fontSize: "13px", color: "#9ca3af" }}>
+          <div style={{ minWidth: 0 }}>
+            <h2
+              style={{
+                margin: 0,
+
+                fontSize: "22px",
+
+                lineHeight: 1.2,
+
+                fontWeight: 800,
+
+                color: theme.textPrimary,
+
+                letterSpacing: "-0.4px",
+
+                whiteSpace: "nowrap",
+              }}
+            >
+              AI Job
+            </h2>
+
+            <p
+              style={{
+                margin: "5px 0 0",
+
+                fontSize: "13px",
+
+                lineHeight: 1.2,
+
+                color: theme.textMuted,
+
+                whiteSpace: "nowrap",
+              }}
+            >
               Assistant v3
             </p>
           </div>
         )}
 
+        {/* ========================================================
+            COLLAPSE / EXPAND BUTTON
+
+            IMPORTANT:
+            This button now has a visible background, border
+            and theme-aware icon color in BOTH modes.
+            ======================================================== */}
+
         <button
-          onClick={() => setCollapsed((v) => !v)}
-          aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-          title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+          type="button"
+          onClick={() => setCollapsed((value) => !value)}
+          aria-label={
+            collapsed
+              ? "Expand sidebar"
+              : "Collapse sidebar"
+          }
+          title={
+            collapsed
+              ? "Expand sidebar"
+              : "Collapse sidebar"
+          }
           style={{
-            background:   "rgba(255,255,255,0.06)",
-            border:       "none",
-            borderRadius: "10px",
-            cursor:       "pointer",
-            color:        "#ffffff",
-            width:        "36px",
-            height:       "36px",
-            display:      "grid",
-            placeItems:   "center",
-            flexShrink:   0,
+            width: "38px",
+
+            height: "38px",
+
+            minWidth: "38px",
+
+            borderRadius: "11px",
+
+            border: `1px solid ${theme.buttonBorder}`,
+
+            background: theme.buttonBg,
+
+            color: theme.buttonText,
+
+            cursor: "pointer",
+
+            display: "flex",
+
+            alignItems: "center",
+
+            justifyContent: "center",
+
+            padding: 0,
+
+            flexShrink: 0,
+
+            transition:
+              "all 0.2s ease",
+
+            boxShadow: darkMode
+              ? "0 2px 8px rgba(0,0,0,0.18)"
+              : "0 2px 8px rgba(15,23,42,0.06)",
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background =
+              darkMode
+                ? "#334155"
+                : "#e2e8f0";
+
+            e.currentTarget.style.transform =
+              "scale(1.04)";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background =
+              theme.buttonBg;
+
+            e.currentTarget.style.transform =
+              "scale(1)";
           }}
         >
-          {collapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
+          {collapsed ? (
+            <ChevronRight
+              size={20}
+              strokeWidth={2.5}
+              aria-hidden="true"
+            />
+          ) : (
+            <ChevronLeft
+              size={20}
+              strokeWidth={2.5}
+              aria-hidden="true"
+            />
+          )}
         </button>
       </div>
 
-      {/* ── Nav ── */}
-      {/* FIXED: nav items were <div onClick> — not keyboard accessible.
-          Replaced with <button> so they're reachable via Tab and
-          activatable with Enter/Space. */}
-      <nav style={{ padding: "20px", flex: 1, overflowY: "auto" }}>
+      {/* ============================================================
+          NAVIGATION
+          ============================================================ */}
+
+      <nav
+        aria-label="Application navigation"
+        style={{
+          padding: "18px 15px",
+
+          flex: 1,
+
+          overflowY: "auto",
+
+          overflowX: "hidden",
+
+          scrollbarWidth: "thin",
+
+          boxSizing: "border-box",
+        }}
+      >
         {menu.map((section) => (
-          <div key={section.title} style={{ marginBottom: "25px" }}>
+          <div
+            key={section.title}
+            style={{
+              marginBottom: "22px",
+            }}
+          >
+            {/* Section title */}
 
             {!collapsed && (
               <p
                 style={{
-                  fontSize:      "11px",
-                  color:         "#6b7280",
-                  marginBottom:  "10px",
-                  marginTop:     0,
+                  fontSize: "11px",
+
+                  color: theme.textMuted,
+
+                  margin:
+                    "0 10px 9px",
+
                   letterSpacing: "1px",
-                  fontWeight:    700,
+
+                  fontWeight: 700,
+
                   textTransform: "uppercase",
+
+                  lineHeight: 1.4,
                 }}
               >
                 {section.title}
               </p>
             )}
 
+            {/* Menu items */}
+
             {section.items.map((item) => {
-              const Icon   = item.icon;
-              const active = router.pathname === item.href ||
-                (item.href !== "/" && router.pathname.startsWith(item.href));
+              const Icon = item.icon;
+
+              const active =
+                router.pathname === item.href ||
+                (item.href !== "/" &&
+                  router.pathname.startsWith(
+                    item.href
+                  ));
 
               return (
                 <button
                   key={item.href}
-                  onClick={() => router.push(item.href)}
-                  aria-current={active ? "page" : undefined}
-                  title={collapsed ? item.label : undefined}
+                  type="button"
+                  onClick={() => {
+                    if (
+                      router.pathname !==
+                      item.href
+                    ) {
+                      router.push(item.href);
+                    }
+                  }}
+                  aria-current={
+                    active
+                      ? "page"
+                      : undefined
+                  }
+                  title={
+                    collapsed
+                      ? item.label
+                      : undefined
+                  }
                   style={{
-                    display:        "flex",
-                    alignItems:     "center",
-                    justifyContent: collapsed ? "center" : "flex-start",
-                    gap:            "14px",
-                    width:          "100%",
-                    padding:        collapsed ? "12px" : "12px 15px",
-                    marginBottom:   "4px",
-                    border:         "none",
-                    borderRadius:   "12px",
-                    cursor:         "pointer",
-                    background:     active ? "#2563eb" : "transparent",
-                    color:          active ? "#ffffff" : "#d1d5db",
-                    textAlign:      "left",
-                    boxShadow:      active ? "0 6px 16px rgba(37,99,235,0.3)" : "none",
-                    transition:     "background 0.15s ease, color 0.15s ease",
+                    display: "flex",
+
+                    alignItems: "center",
+
+                    justifyContent:
+                      collapsed
+                        ? "center"
+                        : "flex-start",
+
+                    gap: "14px",
+
+                    width: "100%",
+
+                    minHeight: "46px",
+
+                    padding: collapsed
+                      ? "10px"
+                      : "10px 13px",
+
+                    marginBottom: "5px",
+
+                    border: active
+                      ? "1px solid rgba(255,255,255,0.08)"
+                      : "1px solid transparent",
+
+                    borderRadius: "12px",
+
+                    cursor: "pointer",
+
+                    background: active
+                      ? theme.activeBg
+                      : "transparent",
+
+                    color: active
+                      ? theme.activeText
+                      : theme.textSecondary,
+
+                    textAlign: "left",
+
+                    boxShadow: active
+                      ? "0 6px 16px rgba(37,99,235,0.25)"
+                      : "none",
+
+                    transition:
+                      "background 0.18s ease, color 0.18s ease, transform 0.18s ease",
+
+                    boxSizing: "border-box",
+
+                    outline: "none",
                   }}
                   onMouseEnter={(e) => {
-                    if (!active) e.currentTarget.style.background = "rgba(255,255,255,0.07)";
+                    if (!active) {
+                      e.currentTarget.style.background =
+                        theme.hoverBg;
+
+                      e.currentTarget.style.color =
+                        theme.textPrimary;
+                    }
                   }}
                   onMouseLeave={(e) => {
-                    if (!active) e.currentTarget.style.background = "transparent";
+                    if (!active) {
+                      e.currentTarget.style.background =
+                        "transparent";
+
+                      e.currentTarget.style.color =
+                        theme.textSecondary;
+                    }
                   }}
                 >
-                  <Icon size={20} aria-hidden="true" />
+                  <Icon
+                    size={20}
+                    strokeWidth={active ? 2.3 : 2}
+                    aria-hidden="true"
+                    style={{
+                      flexShrink: 0,
+
+                      color: active
+                        ? "#ffffff"
+                        : theme.iconColor,
+
+                      transition:
+                        "color 0.18s ease",
+                    }}
+                  />
+
                   {!collapsed && (
-                    <span style={{ fontSize: "15px", fontWeight: active ? 600 : 500 }}>
+                    <span
+                      style={{
+                        fontSize: "15px",
+
+                        fontWeight:
+                          active
+                            ? 600
+                            : 500,
+
+                        color: "inherit",
+
+                        whiteSpace: "nowrap",
+
+                        overflow: "hidden",
+
+                        textOverflow: "ellipsis",
+                      }}
+                    >
                       {item.label}
                     </span>
                   )}
@@ -196,32 +494,88 @@ export default function Sidebar({ collapsed, setCollapsed }) {
         ))}
       </nav>
 
-      {/* ── Footer ── */}
+      {/* ============================================================
+          FOOTER
+          ============================================================ */}
+
       <div
         style={{
-          padding:   "20px",
-          borderTop: "1px solid rgba(255,255,255,0.08)",
-          display:   "flex",
+          padding: "15px",
+
+          borderTop:
+            `1px solid ${theme.divider}`,
+
+          display: "flex",
+
           flexDirection: "column",
-          gap:       "10px",
+
+          gap: "9px",
+
+          background: theme.sidebarBg,
+
+          boxSizing: "border-box",
         }}
       >
-        <button
-          onClick={toggleTheme}
-          style={footerBtn("#1f2937")}
-          title={darkMode ? "Switch to light mode" : "Switch to dark mode"}
-        >
-          {darkMode ? <Sun size={20} aria-hidden="true" /> : <Moon size={20} aria-hidden="true" />}
-          {!collapsed && <span>{darkMode ? "Light Mode" : "Dark Mode"}</span>}
-        </button>
+        {/* ========================================================
+            THEME BUTTON
+            ======================================================== */}
 
         <button
+          type="button"
+          onClick={toggleTheme}
+          style={footerBtn(
+            darkMode
+              ? "#1e293b"
+              : "#334155"
+          )}
+          title={
+            darkMode
+              ? "Switch to light mode"
+              : "Switch to dark mode"
+          }
+        >
+          {darkMode ? (
+            <Sun
+              size={20}
+              strokeWidth={2.2}
+              aria-hidden="true"
+            />
+          ) : (
+            <Moon
+              size={20}
+              strokeWidth={2.2}
+              aria-hidden="true"
+            />
+          )}
+
+          {!collapsed && (
+            <span>
+              {darkMode
+                ? "Light Mode"
+                : "Dark Mode"}
+            </span>
+          )}
+        </button>
+
+        {/* ========================================================
+            LOGOUT
+            ======================================================== */}
+
+        <button
+          type="button"
           onClick={logout}
           style={footerBtn("#dc2626")}
           title="Logout"
         >
-          <LogOut size={20} aria-hidden="true" />
-          {!collapsed && <span>Logout</span>}
+          <LogOut
+            size={20}
+            strokeWidth={2.2}
+            aria-hidden="true"
+          />
+
+          {!collapsed && (
+            <span>Logout</span>
+          )}
         </button>
       </div>
     </aside>

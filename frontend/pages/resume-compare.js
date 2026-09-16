@@ -1,6 +1,9 @@
 import { useState } from "react";
+import api from "../services/api";
+import { useTheme } from "../context/ThemeContext";
 
 export default function ResumeCompare() {
+  const { colors } = useTheme();
 
   const [resume1, setResume1] = useState("");
   const [resume2, setResume2] = useState("");
@@ -9,7 +12,7 @@ export default function ResumeCompare() {
 
   const compareResumes = async () => {
 
-    if (!resume1 || !resume2) {
+    if (!resume1.trim() || !resume2.trim()) {
       alert("Please paste both resumes.");
       return;
     }
@@ -18,226 +21,256 @@ export default function ResumeCompare() {
 
     try {
 
-      const response = await fetch("/api/resume-recommend/compare", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
+      const { data } = await api.post(
+        "/resume-recommend/compare",
+        {
           resume_one: resume1,
           resume_two: resume2
-        })
-      });
+        }
+      );
 
-      const data = await response.json();
+      setComparison(data.comparison || "");
 
-      setComparison(data.comparison || "No comparison generated.");
+    } catch (err) {
 
-    } catch {
+      console.error(err);
 
       alert("Unable to compare resumes.");
 
     }
 
     setLoading(false);
-
   };
 
-  const section = (title) => {
+  function getSection(title, nextTitles = []) {
 
     if (!comparison) return "";
 
-    const regex = new RegExp(
-      `${title}[\\s\\S]*?(?=\\n\\d+\\.|$)`,
-      "i"
-    );
+    let start = comparison.indexOf(title);
 
-    const match = comparison.match(regex);
+    if (start === -1) return "";
 
-    if (!match) return "";
+    start += title.length;
 
-    return match[0]
-      .replace(title, "")
+    let end = comparison.length;
+
+    for (const next of nextTitles) {
+
+      const pos = comparison.indexOf(next, start);
+
+      if (pos !== -1 && pos < end) {
+        end = pos;
+      }
+
+    }
+
+    return comparison
+      .substring(start, end)
+      .replace(/\*\*/g, "")
       .trim();
-
-  };
+  }
 
   return (
 
-<div
-style={{
-maxWidth:"1300px",
-margin:"40px auto",
-background:"#fff",
-padding:"35px",
-borderRadius:"20px",
-boxShadow:"0 15px 35px rgba(0,0,0,.08)"
-}}
->
+    <div
+      style={{
+        maxWidth: "1300px",
+        margin: "40px auto",
+        background: colors.card,
+        border: colors.borderStyle,
+        padding: "35px",
+        borderRadius: "20px",
+        boxShadow: "0 15px 35px rgba(0,0,0,.08)"
+      }}
+    >
 
-<h1>Resume Comparison</h1>
+      <h1 style={{ color: colors.text }}>
+        Resume Comparison
+      </h1>
 
-<p style={{color:"#6b7280"}}>
-Compare two resumes and identify the stronger profile.
-</p>
+      <p style={{ color: colors.subText }}>
+        Compare two resumes and identify the stronger profile.
+      </p>
 
-<div
-style={{
-display:"grid",
-gridTemplateColumns:"1fr 1fr",
-gap:"20px",
-marginTop:"20px"
-}}
->
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "1fr 1fr",
+          gap: "20px",
+          marginTop: "20px"
+        }}
+      >
 
-<textarea
-rows="14"
-placeholder="Resume 1"
-value={resume1}
-onChange={(e)=>setResume1(e.target.value)}
-style={textarea}
-/>
+        <textarea
+          rows={14}
+          placeholder="Resume 1"
+          value={resume1}
+          onChange={(e)=>setResume1(e.target.value)}
+          style={textarea}
+        />
 
-<textarea
-rows="14"
-placeholder="Resume 2"
-value={resume2}
-onChange={(e)=>setResume2(e.target.value)}
-style={textarea}
-/>
+        <textarea
+          rows={14}
+          placeholder="Resume 2"
+          value={resume2}
+          onChange={(e)=>setResume2(e.target.value)}
+          style={textarea}
+        />
 
-</div>
+      </div>
 
-<button
-onClick={compareResumes}
-disabled={loading}
-style={button}
->
+      <button
+        onClick={compareResumes}
+        disabled={loading}
+        style={button}
+      >
 
-{loading ? "Comparing..." : "Compare Resumes"}
+        {loading ? "Comparing..." : "Compare Resumes"}
 
-</button>
+      </button>
 
-{comparison && (
+      {comparison && (
 
-<div
-style={{
-marginTop:"40px"
-}}
->
+        <div style={{marginTop:"40px"}}>
 
-<Card
-title="🏆 Overall Winner"
-content={section("1. Overall Winner:")}
-/>
+          <Card
+            title="🏆 Overall Winner"
+            content={getSection(
+              "**Overall Winner:**",
+              ["**ATS Score Resume 1"]
+            )}
+          />
 
-<div
-style={{
-display:"grid",
-gridTemplateColumns:"1fr 1fr",
-gap:"20px"
-}}
->
+          <div
+            style={{
+              display:"grid",
+              gridTemplateColumns:"1fr 1fr",
+              gap:"20px"
+            }}
+          >
 
-<Card
-title="📊 Resume 1 ATS Score"
-content={section("2. ATS Score Resume 1:")}
-/>
+            <Card
+              title="📊 Resume 1 ATS Score"
+              content={getSection(
+                "**ATS Score Resume 1 (0-100):**",
+                ["**ATS Score Resume 2"]
+              )}
+            />
 
-<Card
-title="📊 Resume 2 ATS Score"
-content={section("3. ATS Score Resume 2:")}
-/>
+            <Card
+              title="📊 Resume 2 ATS Score"
+              content={getSection(
+                "**ATS Score Resume 2 (0-100):**",
+                ["**Strengths of Resume 1:**"]
+              )}
+            />
 
-</div>
+          </div>
 
-<Card
-title="✅ Resume 1 Strengths"
-content={section("4. Strengths of Resume 1:")}
-/>
+          <Card
+            title="✅ Resume 1 Strengths"
+            content={getSection(
+              "**Strengths of Resume 1:**",
+              ["**Strengths of Resume 2:**"]
+            )}
+          />
 
-<Card
-title="✅ Resume 2 Strengths"
-content={section("5. Strengths of Resume 2:")}
-/>
+          <Card
+            title="✅ Resume 2 Strengths"
+            content={getSection(
+              "**Strengths of Resume 2:**",
+              ["**Weaknesses of Resume 1:**"]
+            )}
+          />
 
-<Card
-title="⚠ Resume 1 Weaknesses"
-content={section("6. Weaknesses of Resume 1:")}
-/>
+          <Card
+            title="⚠ Resume 1 Weaknesses"
+            content={getSection(
+              "**Weaknesses of Resume 1:**",
+              ["**Weaknesses of Resume 2:**"]
+            )}
+          />
 
-<Card
-title="⚠ Resume 2 Weaknesses"
-content={section("7. Weaknesses of Resume 2:")}
-/>
+          <Card
+            title="⚠ Resume 2 Weaknesses"
+            content={getSection(
+              "**Weaknesses of Resume 2:**",
+              ["**Missing Skills:**"]
+            )}
+          />
 
-<Card
-title="❌ Missing Skills"
-content={section("8. Missing Skills:")}
-/>
+          <Card
+            title="❌ Missing Skills"
+            content={getSection(
+              "**Missing Skills:**",
+              ["**Final Recommendation:**"]
+            )}
+          />
 
-<Card
-title="💡 Final Recommendation"
-content={section("9. Final Recommendation:")}
-/>
+          <Card
+            title="💡 Final Recommendation"
+            content={getSection(
+              "**Final Recommendation:**"
+            )}
+          />
 
-</div>
+        </div>
 
-)}
+      )}
 
-</div>
+    </div>
 
-);
+  );
 
 }
 
 function Card({title,content}){
 
-return(
+  return(
 
-<div
-style={{
-background:"#f8fafc",
-padding:"20px",
-borderRadius:"15px",
-marginTop:"20px",
-border:"1px solid #e5e7eb"
-}}
->
+    <div
+      style={{
+        background:"#f8fafc",
+        padding:"20px",
+        borderRadius:"15px",
+        marginTop:"20px",
+        border:"1px solid #e5e7eb"
+      }}
+    >
 
-<h3>{title}</h3>
+      <h3>{title}</h3>
 
-<pre
-style={{
-whiteSpace:"pre-wrap",
-fontFamily:"inherit",
-margin:0
-}}
->
-{content}
-</pre>
+      <pre
+        style={{
+          whiteSpace:"pre-wrap",
+          fontFamily:"inherit",
+          margin:0
+        }}
+      >
+        {content}
+      </pre>
 
-</div>
+    </div>
 
-);
+  );
 
 }
 
 const textarea={
-width:"100%",
-padding:"15px",
-borderRadius:"12px",
-border:"1px solid #d1d5db"
+  width:"100%",
+  padding:"15px",
+  borderRadius:"12px",
+  border:"1px solid #d1d5db"
 };
 
 const button={
-width:"100%",
-padding:"15px",
-marginTop:"25px",
-background:"#2563eb",
-color:"#fff",
-border:"none",
-borderRadius:"12px",
-cursor:"pointer",
-fontSize:"16px"
+  width:"100%",
+  padding:"15px",
+  marginTop:"25px",
+  background:"#2563eb",
+  color:"#fff",
+  border:"none",
+  borderRadius:"12px",
+  cursor:"pointer",
+  fontSize:"16px"
 };

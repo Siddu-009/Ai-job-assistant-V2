@@ -15,3 +15,5 @@ python-docx
 PyMuPDF
 docxtpl
 python-multipart
+aiohttp
+docx2pdf

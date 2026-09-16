@@ -1,7 +1,15 @@
 import { useRouter } from "next/router";
+import Loader from "./ui/Loader";
 import { useEffect, useState } from "react";
 
 export default function ProtectedRoute({ children }) {
+
+    try {
+        await api.get("/verify-token");
+        setLoading(false);
+    } catch {
+        router.replace("/login");
+    }
 
     const router = useRouter();
 
@@ -9,9 +17,12 @@ export default function ProtectedRoute({ children }) {
 
     useEffect(()=>{
 
-        const token=localStorage.getItem("token");
+        const token =
+            typeof window !== "undefined"
+                ? localStorage.getItem("token")
+                : null;
 
-        if(!token){
+        if (!token?.trim()) {
 
             router.replace("/login");
 
@@ -21,7 +32,7 @@ export default function ProtectedRoute({ children }) {
 
         setLoading(false);
 
-    },[]);
+    },[router]);
 
     if(loading){
 

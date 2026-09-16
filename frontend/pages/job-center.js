@@ -56,7 +56,7 @@ export default function JobsCenterPage() {
 
         <p
           style={{
-            color: "#6b7280",
+            color: colors.subText,
             marginBottom: 30,
           }}
         >

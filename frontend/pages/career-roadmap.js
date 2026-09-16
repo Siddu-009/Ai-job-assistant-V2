@@ -1,6 +1,9 @@
 import { useState } from "react";
+import { useTheme } from "../context/ThemeContext";
 
 export default function CareerRoadmap() {
+  const { colors } = useTheme();
+  
 
   const [role, setRole] = useState("");
   const [roadmap, setRoadmap] = useState(null);
@@ -88,7 +91,8 @@ export default function CareerRoadmap() {
       style={{
         maxWidth: "1200px",
         margin: "40px auto",
-        background: "#fff",
+        background: colors.card,
+border: colors.borderStyle,
         padding: "35px",
         borderRadius: "20px",
         boxShadow: "0 15px 35px rgba(0,0,0,.08)"
@@ -99,7 +103,7 @@ export default function CareerRoadmap() {
 
       <p
         style={{
-          color: "#6b7280"
+          color: colors.subText
         }}
       >
         Generate your personalized AI career roadmap based on your uploaded resume.

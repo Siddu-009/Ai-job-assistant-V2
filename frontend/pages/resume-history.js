@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
+import { useTheme } from "../context/ThemeContext";
 
 export default function ResumeHistory() {
+  const { colors } = useTheme();
 
   const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -71,7 +73,8 @@ export default function ResumeHistory() {
 
         margin:"40px auto",
 
-        background:"#fff",
+        background: colors.card,
+border: colors.borderStyle,
 
         padding:"35px",
 
@@ -93,7 +96,7 @@ export default function ResumeHistory() {
 
         style={{
 
-          color:"#6b7280"
+          color: colors.subText
 
         }}
 

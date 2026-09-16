@@ -1,12 +1,15 @@
+import { useTheme } from "../context/ThemeContext";
 export default function SectionCard({
   title,
   children,
   action,
 }) {
+  const { colors } = useTheme();
   return (
     <div
       style={{
-        background: "#fff",
+        background: colors.card,
+        border: colors.borderStyle,
         borderRadius: 16,
         padding: 24,
         boxShadow: "0 8px 24px rgba(0,0,0,.06)",

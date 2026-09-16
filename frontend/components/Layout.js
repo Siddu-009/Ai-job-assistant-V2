@@ -27,20 +27,6 @@ const AI_SUGGESTIONS = [
   "Complete Profile",
 ];
 
-// ─── helpers ──────────────────────────────────────────────────────────────────
-
-function buildColors(darkMode) {
-  return {
-    background: darkMode ? "#020617"  : "#f1f5f9",
-    card:       darkMode ? "#0f172a"  : "#ffffff",
-    text:       darkMode ? "#ffffff"  : "#111827",
-    subText:    darkMode ? "#94a3b8"  : "#64748b",
-    borderStyle: darkMode
-      ? "1px solid rgba(255,255,255,0.08)"
-      : "1px solid rgba(226,232,240,1)",
-  };
-}
-
 // ─── sub-components ───────────────────────────────────────────────────────────
 
 function StatCard({ label, value, color, note, colors }) {

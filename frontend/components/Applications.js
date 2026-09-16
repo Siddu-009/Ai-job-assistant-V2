@@ -5,7 +5,6 @@ import Loader from "./ui/Loader";
 import { useTheme } from "../context/ThemeContext";
 
 export default function Applications() {
-
   const { colors } = useTheme();
 
   const [applications, setApplications] = useState([]);
@@ -210,7 +209,7 @@ export default function Applications() {
 
               padding: "25px",
 
-              background: colors.background,
+              background: colors.surface,
               border: colors.borderStyle,
 
               borderRadius: "12px",
@@ -243,7 +242,7 @@ export default function Applications() {
 
               marginTop: "25px",
 
-              border: "1px solid #e5e7eb",
+              border: colors.borderStyle,
 
               borderRadius: "16px",
 
@@ -251,7 +250,6 @@ export default function Applications() {
 
               background: colors.card,
               color: colors.text,
-              border: colors.borderStyle,
 
               boxShadow: "0 5px 15px rgba(0,0,0,.05)"
 
@@ -357,8 +355,9 @@ export default function Applications() {
 
                 style={{
 
-                  background: colors.background,
+                  background: colors.surface,
                   color: colors.text,
+                  border: colors.borderStyle,
 
                   padding: "8px 14px",
 
@@ -461,7 +460,7 @@ export default function Applications() {
 
               padding: "20px",
 
-              background: colors.background,
+              background: colors.surface,
               border: colors.borderStyle,
 
               borderRadius: "12px",
@@ -475,7 +474,7 @@ export default function Applications() {
 
                 marginTop: 0,
 
-                color: "#2563eb"
+                color: colors.text
 
               }}
 

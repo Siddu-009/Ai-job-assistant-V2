@@ -5,8 +5,11 @@ import ATSHeader from "../components/ats/ATSHeader";
 import ResumeReview from "../components/ats/ResumeReview";
 import JobMatch from "../components/ats/JobMatch";
 import ResultDashboard from "../components/ats/ResultDashboard";
+import { useTheme } from "../context/ThemeContext";
+
 
 export default function ATSAnalyzerV2() {
+  const { colors } = useTheme();
 
   const [tab, setTab] = useState("review");
 
@@ -101,10 +104,7 @@ export default function ATSAnalyzerV2() {
         }}
       >
 
-        <ATSHeader
-          tab={tab}
-          setTab={setTab}
-        />
+        {/* <ATSHeader tab={tab} setTab={setTab} /> */}
 
         {
 

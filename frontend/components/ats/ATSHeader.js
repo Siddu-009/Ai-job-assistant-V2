@@ -1,10 +1,8 @@
-export default function ATSHeader({
+import { useTheme } from "../../context/ThemeContext";
 
-  tab,
+export default function ATSHeader({ tab, setTab }) {
 
-  setTab
-
-}) {
+    const { colors } = useTheme();
 
   return (
 
@@ -52,7 +50,7 @@ export default function ATSHeader({
 
             marginTop:"12px",
 
-            color:"#6b7280",
+            color: colors.subText,
 
             fontSize:"16px",
 

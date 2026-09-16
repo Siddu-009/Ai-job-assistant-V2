@@ -1,6 +1,8 @@
 import { useState } from "react";
+import { useTheme } from "../context/ThemeContext";
 
 export default function LearningRecommendations() {
+  const { colors } = useTheme();
 
   const [role, setRole] = useState("");
   const [loading, setLoading] = useState(false);
@@ -85,7 +87,8 @@ export default function LearningRecommendations() {
         maxWidth:"1200px",
         margin:"40px auto",
         padding:"35px",
-        background:"#fff",
+        background: colors.card,
+border: colors.borderStyle,
         borderRadius:"20px",
         boxShadow:"0 15px 35px rgba(0,0,0,.08)"
       }}

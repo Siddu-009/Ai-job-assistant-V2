@@ -1,6 +1,8 @@
+import { useTheme } from "../../context/ThemeContext";
 import Card from "./Card";
 
 export default function ResultDashboard({ result }) {
+  const { colors } = useTheme();
 
   const score = result?.score || 0;
 
@@ -187,7 +189,7 @@ export default function ResultDashboard({ result }) {
 
             :
 
-            <Empty text="No recommendations"/>
+            <Empty text="No recommendations" colors={colors}/>
 
           }
 
@@ -277,32 +279,17 @@ function SkillChip({
 
 }
 
-function Empty({
+function Empty({ text, colors }) {
 
-  text
-
-}){
-
-  return(
-
-    <div
-
-      style={{
-
-        color:"#6b7280",
-
-        textAlign:"center",
-
-        padding:"30px"
-
-      }}
-
-    >
-
-      {text}
-
-    </div>
-
-  );
-
+    return (
+        <div
+            style={{
+                color: colors.subText,
+                textAlign: "center",
+                padding: "30px"
+            }}
+        >
+            {text}
+        </div>
+    );
 }

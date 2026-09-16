@@ -197,7 +197,7 @@ export default function SavedJobs() {
 
               padding: "25px",
 
-              background: colors.background,
+              background: colors.surface,
               border: colors.borderStyle,
 
               borderRadius: "12px",
@@ -230,7 +230,7 @@ export default function SavedJobs() {
 
               marginTop: "25px",
 
-              border: "1px solid #e5e7eb",
+              border: colors.borderStyle,
 
               borderRadius: "16px",
 
@@ -238,7 +238,6 @@ export default function SavedJobs() {
 
               background: colors.card,
               color: colors.text,
-              border: colors.borderStyle,
 
               boxShadow: "0 5px 15px rgba(0,0,0,.05)"
 
@@ -302,9 +301,9 @@ export default function SavedJobs() {
 
                 style={{
 
-                  background: "#dcfce7",
+                  background: colors.successBg,
 
-                  color: "#166534",
+                  color: colors.successText,
 
                   padding: "8px 14px",
 
@@ -342,8 +341,9 @@ export default function SavedJobs() {
 
                 style={{
 
-                  background: colors.background,
+                  background: colors.surface,
                   color: colors.text,
+                  border: colors.borderStyle,
 
                   padding: "8px 14px",
 
@@ -385,7 +385,7 @@ export default function SavedJobs() {
 
                     style={{
 
-                      color: "#2563eb",
+                      color: colors.text,
 
                       textDecoration: "none",
 
@@ -490,7 +490,7 @@ export default function SavedJobs() {
 
               padding: "20px",
 
-              background: colors.background,
+              background: colors.surface,
               border: colors.borderStyle,
 
               borderRadius: "12px",
@@ -505,7 +505,7 @@ export default function SavedJobs() {
 
                 marginTop: 0,
 
-                color: "#2563eb"
+                color: colors.text
 
               }}
 

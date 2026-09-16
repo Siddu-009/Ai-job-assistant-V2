@@ -30,7 +30,7 @@ export default function ProfileStrength() {
         style={{
           marginTop: "20px",
           height: "12px",
-          background: colors.background,
+          background: colors.surface,
           borderRadius: "20px"
         }}
       >
@@ -38,7 +38,7 @@ export default function ProfileStrength() {
           style={{
             width: "92%",
             height: "100%",
-            background: "#16a34a",
+            background: colors.successText,
             borderRadius: "20px"
           }}
         />

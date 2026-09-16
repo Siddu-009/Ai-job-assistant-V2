@@ -1,8 +1,9 @@
 import "../styles/globals.css";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import { ThemeProvider } from "../context/ThemeContext";
 import "../styles/resume-converter.css";
+import "../styles/recommended-jobs.css";
+import { ThemeProvider } from "../context/ThemeContext";
 
 
 const PUBLIC_ROUTES = [

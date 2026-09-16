@@ -1,14 +1,13 @@
+import { useTheme } from "../../context/ThemeContext";
+
 export default function JobMatch({
-
   loading,
-
   analyzeJob,
-
   jobDescription,
-
   setJobDescription
-
 }) {
+
+  const { colors } = useTheme();
 
   return (
 
@@ -48,7 +47,7 @@ export default function JobMatch({
 
         style={{
 
-          color:"#6b7280",
+          color: colors.subText,
 
           marginBottom:"25px",
 
@@ -277,17 +276,17 @@ export default function JobMatch({
 
         >
 
-          <FeatureCard title="🎯 ATS Match Score"/>
+          <FeatureCard title="🎯 ATS Match Score" colors={colors}/>
 
-          <FeatureCard title="✅ Matched Skills"/>
+          <FeatureCard title="✅ Matched Skills" colors={colors}/>
 
-          <FeatureCard title="❌ Missing Skills"/>
+          <FeatureCard title="❌ Missing Skills" colors={colors}/>
 
-          <FeatureCard title="📈 Resume Strength"/>
+          <FeatureCard title="📈 Resume Strength" colors={colors}/>
 
-          <FeatureCard title="🤖 AI Recommendations"/>
+          <FeatureCard title="🤖 AI Recommendations" colors={colors}/>
 
-          <FeatureCard title="📄 Download ATS Report"/>
+          <FeatureCard title="📄 Download ATS Report" colors={colors}/>
 
         </div>
 
@@ -299,7 +298,7 @@ export default function JobMatch({
 
 }
 
-function FeatureCard({title}){
+function FeatureCard({title, colors}){
 
   return(
 
@@ -309,17 +308,17 @@ function FeatureCard({title}){
 
         background: colors.card,
 
+        border: colors.borderStyle,
+
         padding:"16px",
 
         borderRadius:"10px",
-
-        border:"1px solid #e5e7eb",
 
         textAlign:"center",
 
         fontWeight:"600",
 
-        color:"#374151"
+        color: colors.text
 
       }}
 

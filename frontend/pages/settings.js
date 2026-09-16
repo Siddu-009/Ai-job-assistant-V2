@@ -1,8 +1,11 @@
 import { useEffect, useState } from "react";
+import { useTheme } from "../context/ThemeContext";
 
 export default function Settings() {
+  const { colors } = useTheme();
 
   const [darkMode, setDarkMode] = useState(false);
+  const [success, setSuccess] = useState("");
 
   useEffect(() => {
 
@@ -10,6 +13,14 @@ export default function Settings() {
 
           setDarkMode(
               localStorage.getItem("theme") === "dark"
+          );
+
+          setEmailNotifications(
+              JSON.parse(localStorage.getItem("emailNotifications") ?? "true")
+          );
+
+          setAutoApply(
+              JSON.parse(localStorage.getItem("autoApply") ?? "false")
           );
 
       }
@@ -27,6 +38,20 @@ export default function Settings() {
       darkMode ? "dark" : "light"
     );
 
+    localStorage.setItem(
+        "emailNotifications",
+        JSON.stringify(emailNotifications)
+    );
+
+    localStorage.setItem(
+        "autoApply",
+        JSON.stringify(autoApply)
+    );
+
+    setSuccess("Settings saved successfully.");
+
+    window.dispatchEvent(new CustomEvent("themechange"));
+
     alert("Settings Saved");
 
   };
@@ -37,14 +62,19 @@ export default function Settings() {
 style={{
 maxWidth:"900px",
 margin:"40px auto",
-background:"#fff",
+background: colors.card,
+border: colors.borderStyle,
 padding:"35px",
 borderRadius:"20px",
 boxShadow:"0 15px 35px rgba(0,0,0,.08)"
 }}
 >
 
-<h1>
+<h1
+style={{
+    color: colors.text
+}}
+>
 
 Settings
 
@@ -56,7 +86,11 @@ marginTop:"30px"
 }}
 >
 
-<label>
+<label
+style={{
+    color: colors.text
+}}
+>
 
 <input
 
@@ -64,7 +98,7 @@ type="checkbox"
 
 checked={darkMode}
 
-onChange={()=>setDarkMode(!darkMode)}
+onChange={() => setDarkMode(prev => !prev)}
 
 />
 

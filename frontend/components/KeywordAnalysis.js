@@ -58,7 +58,14 @@ export default function KeywordAnalysis({
 
                 <h2>💡 AI Recommendation</h2>
 
-                <p>{recommendation}</p>
+                <ul>
+                    {(Array.isArray(recommendation)
+                        ? recommendation
+                        : [recommendation]
+                    ).map((item, index) => (
+                        <li key={index}>{item}</li>
+                    ))}
+                </ul>
 
             </div>
 

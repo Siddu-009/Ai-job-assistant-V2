@@ -1,5 +1,6 @@
 import Layout from "../components/Layout";
 import AIToolCard from "../components/ai/AIToolCard";
+import { useTheme } from "../context/ThemeContext";
 
 const tools = [
   {
@@ -40,23 +41,26 @@ const tools = [
   },
 ];
 
+
+
 export default function AICenterPage() {
+  const { colors } = useTheme();
   return (
     <Layout>
       <div
         style={{
-          padding: 30,
-          background: "#f5f7fb",
+          padding:"35px",
+          background: colors.background,
           minHeight: "100vh",
         }}
       >
-        <h1 style={{ marginBottom: 10 }}>
-          AI Center
+        <h1 style={{ color: colors.text }}>
+            AI Center
         </h1>
 
         <p
           style={{
-            color: "#6b7280",
+            color: colors.subText,
             marginBottom: 30,
           }}
         >

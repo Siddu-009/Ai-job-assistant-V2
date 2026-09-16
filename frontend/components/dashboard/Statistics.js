@@ -1,67 +1,18 @@
+import { useTheme } from "../../context/ThemeContext";
 export default function Statistics() {
+    const { colors } = useTheme();
 
-const cards=[
-
-{
-
-title:"ATS Score",
-
-value:"91%",
-
-color:"#2563eb"
-
-},
-
-{
-
-title:"Applications",
-
-value:"24",
-
-color:"#16a34a"
-
-},
-
-{
-
-title:"Saved Jobs",
-
-value:"18",
-
-color:"#f59e0b"
-
-},
-
-{
-
-title:"Interviews",
-
-value:"4",
-
-color:"#7c3aed"
-
-},
-
-{
-
-title:"Profile",
-
-value:"96%",
-
-color:"#dc2626"
-
-},
-
-{
-
-title:"AI Matches",
-
-value:"42",
-
-color:"#0891b2"
-
-}
-
+const cards = [
+  {
+    title: "ATS Score",
+    value: "92%",
+    color: "#2563eb",
+  },
+  {
+    title: "Applications",
+    value: 48,
+    color: "#22c55e",
+  },
 ];
 
 return(
@@ -92,13 +43,13 @@ key={index}
 
 style={{
 
-background:"#fff",
+background: colors.card,
 
 borderRadius:"18px",
 
 padding:"25px",
 
-boxShadow:"0 8px 25px rgba(0,0,0,.06)",
+boxShadow:"0 10px 30px rgba(0,0,0,.08)",
 
 borderTop:`5px solid ${card.color}`
 
@@ -112,7 +63,7 @@ style={{
 
 margin:0,
 
-color:"#6b7280"
+color: colors.subText
 
 }}
 

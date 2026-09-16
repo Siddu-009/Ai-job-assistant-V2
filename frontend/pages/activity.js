@@ -60,7 +60,7 @@ export default function ActivityTimeline() {
 
         <p
           style={{
-            color: "#6b7280",
+            color: colors.subText,
             marginBottom: "30px"
           }}
         >
@@ -119,7 +119,7 @@ export default function ActivityTimeline() {
 
                 <p
                   style={{
-                    color: "#6b7280",
+                    color: colors.subText,
                     fontSize: "14px"
                   }}
                 >

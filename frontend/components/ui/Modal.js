@@ -50,7 +50,8 @@ width:"650px",
 
 maxWidth:"95%",
 
-background:"#fff",
+background: colors.card,
+border: colors.borderStyle,
 
 borderRadius:"18px",
 

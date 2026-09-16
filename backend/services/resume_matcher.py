@@ -1,35 +1,30 @@
+import re
+
 SKILLS = [
     "aws",
     "docker",
     "kubernetes",
     "terraform",
-    "linux",
     "jenkins",
+    "ansible",
+    "linux",
+    "python",
     "git",
     "github",
-    "helm",
-    "ansible",
-    "python",
-    "java",
-    "mysql",
-    "postgresql",
-    "redis",
-    "mongodb",
     "prometheus",
     "grafana",
-    "nginx",
-    "apache",
+    "helm",
+    "argocd",
 ]
 
 
 def extract_resume_skills(resume_text: str):
-
-    resume_text = (resume_text or "").lower()
+    resume = resume_text.lower()
 
     found = []
 
     for skill in SKILLS:
-        if skill in resume_text:
+        if re.search(r"\b" + re.escape(skill) + r"\b", resume):
             found.append(skill)
 
     return found
@@ -37,11 +32,11 @@ def extract_resume_skills(resume_text: str):
 
 def match_job(job, resume_skills):
 
-    text = " ".join([
-        str(job.get("title", "")),
-        str(job.get("description", "")),
-        str(job.get("skills", "")),
-    ]).lower()
+    text = (
+        str(job.get("title", "")) + " " +
+        str(job.get("description", "")) + " " +
+        str(job.get("skills", ""))
+    ).lower()
 
     matched = []
     missing = []
@@ -51,23 +46,25 @@ def match_job(job, resume_skills):
             matched.append(skill)
 
     for skill in SKILLS:
-        if skill in text and skill not in matched:
+        if skill not in matched and skill in text:
             missing.append(skill)
 
-    total = len(matched) + len(missing)
+    score = 0
 
-    if total == 0:
-        score = 50
-    else:
-        score = int((len(matched) / total) * 100)
+    if len(resume_skills) > 0:
+        score = int((len(matched) / len(resume_skills)) * 100)
+
+    recommendation = (
+        "Excellent Match"
+        if score >= 80 else
+        "Good Match"
+        if score >= 60 else
+        "Needs Improvement"
+    )
 
     return {
         "score": score,
         "matched": matched,
         "missing": missing,
-        "recommendation":
-            "Great match!"
-            if len(missing) == 0
-            else
-            "Learn " + ", ".join(missing[:3]) + " to improve your chances."
+        "recommendation": recommendation
     }

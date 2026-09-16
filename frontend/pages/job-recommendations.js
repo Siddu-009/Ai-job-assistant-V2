@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
+import { useTheme } from "../context/ThemeContext";
 
 export default function JobRecommendations() {
+  const { colors } = useTheme();
 
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -190,7 +192,8 @@ maxWidth:"1300px",
 
 margin:"40px auto",
 
-background:"#fff",
+background: colors.card,
+border: colors.borderStyle,
 
 padding:"35px",
 
@@ -212,7 +215,7 @@ AI Job Recommendations
 
 style={{
 
-color:"#6b7280"
+color: colors.subText
 
 }}
 

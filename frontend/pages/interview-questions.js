@@ -1,6 +1,8 @@
 import { useState } from "react";
+import { useTheme } from "../context/ThemeContext";
 
 export default function InterviewQuestions() {
+  const { colors } = useTheme();
   const [role, setRole] = useState("");
   const [experience, setExperience] = useState("Fresher");
   const [questions, setQuestions] = useState("");
@@ -59,7 +61,8 @@ export default function InterviewQuestions() {
       style={{
         maxWidth: "1200px",
         margin: "40px auto",
-        background: "#fff",
+        background: colors.card,
+border: colors.borderStyle,
         padding: "35px",
         borderRadius: "20px",
         boxShadow: "0 15px 35px rgba(0,0,0,.08)",

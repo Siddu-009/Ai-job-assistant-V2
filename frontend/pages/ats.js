@@ -1,7 +1,9 @@
 import { useState } from "react";
 import Layout from "../components/Layout";
+import { useTheme } from "../context/ThemeContext";
 
 export default function ATSAnalyzer() {
+  const { colors } = useTheme();
 
   const [jobDescription, setJobDescription] = useState("");
   const [result, setResult] = useState(null);
@@ -47,6 +49,9 @@ export default function ATSAnalyzer() {
 
       const data = await response.json();
 
+      console.log("Full Response:", data);
+      console.log("Analysis:", data.analysis);
+
       if (!response.ok) {
 
     	  console.error(data);
@@ -65,7 +70,8 @@ export default function ATSAnalyzer() {
 
       }
 
-      setResult(data);
+      setResult(data.analysis);
+      console.log("Result being stored:", data.analysis);
 
     }
     catch (err) {
@@ -76,11 +82,20 @@ export default function ATSAnalyzer() {
 
     }
 
-    setLoading(false);
+    finally {
+
+      setLoading(false);
+
+    }
 
   };
+  console.log("Current Result State:", result);
 
-  const score = result?.score || 0;
+  const score =
+    result?.overall_score ??
+    result?.ats_score ??
+    result?.score ??
+    0;
 
   return (
 
@@ -90,7 +105,8 @@ export default function ATSAnalyzer() {
         style={{
           maxWidth: "1100px",
           margin: "40px auto",
-          background: "#fff",
+          background: colors.card,
+          border: colors.borderStyle,
           padding: "35px",
           borderRadius: "20px",
           boxShadow: "0 15px 35px rgba(0,0,0,.08)"
@@ -105,7 +121,7 @@ export default function ATSAnalyzer() {
 
         <p
           style={{
-            color: "#6b7280"
+            color: colors.subText
           }}
         >
 
@@ -186,28 +202,28 @@ export default function ATSAnalyzer() {
 
             >
 
-              <h2>
-
-                ATS Score
-
-              </h2>
+              <h3
+                style={{
+                  marginTop: "20px",
+                  color: "#374151"
+                }}
+              >
+                Overall Score: {result?.overall_score}/100
+              </h3>
 
               <div
-
                 style={{
-
-                  fontSize:"70px",
-
-                  fontWeight:"bold",
-
-                  color:"#2563eb"
-
+                  fontSize: "70px",
+                  fontWeight: "bold",
+                  color:
+                    score >= 80
+                      ? "#16a34a"
+                      : score >= 60
+                      ? "#f59e0b"
+                      : "#dc2626"
                 }}
-
               >
-
                 {score}%
-
               </div>
 
               <div
@@ -290,13 +306,11 @@ export default function ATSAnalyzer() {
 
                 {
 
-                  result.missing_skills?.length
+                  result?.job_match?.missing_keywords?.length
 
                   ?
 
-                  result.missing_skills.map(
-
-                    (skill,index)=>(
+                  result.job_match.missing_keywords.map((skill, index) => (
 
                       <span
 
@@ -336,6 +350,143 @@ export default function ATSAnalyzer() {
                   </span>
 
                 }
+
+              </div>
+
+              <h3 style={{ marginTop: "35px" }}>
+                Matched Keywords
+              </h3>
+
+              <div
+                style={{
+                  display: "flex",
+                  flexWrap: "wrap",
+                  gap: "12px"
+                }}
+              >
+                {result?.job_match?.matched_keywords?.length ? (
+                  result.job_match.matched_keywords.map((skill, index) => (
+                    <span
+                      key={index}
+                      style={{
+                        background: "#dcfce7",
+                        color: "#166534",
+                        padding: "8px 15px",
+                        borderRadius: "25px"
+                      }}
+                    >
+                      {skill}
+                    </span>
+                  ))
+                ) : (
+                  <span>No matched keywords.</span>
+                )}
+              </div>
+
+              <h3 style={{ marginTop: "35px" }}>
+                Strengths
+              </h3>
+
+              <ul>
+                {result?.strengths?.map((item, index) => (
+                  <li
+                    key={index}
+                    style={{
+                      color: "#166534",
+                      marginBottom: "8px"
+                    }}
+                  >
+                    ✅ {item}
+                  </li>
+                ))}
+              </ul>
+
+              <h3 style={{ marginTop: "35px" }}>
+                Weaknesses
+              </h3>
+
+              <ul>
+                {result?.weaknesses?.map((item, index) => (
+                  <li
+                    key={index}
+                    style={{
+                      color: "#991b1b",
+                      marginBottom: "8px"
+                    }}
+                  >
+                    ❌ {item}
+                  </li>
+                ))}
+              </ul>
+
+              <h3 style={{ marginTop: "35px" }}>
+                AI Suggestions
+              </h3>
+
+              <ul>
+                {result?.suggestions?.map((item, index) => (
+                  <li
+                    key={index}
+                    style={{
+                      color: "#1d4ed8",
+                      marginBottom: "8px"
+                    }}
+                  >
+                    💡 {item}
+                  </li>
+                ))}
+              </ul>
+
+              <h3 style={{ marginTop: "35px" }}>
+                ATS Breakdown
+              </h3>
+
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+                  gap: "15px",
+                  marginTop: "20px"
+                }}
+              >
+
+                {Object.entries(result?.ats_breakdown || {}).map(
+                  ([key, value]) => (
+
+                    <div
+                      key={key}
+                      style={{
+                        background: "#f8fafc",
+                        border: "1px solid #e5e7eb",
+                        borderRadius: "12px",
+                        padding: "18px"
+                      }}
+                    >
+
+                      <div
+                        style={{
+                          fontWeight: "600",
+                          textTransform: "capitalize",
+                          marginBottom: "10px"
+                        }}
+                      >
+                        {key.replace(/_/g, " ")}
+                      </div>
+
+                      <div
+                        style={{
+                          fontSize: "30px",
+                          color: "#2563eb",
+                          fontWeight: "700"
+                        }}
+                      >
+                        {value} pts
+                      </div>
+
+                    </div>
+
+                  )
+                )}
 
               </div>
 

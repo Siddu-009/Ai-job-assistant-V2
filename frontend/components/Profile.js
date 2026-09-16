@@ -14,11 +14,20 @@ export default function Profile() {
 
   const loadProfile = async () => {
 
+    if (profile) {
+        return;
+    }
+
     setLoading(true);
 
     try {
 
       const token = localStorage.getItem("token");
+
+      if (!token) {
+          alert("Please login first.");
+          return;
+      }
 
       const response = await fetch(
 
@@ -44,7 +53,7 @@ export default function Profile() {
 
       );
 
-      const data = await response.json();
+      const data = await response.json().catch(() => ({}));
 
       if (!response.ok) {
 	  alert(data.detail || data.message || "Unable to load profile.");
@@ -126,6 +135,7 @@ marginTop:"20px"
 <Button
 
 onClick={loadProfile}
+disabled={loading}
 
 >
 
@@ -224,7 +234,7 @@ Load Profile
 
                   ?
 
-                  profile.name.charAt(0).toUpperCase()
+                  profile.name?.trim()?.charAt(0)?.toUpperCase() || "U"
 
                   :
 

@@ -10,7 +10,7 @@ export default function PageHeader({
 
       <p
         style={{
-          color: "#6b7280",
+          color: colors.subText,
           fontSize: 16,
         }}
       >

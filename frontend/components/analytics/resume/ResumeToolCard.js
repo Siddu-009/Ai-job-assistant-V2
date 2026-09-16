@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { useTheme } from "../../../context/ThemeContext";
 
 export default function ResumeToolCard({
   title,
@@ -6,10 +7,14 @@ export default function ResumeToolCard({
   icon,
   href,
 }) {
+
+  const { colors } = useTheme();
+
   return (
     <div
       style={{
-        background: "#fff",
+        background: colors.card,
+        border: colors.borderStyle,
         borderRadius: 18,
         padding: 25,
         boxShadow: "0 10px 25px rgba(0,0,0,.06)",
@@ -27,6 +32,7 @@ export default function ResumeToolCard({
       <h2
         style={{
           marginBottom: 10,
+          color: colors.text,
         }}
       >
         {title}
@@ -34,7 +40,7 @@ export default function ResumeToolCard({
 
       <p
         style={{
-          color: "#6b7280",
+          color: colors.subText,
           lineHeight: 1.7,
         }}
       >

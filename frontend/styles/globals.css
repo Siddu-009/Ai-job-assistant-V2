@@ -1,6 +1,8 @@
 @import "./layout.css";
 
-/* Reset */
+/* =========================================================
+   RESET
+========================================================= */
 
 * {
   margin: 0;
@@ -8,63 +10,594 @@
   box-sizing: border-box;
 }
 
-/* Variables */
+/* =========================================================
+   ROOT / HTML
+========================================================= */
+
+html {
+  min-height: 100%;
+
+  background-color: var(--background);
+
+  color: var(--text);
+
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
+}
+
+/* =========================================================
+   LIGHT THEME
+========================================================= */
 
 :root {
+  /* Primary */
   --primary: #2563eb;
   --primary-hover: #1d4ed8;
+  --primary-light: #dbeafe;
+
+  /* Page */
   --background: #f8fafc;
+  --background-secondary: #f1f5f9;
+
+  /* Cards */
   --card: #ffffff;
+  --card-secondary: #f8fafc;
+  --surface: #ffffff;
+
+  /* Text */
   --text: #0f172a;
-  --border: #e2e8f0;
+  --text-secondary: #475569;
   --muted: #64748b;
+  --text-light: #94a3b8;
+
+  /* Borders */
+  --border: #e2e8f0;
+  --border-light: #f1f5f9;
+
+  /* Inputs */
+  --input-background: #ffffff;
+  --input-border: #cbd5e1;
+  --input-focus: #2563eb;
+  --placeholder: #94a3b8;
+
+  /* Hover */
+  --hover: #f1f5f9;
+  --hover-strong: #e2e8f0;
+
+  /* Success */
+  --success: #16a34a;
+  --success-background: #dcfce7;
+  --success-text: #166534;
+
+  /* Danger */
+  --danger: #dc2626;
+  --danger-background: #fee2e2;
+  --danger-text: #b91c1c;
+
+  /* Warning */
+  --warning: #d97706;
+  --warning-background: #fef3c7;
+  --warning-text: #92400e;
+
+  /* Info */
+  --info: #2563eb;
+  --info-background: #dbeafe;
+  --info-text: #1d4ed8;
+
+  /* Shadows */
+  --shadow-sm:
+    0 1px 2px rgba(15, 23, 42, 0.05);
+
+  --shadow:
+    0 4px 12px rgba(15, 23, 42, 0.08);
+
+  --shadow-lg:
+    0 12px 30px rgba(15, 23, 42, 0.12);
+
+  /* Radius */
   --radius: 16px;
+  --radius-sm: 10px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
 }
 
-/* Body */
+/* =========================================================
+   DARK THEME
+
+   IMPORTANT:
+   ThemeContext.js uses:
+   data-theme="dark"
+
+   Therefore DO NOT use .dark here.
+========================================================= */
+
+[data-theme="dark"] {
+  /* Primary */
+  --primary: #3b82f6;
+  --primary-hover: #60a5fa;
+  --primary-light: #1e3a8a;
+
+  /* Page */
+  --background: #020617;
+  --background-secondary: #0f172a;
+
+  /* Cards */
+  --card: #111827;
+  --card-secondary: #1e293b;
+  --surface: #172033;
+
+  /* Text */
+  --text: #f8fafc;
+  --text-secondary: #cbd5e1;
+  --muted: #94a3b8;
+  --text-light: #64748b;
+
+  /* Borders */
+  --border: #334155;
+  --border-light: #1e293b;
+
+  /* Inputs */
+  --input-background: #0f172a;
+  --input-border: #475569;
+  --input-focus: #3b82f6;
+  --placeholder: #94a3b8;
+
+  /* Hover */
+  --hover: #1e293b;
+  --hover-strong: #334155;
+
+  /* Success */
+  --success: #22c55e;
+  --success-background: #14532d;
+  --success-text: #bbf7d0;
+
+  /* Danger */
+  --danger: #ef4444;
+  --danger-background: #7f1d1d;
+  --danger-text: #fecaca;
+
+  /* Warning */
+  --warning: #f59e0b;
+  --warning-background: #78350f;
+  --warning-text: #fde68a;
+
+  /* Info */
+  --info: #60a5fa;
+  --info-background: #1e3a8a;
+  --info-text: #bfdbfe;
+
+  /* Shadows */
+  --shadow-sm:
+    0 1px 2px rgba(0, 0, 0, 0.30);
+
+  --shadow:
+    0 4px 12px rgba(0, 0, 0, 0.30);
+
+  --shadow-lg:
+    0 12px 30px rgba(0, 0, 0, 0.45);
+
+  /* Radius */
+  --radius: 16px;
+  --radius-sm: 10px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+}
+
+/* =========================================================
+   BODY
+========================================================= */
 
 body {
-  font-family: Inter, Arial, sans-serif;
-  background: linear-gradient(135deg, #f8fafc, #eef4ff);
+  font-family:
+    Inter,
+    Arial,
+    Helvetica,
+    sans-serif;
+
+  background-color: var(--background);
+
   color: var(--text);
+
   min-height: 100vh;
+
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
 }
 
-/* Links */
+/* =========================================================
+   NEXT.JS ROOT
+========================================================= */
+
+#__next {
+  min-height: 100vh;
+
+  background-color: var(--background);
+
+  color: var(--text);
+
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
+}
+
+/* =========================================================
+   LINKS
+========================================================= */
 
 a {
   text-decoration: none;
+
   color: inherit;
+
+  transition:
+    color 0.2s ease,
+    background-color 0.2s ease;
 }
 
-/* Inputs */
+/* Don't force every link blue on hover */
+a:hover {
+  color: var(--primary);
+}
+
+/* =========================================================
+   HEADINGS
+========================================================= */
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  color: var(--text);
+
+  transition:
+    color 0.3s ease;
+}
+
+/* =========================================================
+   INPUTS
+========================================================= */
 
 input,
 textarea,
 select {
-  outline: none;
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 12px;
-  font-size: 15px;
   width: 100%;
-  transition: all .25s ease;
+
+  padding: 12px;
+
+  border-radius: var(--radius-sm);
+
+  border:
+    1px solid var(--input-border);
+
+  background-color:
+    var(--input-background);
+
+  color: var(--text);
+
+  font-family: inherit;
+
+  font-size: 14px;
+
+  transition:
+    background-color 0.25s ease,
+    color 0.25s ease,
+    border-color 0.25s ease,
+    box-shadow 0.25s ease;
 }
+
+/* =========================================================
+   PLACEHOLDER
+========================================================= */
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--placeholder);
+
+  opacity: 1;
+}
+
+/* =========================================================
+   INPUT FOCUS
+========================================================= */
 
 input:focus,
 textarea:focus,
 select:focus {
-  border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, .15);
+  outline: none;
+
+  border-color:
+    var(--input-focus);
+
+  box-shadow:
+    0 0 0 3px
+    rgba(37, 99, 235, 0.15);
 }
 
-/* Buttons */
+/* =========================================================
+   DISABLED INPUT
+========================================================= */
+
+input:disabled,
+textarea:disabled,
+select:disabled {
+  cursor: not-allowed;
+
+  opacity: 0.6;
+
+  background-color:
+    var(--background-secondary);
+}
+
+/* =========================================================
+   SELECT OPTIONS
+========================================================= */
+
+select option {
+  background:
+    var(--card);
+
+  color:
+    var(--text);
+}
+
+/* =========================================================
+   BUTTON
+========================================================= */
 
 button {
+  font-family: inherit;
+
   cursor: pointer;
-  transition: all .25s ease;
+
+  transition:
+    background-color 0.25s ease,
+    color 0.25s ease,
+    border-color 0.25s ease,
+    box-shadow 0.25s ease,
+    transform 0.2s ease;
 }
 
-button:hover {
-  transform: translateY(-2px);
+button:disabled {
+  cursor: not-allowed;
+
+  opacity: 0.6;
+
+  transform: none;
+}
+
+/*
+   Do NOT globally translate every button.
+   Many navbar/sidebar buttons should stay fixed.
+*/
+
+button:active {
+  transform: translateY(0);
+}
+
+/* =========================================================
+   TEXT SELECTION
+========================================================= */
+
+::selection {
+  background:
+    rgba(37, 99, 235, 0.25);
+
+  color:
+    var(--text);
+}
+
+/* =========================================================
+   SCROLLBAR
+========================================================= */
+
+::-webkit-scrollbar {
+  width: 8px;
+
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background:
+    var(--background);
+}
+
+::-webkit-scrollbar-thumb {
+  background:
+    var(--border);
+
+  border-radius:
+    999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background:
+    var(--muted);
+}
+
+/* =========================================================
+   TABLES
+========================================================= */
+
+table {
+  width: 100%;
+
+  border-collapse: collapse;
+
+  background:
+    var(--card);
+
+  color:
+    var(--text);
+
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
+}
+
+th,
+td {
+  padding:
+    12px 14px;
+
+  border-bottom:
+    1px solid var(--border);
+
+  color:
+    var(--text);
+}
+
+th {
+  font-weight: 600;
+
+  color:
+    var(--text-secondary);
+
+  background:
+    var(--card-secondary);
+}
+
+/* =========================================================
+   HORIZONTAL LINE
+========================================================= */
+
+hr {
+  border: 0;
+
+  border-top:
+    1px solid var(--border);
+}
+
+/* =========================================================
+   COMMON CARD
+========================================================= */
+
+.card {
+  background:
+    var(--card);
+
+  color:
+    var(--text);
+
+  border:
+    1px solid var(--border);
+
+  border-radius:
+    var(--radius);
+
+  box-shadow:
+    var(--shadow-sm);
+
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease,
+    border-color 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+/* =========================================================
+   COMMON SURFACE
+========================================================= */
+
+.surface {
+  background:
+    var(--surface);
+
+  color:
+    var(--text);
+
+  border:
+    1px solid var(--border);
+
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease,
+    border-color 0.3s ease;
+}
+
+/* =========================================================
+   TEXT HELPERS
+========================================================= */
+
+.text-muted {
+  color:
+    var(--muted);
+}
+
+.text-secondary {
+  color:
+    var(--text-secondary);
+}
+
+.text-success {
+  color:
+    var(--success);
+}
+
+.text-danger {
+  color:
+    var(--danger);
+}
+
+.text-warning {
+  color:
+    var(--warning);
+}
+
+.text-info {
+  color:
+    var(--info);
+}
+
+/* =========================================================
+   FOCUS ACCESSIBILITY
+========================================================= */
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline:
+    2px solid var(--primary);
+
+  outline-offset:
+    2px;
+}
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 768px) {
+  body {
+    overflow-x: hidden;
+  }
+
+  input,
+  textarea,
+  select {
+    font-size: 16px;
+  }
+}
+
+/* =========================================================
+   REDUCED MOTION
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    transition: none !important;
+
+    animation: none !important;
+  }
 }

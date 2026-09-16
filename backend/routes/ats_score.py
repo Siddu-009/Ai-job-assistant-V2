@@ -11,7 +11,6 @@ from services.notification_service import create_notification
 
 router = APIRouter()
 
-
 class ATSRequest(BaseModel):
 
     token: str
@@ -66,14 +65,6 @@ def ats_score(req: ATSRequest):
 
         if not row:
 
-            create_notification(
-                user_id=user_id,
-                title="✅ ATS Score Generated",
-                message="Your ATS score has been generated.",
-                notification_type="ats",
-                link="/ats-score"
-            )
-
             return {
 
                 "success": False,
@@ -85,6 +76,14 @@ def ats_score(req: ATSRequest):
         result = calculate_ats_score(
             row[0],
             req.job_description
+        )
+
+        create_notification(
+            user_id=user_id,
+            title="✅ ATS Score Generated",
+            message="Your ATS score has been generated.",
+            notification_type="ats",
+            link="/ats-score"
         )
 
         print(result)

@@ -6,6 +6,11 @@ from .templates.minimal import build_minimal_resume
 
 def build_resume(data, template="classic"):
 
+    if not isinstance(data, dict):
+        raise TypeError(
+            "Resume data must be a dictionary."
+        )
+
     builders = {
         "classic": build_classic_resume,
         "modern": build_modern_resume,
@@ -13,6 +18,9 @@ def build_resume(data, template="classic"):
         "minimal": build_minimal_resume,
     }
 
-    builder = builders.get(template, build_classic_resume)
+    builder = builders.get(
+        template,
+        build_classic_resume
+    )
 
     return builder(data)

@@ -1,85 +1,327 @@
 import { useEffect, useState } from "react";
+import { useRouter } from "next/router";
+import { useTheme } from "../context/ThemeContext";
 
 export default function Notifications() {
+  const router = useRouter();
+  const { colors, darkMode } = useTheme();
 
   const [notifications, setNotifications] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const loadNotifications = async () => {
+    try {
+      setLoading(true);
+
+      const token = localStorage.getItem("token");
+
+      if (!token) {
+        setNotifications([]);
+        return;
+      }
+
+      const response = await fetch("http://localhost:8000/notifications/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ token }),
+      });
+
+      const data = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        setNotifications([]);
+        return;
+      }
+
+      if (data.success) {
+        setNotifications(data.notifications || []);
+      } else {
+        setNotifications([]);
+      }
+    } catch (err) {
+      console.error(err);
+      setNotifications([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
+    loadNotifications();
 
-    setNotifications([
-      {
-        title:"Resume Generated",
-        message:"Your ATS Resume is ready."
-      },
-      {
-        title:"Interview Scheduled",
-        message:"Google interview tomorrow."
-      }
-    ]);
+    const interval = setInterval(() => {
+      loadNotifications();
+    }, 30000);
 
-  },[]);
+    return () => clearInterval(interval);
+  }, []);
 
-  return(
+  const markAsRead = async (id) => {
+    try {
+      const token = localStorage.getItem("token");
 
-<div
-style={{
-maxWidth:"900px",
-margin:"40px auto",
-background:"#fff",
-padding:"35px",
-borderRadius:"20px",
-boxShadow:"0 15px 35px rgba(0,0,0,.08)"
-}}
->
+      await fetch(`http://localhost:8000/notifications/${id}/read`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ token }),
+      });
 
-<h1>
+      await loadNotifications();
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
-Notifications
+  const markAllRead = async () => {
+    try {
+      const token = localStorage.getItem("token");
 
-</h1>
+      await fetch("http://localhost:8000/notifications/read-all", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ token }),
+      });
 
-{
+      await loadNotifications();
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
-notifications.map((item,index)=>(
+  const clearAllNotifications = async () => {
+    try {
+      const token = localStorage.getItem("token");
 
-<div
+      await fetch("http://localhost:8000/notifications/clear-all", {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ token }),
+      });
 
-key={index}
+      await loadNotifications();
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
-style={{
+  if (loading) {
+    return (
+      <div
+        style={{
+          padding: "60px",
+          textAlign: "center",
+          color: colors.text,
+          backgroundColor: colors.background,
+          minHeight: "200px",
+          transition: "background-color 0.3s ease, color 0.3s ease",
+        }}
+      >
+        Loading Notifications...
+      </div>
+    );
+  }
 
-padding:"20px",
+  return (
+    <div
+      style={{
+        maxWidth: "900px",
+        margin: "40px auto",
+        backgroundColor: colors.card,
+        color: colors.text,
+        border: `1px solid ${colors.border}`,
+        borderRadius: "20px",
+        padding: "35px",
+        boxShadow: darkMode
+          ? "0 15px 35px rgba(0, 0, 0, 0.25)"
+          : "0 15px 35px rgba(15, 23, 42, 0.08)",
+        transition:
+          "background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease",
+      }}
+    >
+      {/* HEADER */}
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: "30px",
+          flexWrap: "wrap",
+          gap: "15px",
+        }}
+      >
+        <h1
+          style={{
+            margin: 0,
+            color: colors.text,
+            fontSize: "30px",
+            fontWeight: 700,
+          }}
+        >
+          Notifications
+        </h1>
 
-marginTop:"20px",
+        {notifications.length > 0 && (
+          <div
+            style={{
+              display: "flex",
+              gap: "10px",
+              flexWrap: "wrap",
+            }}
+          >
+            <button
+              onClick={markAllRead}
+              style={{
+                padding: "10px 18px",
+                border: "none",
+                borderRadius: "8px",
+                backgroundColor: colors.button,
+                color: "#ffffff",
+                cursor: "pointer",
+                fontWeight: 600,
+              }}
+            >
+              Mark All Read
+            </button>
 
-border:"1px solid #eee",
+            <button
+              onClick={clearAllNotifications}
+              style={{
+                padding: "10px 18px",
+                border: "none",
+                borderRadius: "8px",
+                backgroundColor: "#ef4444",
+                color: "#ffffff",
+                cursor: "pointer",
+                fontWeight: 600,
+              }}
+            >
+              Clear All
+            </button>
+          </div>
+        )}
+      </div>
 
-borderRadius:"12px"
+      {/* NOTIFICATIONS LIST */}
+      {notifications.length === 0 ? (
+        <div
+          style={{
+            textAlign: "center",
+            padding: "80px 20px",
+            color: colors.subText,
+            fontSize: "18px",
+          }}
+        >
+          No notifications available.
+        </div>
+      ) : (
+        notifications.map((item) => (
+          <div
+            key={item.id}
+            onClick={async () => {
+              if (!item.is_read) {
+                await markAsRead(item.id);
+              }
 
-}}
+              if (item.link) {
+                router.push(item.link);
+              }
+            }}
+            style={{
+              marginBottom: "18px",
+              padding: "20px",
+              borderRadius: "15px",
+              border: `1px solid ${colors.border}`,
+              backgroundColor: item.is_read
+                ? colors.background
+                : colors.infoBg,
+              cursor: item.link ? "pointer" : "default",
+              transition:
+                "transform 0.25s ease, box-shadow 0.25s ease, background-color 0.3s ease",
+            }}
+            onMouseEnter={(e) => {
+              if (item.link) {
+                e.currentTarget.style.transform = "translateY(-2px)";
+                e.currentTarget.style.boxShadow = darkMode
+                  ? "0 10px 20px rgba(0, 0, 0, 0.25)"
+                  : "0 10px 20px rgba(15, 23, 42, 0.08)";
+              }
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = "translateY(0)";
+              e.currentTarget.style.boxShadow = "none";
+            }}
+          >
+            {/* TITLE AND NEW BADGE */}
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                gap: "15px",
+              }}
+            >
+              <h3
+                style={{
+                  margin: 0,
+                  color: colors.text,
+                  fontSize: "17px",
+                  fontWeight: 700,
+                }}
+              >
+                {item.title}
+              </h3>
 
->
+              {!item.is_read && (
+                <span
+                  style={{
+                    backgroundColor: colors.button,
+                    color: "#ffffff",
+                    padding: "4px 10px",
+                    borderRadius: "20px",
+                    fontSize: "11px",
+                    fontWeight: 600,
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  NEW
+                </span>
+              )}
+            </div>
 
-<h3>
+            {/* MESSAGE */}
+            <p
+              style={{
+                marginTop: "10px",
+                marginBottom: 0,
+                color: colors.subText,
+                lineHeight: "24px",
+                fontSize: "14px",
+              }}
+            >
+              {item.message}
+            </p>
 
-{item.title}
-
-</h3>
-
-<p>
-
-{item.message}
-
-</p>
-
-</div>
-
-))
-
-}
-
-</div>
-
-);
-
+            {/* DATE */}
+            <div
+              style={{
+                marginTop: "12px",
+                color: colors.muted,
+                fontSize: "13px",
+              }}
+            >
+              {item.created_at}
+            </div>
+          </div>
+        ))
+      )}
+    </div>
+  );
 }

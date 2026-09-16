@@ -9,7 +9,8 @@ export default function JobToolCard({
   return (
     <div
       style={{
-        background: "#fff",
+        background: colors.card,
+border: colors.borderStyle,
         borderRadius: 18,
         padding: 25,
         boxShadow: "0 10px 25px rgba(0,0,0,.06)",
@@ -30,7 +31,7 @@ export default function JobToolCard({
 
       <p
         style={{
-          color: "#6b7280",
+          color: colors.subText,
           lineHeight: 1.7,
         }}
       >

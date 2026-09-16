@@ -1,324 +1,336 @@
 import { useState } from "react";
+import { useTheme } from "../context/ThemeContext";
 
 export default function ResumeTailoring() {
+  const { colors } = useTheme();
 
   const [resume, setResume] = useState("");
   const [jobDescription, setJobDescription] = useState("");
   const [tailoredResume, setTailoredResume] = useState("");
+  const [downloadUrl, setDownloadUrl] = useState("");
   const [loading, setLoading] = useState(false);
 
   const tailorResume = async () => {
-
-    if (!resume || !jobDescription) {
-
+    if (!resume.trim() || !jobDescription.trim()) {
       alert("Please enter Resume and Job Description.");
-
       return;
-
     }
 
     const token = localStorage.getItem("token");
 
     if (!token) {
-
-      alert("Please login first.");
-
       window.location.href = "/login";
-
       return;
-
     }
 
     setLoading(true);
+    setTailoredResume("");
+    setDownloadUrl("");
 
     try {
-
       const response = await fetch(
-
         "/api/resume-tailoring/",
-
         {
-
           method: "POST",
-
           headers: {
-
             "Content-Type": "application/json"
-
           },
-
           body: JSON.stringify({
-
             token: token,
-
             resume: resume,
-
             job_description: jobDescription
-
           })
-
         }
-
       );
 
-      const data = await response.json();
+      const data = await response.json().catch(() => ({}));
+
+      console.log("Resume Tailoring Response:", data);
 
       if (!response.ok) {
-
-        alert(data.message || data.detail || "Resume tailoring failed.");
-
-        setLoading(false);
-
+        alert(
+          data.message ||
+          data.detail ||
+          "Resume tailoring failed."
+        );
         return;
+      }
 
+      if (data.success === false) {
+        alert(
+          data.message ||
+          "Resume tailoring failed."
+        );
+        return;
       }
 
       setTailoredResume(
-
-        data.tailored_resume ||
-
-        data.resume ||
-
-        ""
-
+        data.tailored_resume || ""
       );
 
-    }
+      setDownloadUrl(
+        data.download_url || ""
+      );
 
-    catch (err) {
+    } catch (error) {
+      console.error(
+        "Resume Tailoring Error:",
+        error
+      );
 
-      console.error(err);
+      alert(
+        "Unable to generate tailored resume. Please check Ollama and backend."
+      );
 
-      alert("Unable to tailor resume.");
-
-    }
-
-    finally {
-
+    } finally {
       setLoading(false);
-
     }
-
   };
 
-  const copyResume = () => {
+  const copyResume = async () => {
+    if (!tailoredResume) {
+      return;
+    }
 
-    navigator.clipboard.writeText(tailoredResume);
+    try {
+      await navigator.clipboard.writeText(
+        tailoredResume
+      );
 
-    alert("Copied Successfully");
+      alert(
+        "Tailored resume copied successfully!"
+      );
 
+    } catch (error) {
+      console.error(error);
+      alert("Unable to copy resume.");
+    }
+  };
+
+  const downloadResume = () => {
+    if (!downloadUrl) {
+      alert("Download link is not available.");
+      return;
+    }
+
+    window.open(
+      downloadUrl,
+      "_blank"
+    );
   };
 
   return (
-
     <div
-
       style={{
-
-        maxWidth:"1200px",
-
-        margin:"40px auto",
-
-        background:"#fff",
-
-        padding:"35px",
-
-        borderRadius:"20px",
-
-        boxShadow:"0 15px 35px rgba(0,0,0,.08)"
-
+        maxWidth: "1200px",
+        margin: "40px auto",
+        background: colors.card,
+        border: colors.borderStyle,
+        padding: "35px",
+        borderRadius: "20px",
+        boxShadow: "0 15px 35px rgba(0,0,0,.08)"
       }}
-
     >
 
-      <h1>
-
+      <h1
+        style={{
+          color: colors.text
+        }}
+      >
         Resume Tailoring
-
       </h1>
 
       <p
-
         style={{
-
-          color:"#6b7280"
-
+          color: colors.subText
         }}
-
       >
-
-        Customize your resume for every job application.
-
+        Customize your resume for a specific job
+        description using AI.
       </p>
 
+      {/* RESUME */}
+
       <textarea
-
-        rows="10"
-
-        placeholder="Paste Resume"
-
+        rows="14"
+        placeholder="Paste your existing resume here..."
         value={resume}
-
-        onChange={(e)=>setResume(e.target.value)}
-
+        onChange={(e) =>
+          setResume(e.target.value)
+        }
         style={textarea}
-
       />
+
+      {/* JOB DESCRIPTION */}
 
       <textarea
-
-        rows="10"
-
-        placeholder="Paste Job Description"
-
+        rows="14"
+        placeholder="Paste the Job Description here..."
         value={jobDescription}
-
-        onChange={(e)=>setJobDescription(e.target.value)}
-
+        onChange={(e) =>
+          setJobDescription(e.target.value)
+        }
         style={textarea}
-
       />
+
+      {/* GENERATE */}
 
       <button
-
         onClick={tailorResume}
-
         disabled={loading}
-
-        style={button}
-
+        style={{
+          ...button,
+          opacity: loading ? 0.7 : 1,
+          cursor: loading
+            ? "not-allowed"
+            : "pointer"
+        }}
       >
-
-        {
-
-          loading
-
-            ?
-
-            "Tailoring..."
-
-            :
-
-            "Generate Tailored Resume"
-
-        }
-
+        {loading
+          ? "Generating Tailored Resume..."
+          : "Generate Tailored Resume"}
       </button>
 
-      {
+      {/* RESULT */}
 
-        tailoredResume &&
-
-        <>
+      {tailoredResume && (
+        <div
+          style={{
+            marginTop: "40px",
+            padding: "25px",
+            background:
+              colors.cardSecondary ||
+              "#f8fafc",
+            borderRadius: "16px",
+            border: colors.borderStyle
+          }}
+        >
 
           <h2
-
             style={{
-
-              marginTop:"35px"
-
+              color: colors.text
             }}
-
           >
-
-            Tailored Resume
-
+            ✅ Tailored Resume Generated
           </h2>
 
-          <textarea
+          <p
+            style={{
+              color: colors.subText,
+              lineHeight: 1.7
+            }}
+          >
+            Your resume has been optimized
+            according to the job description.
+          </p>
 
-            rows="16"
+          {/* DOWNLOAD BUTTON */}
 
-            readOnly
+          {downloadUrl && (
+            <button
+              onClick={downloadResume}
+              style={{
+                ...downloadButton
+              }}
+            >
+              📄 Download Word Resume
+            </button>
+          )}
 
-            value={tailoredResume}
-
-            style={textarea}
-
-          />
+          {/* COPY BUTTON */}
 
           <button
-
             onClick={copyResume}
-
-            style={greenButton}
-
+            disabled={!tailoredResume}
+            style={{
+              ...copyButton,
+              opacity: !tailoredResume
+                ? 0.6
+                : 1
+            }}
           >
-
-            Copy Resume
-
+            📋 Copy Resume
           </button>
 
-        </>
+          {/* PREVIEW */}
 
-      }
+          <h3
+            style={{
+              marginTop: "30px",
+              color: colors.text
+            }}
+          >
+            Resume Preview
+          </h3>
+
+          <textarea
+            rows="22"
+            readOnly
+            value={tailoredResume}
+            style={{
+              ...textarea,
+              background:
+                colors.card ||
+                "#ffffff",
+              color:
+                colors.text ||
+                "#111827",
+              lineHeight: 1.6
+            }}
+          />
+
+        </div>
+      )}
 
     </div>
-
   );
-
 }
 
 const textarea = {
-
-  width:"100%",
-
-  padding:"15px",
-
-  marginTop:"20px",
-
-  borderRadius:"12px",
-
-  border:"1px solid #d1d5db",
-
-  fontSize:"14px",
-
-  fontFamily:"inherit",
-
-  boxSizing:"border-box"
-
+  width: "100%",
+  padding: "15px",
+  marginTop: "20px",
+  borderRadius: "12px",
+  border: "1px solid #d1d5db",
+  fontSize: "14px",
+  fontFamily: "inherit",
+  boxSizing: "border-box",
+  resize: "vertical"
 };
 
 const button = {
-
-  width:"100%",
-
-  padding:"15px",
-
-  marginTop:"20px",
-
-  background:"#2563eb",
-
-  color:"#fff",
-
-  border:"none",
-
-  borderRadius:"12px",
-
-  cursor:"pointer",
-
-  fontSize:"16px"
-
+  width: "100%",
+  padding: "16px",
+  marginTop: "25px",
+  background: "#2563eb",
+  color: "#fff",
+  border: "none",
+  borderRadius: "12px",
+  fontSize: "17px",
+  fontWeight: "600"
 };
 
-const greenButton = {
+const downloadButton = {
+  padding: "14px 22px",
+  marginTop: "20px",
+  marginRight: "12px",
+  background: "#16a34a",
+  color: "#fff",
+  border: "none",
+  borderRadius: "10px",
+  fontSize: "16px",
+  fontWeight: "600",
+  cursor: "pointer"
+};
 
-  width:"100%",
-
-  padding:"15px",
-
-  marginTop:"20px",
-
-  background:"#16a34a",
-
-  color:"#fff",
-
-  border:"none",
-
-  borderRadius:"12px",
-
-  cursor:"pointer",
-
-  fontSize:"16px"
-
+const copyButton = {
+  padding: "14px 22px",
+  marginTop: "20px",
+  background: "#2563eb",
+  color: "#fff",
+  border: "none",
+  borderRadius: "10px",
+  fontSize: "16px",
+  fontWeight: "600",
+  cursor: "pointer"
 };

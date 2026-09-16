@@ -1,4 +1,6 @@
+import { useTheme } from "../../context/ThemeContext";
 export default function AICoachCard(){
+    const { colors } = useTheme();
 
 return(
 
@@ -6,7 +8,8 @@ return(
 
 style={{
 
-background:"#fff",
+background: colors.card,
+border: colors.borderStyle,
 
 padding:"25px",
 

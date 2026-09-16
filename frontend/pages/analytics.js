@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 
 import Layout from "../components/Layout";
 import Loader from "../components/ui/Loader";
+import { useTheme } from "../context/ThemeContext";
 
 import AnalyticsCard from "../components/analytics/AnalyticsCard";
 import WeeklyPerformance from "../components/analytics/WeeklyPerformance";
@@ -14,9 +15,12 @@ import AiSuggestions from "../components/dashboard/AiSuggestions";
 import CareerRoadmap from "../components/dashboard/CareerRoadmap";
 import UpcomingInterviews from "../components/dashboard/UpcomingInterviews";
 import AiInsights from "../components/dashboard/AiInsights";
+
 import { getAnalytics } from "../services/analytics";
 
 export default function Analytics() {
+  const { colors } = useTheme();
+
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -25,63 +29,127 @@ export default function Analytics() {
   }, []);
 
   const loadAnalytics = async () => {
-  try {
-    console.log("getAnalytics()", getAnalytics);
+    try {
+      console.log("getAnalytics()", getAnalytics);
 
-    const response = await getAnalytics();
+      const response = await getAnalytics();
 
-    setData(response.data);
-  } catch (error) {
-    console.log("========== AXIOS DEBUG ==========");
-    console.log("Base URL:", error.config?.baseURL);
-    console.log("URL:", error.config?.url);
-    console.log("Full URI:", error.config?.baseURL + error.config?.url);
-    console.log("================================");
+      setData(response.data);
+    } catch (error) {
+      console.log("========== AXIOS DEBUG ==========");
 
-    console.error(error);
+      console.log("Base URL:", error.config?.baseURL);
+      console.log("URL:", error.config?.url);
+      console.log(
+        "Full URI:",
+        error.config?.baseURL + error.config?.url
+      );
 
-    alert("Unable to load analytics.");
-  } finally {
-    setLoading(false);
-  }
-};
+      console.log("================================");
+
+      console.error("Analytics Error:", error);
+
+      alert("Unable to load analytics.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <Layout>
-      <div
+      <main
         style={{
-          padding: "30px",
-          background: "#f5f7fb",
+          width: "100%",
           minHeight: "100vh",
+          padding: "30px",
+
+          backgroundColor: colors.background,
+          color: colors.text,
+
+          transition:
+            "background-color 0.3s ease, color 0.3s ease",
         }}
       >
-        <h1 style={{ marginBottom: "10px" }}>
-          Analytics Dashboard
-        </h1>
+        {/* =================================================
+            PAGE HEADER
+        ================================================= */}
 
-        <p
+        <header
           style={{
-            color: "#6b7280",
             marginBottom: "30px",
           }}
         >
-          Track your resume performance and job search analytics.
-        </p>
+          <h1
+            style={{
+              marginBottom: "10px",
+
+              color: colors.text,
+
+              fontSize: "28px",
+              fontWeight: 700,
+
+              transition: "color 0.3s ease",
+            }}
+          >
+            Analytics Dashboard
+          </h1>
+
+          <p
+            style={{
+              color: colors.subText,
+
+              fontSize: "14px",
+              lineHeight: 1.6,
+
+              transition: "color 0.3s ease",
+            }}
+          >
+            Track your resume performance and job search analytics.
+          </p>
+        </header>
+
+        {/* =================================================
+            LOADING STATE
+        ================================================= */}
 
         {loading && (
-          <Loader text="Loading Analytics Dashboard..." />
+          <div
+            style={{
+              color: colors.text,
+              backgroundColor: colors.card,
+
+              border: colors.borderStyle,
+              borderRadius: "16px",
+
+              padding: "30px",
+
+              transition:
+                "background-color 0.3s ease, color 0.3s ease",
+            }}
+          >
+            <Loader text="Loading Analytics Dashboard..." />
+          </div>
         )}
 
-        {data && (
-          <>
-            {/* Top Cards */}
+        {/* =================================================
+            ANALYTICS CONTENT
+        ================================================= */}
 
-            <div
+        {!loading && data && (
+          <>
+            {/* =================================================
+                TOP ANALYTICS CARDS
+            ================================================= */}
+
+            <section
               style={{
                 display: "grid",
+
                 gridTemplateColumns:
-                  "repeat(auto-fit,minmax(220px,1fr))",
+                  "repeat(auto-fit, minmax(220px, 1fr))",
+
                 gap: "20px",
+
                 marginBottom: "30px",
               }}
             >
@@ -108,73 +176,131 @@ export default function Analytics() {
                 value={data.applications || 0}
                 color="#7c3aed"
               />
-            </div>
+            </section>
 
-            {/* Weekly Performance + Profile */}
+            {/* =================================================
+                WEEKLY PERFORMANCE + PROFILE SCORE
+            ================================================= */}
 
-            <div
+            <section
               style={{
                 display: "grid",
-                gridTemplateColumns: "repeat(auto-fit,minmax(350px,1fr))",
+
+                gridTemplateColumns:
+                  "repeat(auto-fit, minmax(350px, 1fr))",
+
                 gap: "25px",
+
                 marginBottom: "30px",
               }}
             >
               <WeeklyPerformance data={data} />
 
               <ProfileScore data={data} />
-            </div>
+            </section>
 
-                        {/* ATS Progress + AI Insights */}
+            {/* =================================================
+                ATS PROGRESS + AI INSIGHTS
+            ================================================= */}
 
-            <div
+            <section
               style={{
                 display: "grid",
-                gridTemplateColumns: "repeat(auto-fit,minmax(350px,1fr))",
+
+                gridTemplateColumns:
+                  "repeat(auto-fit, minmax(350px, 1fr))",
+
                 gap: "25px",
+
                 marginBottom: "30px",
               }}
             >
               <ATSProgress data={data} />
 
               <AiInsights />
-            </div>
+            </section>
 
-            {/* Weekly Goals */}
+            {/* =================================================
+                WEEKLY GOALS
+            ================================================= */}
 
-            <WeeklyGoals data={data} />
+            <section
+              style={{
+                marginBottom: "30px",
+              }}
+            >
+              <WeeklyGoals data={data} />
+            </section>
 
-            {/* AI Suggestions + Career Roadmap */}
+            {/* =================================================
+                AI SUGGESTIONS + CAREER ROADMAP
+            ================================================= */}
 
-            <div
+            <section
               style={{
                 display: "grid",
-                gridTemplateColumns: "repeat(auto-fit,minmax(350px,1fr))",
+
+                gridTemplateColumns:
+                  "repeat(auto-fit, minmax(350px, 1fr))",
+
                 gap: "25px",
+
                 marginBottom: "30px",
               }}
             >
               <AiSuggestions />
 
               <CareerRoadmap />
-            </div>
+            </section>
 
-            {/* Upcoming Interviews */}
+            {/* =================================================
+                UPCOMING INTERVIEWS
+            ================================================= */}
 
-            <div
+            <section
               style={{
                 marginBottom: "30px",
               }}
             >
               <UpcomingInterviews />
-            </div>
+            </section>
 
-            {/* Career Recommendations */}
+            {/* =================================================
+                CAREER RECOMMENDATIONS
+            ================================================= */}
 
-            <CareerRecommendations data={data} />
+            <section
+              style={{
+                marginBottom: "30px",
+              }}
+            >
+              <CareerRecommendations data={data} />
+            </section>
           </>
         )}
-      </div>
+
+        {/* =================================================
+            EMPTY STATE
+        ================================================= */}
+
+        {!loading && !data && (
+          <div
+            style={{
+              padding: "30px",
+
+              backgroundColor: colors.card,
+              color: colors.text,
+
+              border: colors.borderStyle,
+              borderRadius: "16px",
+
+              textAlign: "center",
+            }}
+          >
+            No analytics data available.
+          </div>
+        )}
+      </main>
     </Layout>
   );
 }

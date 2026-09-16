@@ -14,7 +14,7 @@ export default function Layout({
 
         <div className="app-layout">
 
-            <Sidebar collapsed={undefined} setCollapsed={undefined} />
+            <Sidebar />
 
             <div className="layout-content">
 

@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
+import { useTheme } from "../context/ThemeContext";
 
 export default function History() {
+  const { colors } = useTheme();
+  
 
   const [history, setHistory] = useState([]);
 
@@ -72,7 +75,8 @@ maxWidth:"1200px",
 
 margin:"40px auto",
 
-background:"#fff",
+background: colors.card,
+border: colors.borderStyle,
 
 padding:"35px",
 

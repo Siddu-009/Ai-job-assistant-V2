@@ -8,7 +8,8 @@ export default function SecondaryButton({
       type={type}
       onClick={onClick}
       style={{
-        background: "#fff",
+        background: colors.card,
+border: colors.borderStyle,
         color: "#2563eb",
         border: "1px solid #2563eb",
         borderRadius: 10,

@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import Layout from "../components/Layout";
+import { useTheme } from "../context/ThemeContext";
 
 export default function Profile() {
+  const { colors } = useTheme();
 
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -68,7 +70,8 @@ export default function Profile() {
         style={{
           maxWidth: "900px",
           margin: "40px auto",
-          background: "#fff",
+          background: colors.card,
+border: colors.borderStyle,
           padding: "35px",
           borderRadius: "20px",
           boxShadow: "0 15px 35px rgba(0,0,0,.08)"

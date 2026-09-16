@@ -1,6 +1,8 @@
 import { useState } from "react";
+import { useTheme } from "../context/ThemeContext";
 
 export default function Downloads() {
+  const { colors } = useTheme();
 
   const [loading, setLoading] = useState(false);
 
@@ -98,7 +100,8 @@ maxWidth:"1000px",
 
 margin:"40px auto",
 
-background:"#fff",
+background: colors.card,
+border: colors.borderStyle,
 
 padding:"35px",
 
@@ -120,7 +123,7 @@ Downloads
 
 style={{
 
-color:"#6b7280",
+color: colors.subText,
 
 marginBottom:"30px"
 

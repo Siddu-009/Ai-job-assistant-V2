@@ -7,6 +7,7 @@ import {
   CalendarCheck,
   CircleCheckBig,
 } from "lucide-react";
+import { useTheme } from "../context/ThemeContext";
 
 // ─── constants ────────────────────────────────────────────────────────────────
 
@@ -38,19 +39,6 @@ const DEFAULT_STATS = {
   interviews:   0,
   selected:     0,
 };
-
-// ─── helpers ──────────────────────────────────────────────────────────────────
-
-function buildColors(darkMode) {
-  return {
-    text:    darkMode ? "#ffffff"  : "#111827",
-    sub:     darkMode ? "#94a3b8"  : "#64748b",
-    card:    darkMode ? "#0f172a"  : "#ffffff",
-    trackBg: darkMode ? "#1e293b"  : "#e5e7eb",
-    inputBg: darkMode ? "#1e293b"  : "#f8fafc",
-    circleBg: darkMode ? "#0f172a" : "#ffffff",
-  };
-}
 
 // ─── sub-components ───────────────────────────────────────────────────────────
 
@@ -120,7 +108,14 @@ function WeeklyProgress({ cardStyle, subColor }) {
   );
 }
 
-function AtsDonut({ ats, cardStyle, subColor, circleBg }) {
+function AtsDonut({
+    ats,
+    cardStyle,
+    subColor,
+    circleBg,
+    trackBg
+})
+{
   return (
     <div style={{ ...cardStyle, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
       <div
@@ -130,7 +125,7 @@ function AtsDonut({ ats, cardStyle, subColor, circleBg }) {
           width:        "180px",
           height:       "180px",
           borderRadius: "50%",
-          background:   `conic-gradient(#2563eb ${ats * 3.6}deg, #e5e7eb 0deg)`,
+          background:   `conic-gradient(#2563eb ${ats*3.6}deg, ${trackBg} 0deg)`,
           display:      "flex",
           alignItems:   "center",
           justifyContent: "center",
@@ -217,21 +212,14 @@ function AiSuggestions({ cardStyle, inputBg }) {
 // ─── main component ───────────────────────────────────────────────────────────
 
 export default function DashboardCards() {
-  const [darkMode, setDarkMode] = useState(false);
+  const { colors } = useTheme();
+
   const [stats,    setStats]    = useState(DEFAULT_STATS);
   const [loading,  setLoading]  = useState(true);
   const [error,    setError]    = useState(null);
 
   useEffect(() => {
-    setDarkMode(localStorage.getItem("theme") === "dark");
-
-    const onStorage = (e) => {
-      if (e.key === "theme") setDarkMode(e.newValue === "dark");
-    };
-    const onCustom = () => setDarkMode(localStorage.getItem("theme") === "dark");
-  
-    window.addEventListener("storage",     onStorage);
-    window.addEventListener("themechange", onCustom);
+    
 
     // ── fetch dashboard data ──────────────────────────────────────────────
     const token = localStorage.getItem("token");
@@ -286,17 +274,15 @@ export default function DashboardCards() {
       })
 
     ])
-      .then(([dashboard, ats, jobs]) => {
-        setStats({
-          ats:          ats.score              ?? 92,
-          resumes:      dashboard.resume_count  ?? 1,
-          jobs: jobs.recommended_jobs
-  	    ? jobs.recommended_jobs.length
-  	    : 0,
-          applications: dashboard.applications  ?? 0,
-          interviews:   dashboard.interviews    ?? 0,
-          selected:     dashboard.selected      ?? 0,
-        });
+      .then(([dashboard = {}, ats = {}, jobs = {}]) => {
+          setStats({
+              ats: ats.score ?? 92,
+              resumes: dashboard.resume_count ?? 1,
+              jobs: jobs.recommended_jobs?.length ?? 0,
+              applications: dashboard.applications ?? 0,
+              interviews: dashboard.interviews ?? 0,
+              selected: dashboard.selected ?? 0,
+          });
       })
       .catch((err) => {
         console.error("DashboardCards fetch error:", err);
@@ -304,21 +290,16 @@ export default function DashboardCards() {
       })
       .finally(() => setLoading(false));
 
-    return () => {
-      window.removeEventListener("storage",     onStorage);
-      window.removeEventListener("themechange", onCustom);
-    };
   }, []);
 
-  const c = buildColors(darkMode);
-
   const cardStyle = {
-    background:   c.card,
-    color:        c.text,
+    background: colors.card,
+    color: colors.text,
+    border: colors.borderStyle,
     borderRadius: "18px",
-    padding:      "25px",
-    boxShadow:    "0 10px 25px rgba(0,0,0,0.08)",
-  };
+    padding: "25px",
+    boxShadow: "0 10px 25px rgba(0,0,0,.08)",
+};
 
   const STAT_CARDS = [
     { icon: <Award            size={34} />, color: "#2563eb", title: "ATS Score",     value: `${stats.ats}%`,     subtitle: "Resume Quality"   },
@@ -331,7 +312,7 @@ export default function DashboardCards() {
 
   if (loading) {
     return (
-      <div style={{ padding: "40px", textAlign: "center", color: c.sub }}>
+      <div style={{ padding: "40px", textAlign: "center", color: colors.subText }}>
         Loading dashboard…
       </div>
     );
@@ -371,8 +352,14 @@ export default function DashboardCards() {
           gap:                 "25px",
         }}
       >
-        <WeeklyProgress cardStyle={cardStyle} subColor={c.sub} />
-        <AtsDonut ats={stats.ats} cardStyle={cardStyle} subColor={c.sub} circleBg={c.circleBg} />
+        <WeeklyProgress cardStyle={cardStyle} subColor={colors.subText} />
+        <AtsDonut
+            ats={stats.ats}
+            cardStyle={cardStyle}
+            subColor={colors.subText}
+            circleBg={colors.card}
+            trackBg={colors.border}
+        />
       </div>
 
       {/* ── Resume completion + AI suggestions ── */}
@@ -383,8 +370,8 @@ export default function DashboardCards() {
           gap:                 "25px",
         }}
       >
-        <ResumeCompletion cardStyle={cardStyle} trackBg={c.trackBg} />
-        <AiSuggestions    cardStyle={cardStyle} inputBg={c.inputBg} />
+        <ResumeCompletion cardStyle={cardStyle} trackBg={colors.border} />
+        <AiSuggestions    cardStyle={cardStyle} inputBg={colors.cardSecondary} />
       </div>
 
     </div>

@@ -61,7 +61,8 @@ export default function JobDetails() {
             style={{
                 maxWidth:"1000px",
                 margin:"40px auto",
-                background:"#fff",
+                background: colors.card,
+border: colors.borderStyle,
                 padding:"30px",
                 borderRadius:"20px",
                 boxShadow:"0 10px 30px rgba(0,0,0,.08)"

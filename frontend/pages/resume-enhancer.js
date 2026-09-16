@@ -1,6 +1,8 @@
 import { useState } from "react";
+import { useTheme } from "../context/ThemeContext";
 
 export default function ResumeEnhancer() {
+  const { colors } = useTheme();
 
   const [resume, setResume] = useState("");
   const [enhancedResume, setEnhancedResume] = useState("");
@@ -29,7 +31,13 @@ export default function ResumeEnhancer() {
         })
       });
 
-      const data = await response.json();
+      const data = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        alert(data.message || "Resume enhancement failed.");
+        setLoading(false);
+        return;
+    }
 
       if (data.optimized_resume) {
         setEnhancedResume(data.optimized_resume);
@@ -47,21 +55,26 @@ export default function ResumeEnhancer() {
         setEnhancedResume(JSON.stringify(data, null, 2));
       }
 
-    } catch (err) {
+    } 
+    
+    catch (err) {
 
-      console.error(err);
-      alert("Unable to enhance resume.");
+        console.error(err);
+        alert("Unable to enhance resume.");
 
     }
+    finally {
 
-    setLoading(false);
+        setLoading(false);
+
+    }
 
   };
 
   const copyResume = () => {
 
     navigator.clipboard.writeText(enhancedResume);
-    alert("Copied Successfully");
+    alert("Resume copied successfully!");
 
   };
 
@@ -71,20 +84,25 @@ export default function ResumeEnhancer() {
 style={{
 maxWidth:"1200px",
 margin:"40px auto",
-background:"#fff",
+background: colors.card,
+border: colors.borderStyle,
 padding:"35px",
 borderRadius:"20px",
 boxShadow:"0 15px 35px rgba(0,0,0,.08)"
 }}
 >
 
-<h1>
+<h1
+style={{
+color: colors.text
+}}
+>
 AI Resume Rewriter & ATS Optimizer
 </h1>
 
 <p
 style={{
-color:"#6b7280"
+color: colors.subText
 }}
 >
 Rewrite your resume professionally with improved ATS score, stronger bullet points, better grammar and modern formatting.
@@ -109,7 +127,7 @@ loading
 ?
 "Enhancing..."
 :
-"Rewrite Resume"
+"Enhance Resume"
 }
 
 </button>

@@ -1,3 +1,4 @@
+import { useTheme } from "../context/ThemeContext";
 export default function Table({
 
   columns = [],
@@ -7,7 +8,7 @@ export default function Table({
   emptyMessage = "No Records Found"
 
 }) {
-
+const { colors } = useTheme();
   return (
 
     <div
@@ -98,7 +99,7 @@ export default function Table({
 
                 padding:"40px",
 
-                color:"#6b7280"
+                color: colors.subText
 
               }}
 

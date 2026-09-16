@@ -1,10 +1,8 @@
-export default function ResumeReview({
+import { useTheme } from "../../context/ThemeContext";
 
-  loading,
+export default function ResumeReview({ loading, analyzeResume }) {
 
-  analyzeResume
-
-}) {
+    const { colors } = useTheme();
 
   return (
 
@@ -44,7 +42,7 @@ export default function ResumeReview({
 
         style={{
 
-          color:"#6b7280",
+          color: colors.subText,
 
           marginBottom:"30px"
 
@@ -132,6 +130,8 @@ export default function ResumeReview({
 
           value="Latest Uploaded Resume"
 
+          colors={colors}
+
         />
 
         <InfoCard
@@ -140,6 +140,8 @@ export default function ResumeReview({
 
           value="Ready for Analysis"
 
+          colors={colors}
+
         />
 
         <InfoCard
@@ -147,6 +149,8 @@ export default function ResumeReview({
           title="Analysis Type"
 
           value="Resume Review"
+
+          colors={colors}
 
         />
 
@@ -276,7 +280,9 @@ function InfoCard({
 
   title,
 
-  value
+  value,
+
+  colors
 
 }) {
 
@@ -304,7 +310,7 @@ function InfoCard({
 
           fontSize:"14px",
 
-          color:"#6b7280"
+          color: colors.subText
 
         }}
 

@@ -1,0 +1,104 @@
+/* =========================
+   Recommended Jobs
+========================= */
+
+.recommended-jobs {
+  margin-top: 30px;
+  border-radius: 18px;
+  padding: 30px;
+  transition: 0.3s;
+}
+
+.jobs-title {
+  margin-top: 0;
+  margin-bottom: 8px;
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.jobs-subtitle {
+  margin-bottom: 25px;
+  line-height: 1.6;
+}
+
+.job-card {
+  margin-top: 25px;
+  padding: 22px;
+  border-radius: 18px;
+  transition: .3s;
+}
+
+.job-card:hover {
+  transform: translateY(-4px);
+}
+
+.job-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.job-title {
+  font-size: 22px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.company {
+  margin-top: 8px;
+}
+
+.badges {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 15px;
+}
+
+.badge {
+  padding: 8px 14px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.section-title {
+  margin-top: 18px;
+  margin-bottom: 10px;
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.skill-list {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.skill-chip {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.ai-box {
+  margin-top: 20px;
+  padding: 18px;
+  border-radius: 12px;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 20px;
+}
+
+.job-tips {
+  margin-top: 35px;
+  padding: 25px;
+  border-radius: 16px;
+}

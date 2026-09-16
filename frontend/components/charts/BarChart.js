@@ -8,7 +8,8 @@ return(
 
 style={{
 
-background:"#fff",
+background: colors.card,
+border: colors.borderStyle,
 
 padding:"25px",
 

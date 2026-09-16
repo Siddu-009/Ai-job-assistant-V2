@@ -67,19 +67,58 @@ CREATE TABLE IF NOT EXISTS jobs (
 
     id SERIAL PRIMARY KEY,
 
+    provider_job_id VARCHAR(255) NOT NULL,
+
     title VARCHAR(255),
 
     company VARCHAR(255),
 
     location VARCHAR(255),
 
-    skills TEXT,
+    description TEXT,
+
+    employment_type VARCHAR(100),
+
+    salary VARCHAR(255),
+
+    experience VARCHAR(255),
+
+    source VARCHAR(150) NOT NULL,
 
     apply_url TEXT,
 
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    remote BOOLEAN DEFAULT FALSE,
+
+    posted_date VARCHAR(100),
+
+    company_logo TEXT,
+
+    company_url TEXT,
+
+    country VARCHAR(100),
+
+    skills TEXT[],
+
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    UNIQUE(provider_job_id, source)
 
 );
+
+CREATE INDEX IF NOT EXISTS idx_jobs_title
+ON jobs(title);
+
+CREATE INDEX IF NOT EXISTS idx_jobs_company
+ON jobs(company);
+
+CREATE INDEX IF NOT EXISTS idx_jobs_location
+ON jobs(location);
+
+CREATE INDEX IF NOT EXISTS idx_jobs_source
+ON jobs(source);
+
+CREATE INDEX IF NOT EXISTS idx_jobs_provider
+ON jobs(provider_job_id);
 
 -- ==========================
 -- APPLICATIONS

@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
+import { useTheme } from "../context/ThemeContext";
 
 export default function LiveJobs() {
+    const { colors } = useTheme();
 
     const [keyword, setKeyword] = useState("");
     const [location, setLocation] = useState("");
@@ -37,6 +39,7 @@ export default function LiveJobs() {
                     body: JSON.stringify({
                         keyword,
                         location,
+                        experience,
                         page,
                         limit: 20
                     })
@@ -66,6 +69,13 @@ export default function LiveJobs() {
 
     const saveJob = async (job) => {
 
+        const token = localStorage.getItem("token");
+
+        if (!token) {
+            window.location.href = "/login";
+            return;
+        }
+
         try {
 
             const addResponse = await fetch("/api/jobs/add", {
@@ -90,7 +100,7 @@ export default function LiveJobs() {
                     "Content-Type": "application/json"
                 },
                 body: JSON.stringify({
-                    token: localStorage.getItem("token"),
+                    token: token,
                     job_id: addedJob.id
                 })
             });
@@ -109,6 +119,13 @@ export default function LiveJobs() {
     };
 
     const applyJob = async (job) => {
+
+        const token = localStorage.getItem("token");
+
+        if (!token) {
+            window.location.href = "/login";
+            return;
+        }
 
         try {
 
@@ -134,7 +151,7 @@ export default function LiveJobs() {
                     "Content-Type": "application/json"
                 },
                 body: JSON.stringify({
-                    token: localStorage.getItem("token"),
+                    token: token,
                     job_id: addedJob.id
                 })
             });
@@ -158,7 +175,7 @@ export default function LiveJobs() {
             style={{
                 maxWidth: "1300px",
                 margin: "40px auto",
-                background: "#fff",
+                background: colors.card,
                 padding: "35px",
                 borderRadius: "20px",
                 boxShadow: "0 15px 35px rgba(0,0,0,.08)"
@@ -167,7 +184,7 @@ export default function LiveJobs() {
 
             <h1>Live Jobs</h1>
 
-            <p style={{ color: "#6b7280" }}>
+            <p style={{ color: colors.subText }}>
                 Search jobs from multiple job portals.
             </p>
 
@@ -184,6 +201,12 @@ export default function LiveJobs() {
                     placeholder="Job Title"
                     value={keyword}
                     onChange={(e) => setKeyword(e.target.value)}
+                    onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                            setPage(1);
+                            searchJobs();
+                        }
+                    }}
                     style={input}
                 />
 
@@ -191,6 +214,12 @@ export default function LiveJobs() {
                     placeholder="Location"
                     value={location}
                     onChange={(e) => setLocation(e.target.value)}
+                    onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                            setPage(1);
+                            searchJobs();
+                        }
+                    }}
                     style={input}
                 />
 
@@ -263,7 +292,7 @@ export default function LiveJobs() {
 
                     <p
                     style={{
-                    color:"#6b7280"
+                    color: colors.subText
                     }}
                     >
                     📍 {job.location || "Remote"}
@@ -299,7 +328,7 @@ export default function LiveJobs() {
 
                     <span
                     style={{
-                    background:"#dcfce7",
+                    background: colors.successBg || "#dcfce7",
                     padding:"6px 12px",
                     borderRadius:"20px"
                     }}
@@ -318,7 +347,7 @@ export default function LiveJobs() {
                     >
 
                     {job.description
-                    ? job.description.substring(0,220)+"..."
+                    ? job.description.substring(0,180)+"..."
                     : "No description available."}
 
                     {job.apply_url && (

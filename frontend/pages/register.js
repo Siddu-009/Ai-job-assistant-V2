@@ -1,10 +1,13 @@
 import { useState } from "react";
 import { useRouter } from "next/router";
 import { register } from "../services/auth";
+import { useTheme } from "../context/ThemeContext";
 
 export default function Register() {
 
     const router = useRouter();
+
+    const { colors } = useTheme();
 
     const [name, setName] = useState("");
 
@@ -18,9 +21,32 @@ export default function Register() {
 
     const [success, setSuccess] = useState("");
 
+    const buttonStyle={
+
+        width:"100%",
+        padding:14,
+        background:"#2563eb",
+        color:"#fff",
+        border:0,
+        borderRadius:8,
+        cursor: loading ? "not-allowed" : "pointer",
+        opacity: loading ? 0.7 : 1,
+        fontSize:16
+
+    };
+
     async function handleRegister(e) {
 
         e.preventDefault();
+
+        if (
+            !name.trim() ||
+            !email.trim() ||
+            !password.trim()
+        ) {
+            setError("All fields are required.");
+            return;
+        }
 
         setLoading(true);
 
@@ -31,8 +57,8 @@ export default function Register() {
         try {
 
             await register(
-                name,
-                email,
+                name.trim(),
+                email.trim(),
                 password
             );
 
@@ -49,6 +75,8 @@ export default function Register() {
         }
 
         catch (err) {
+
+            console.error(err);
 
             setError(
                 err.message || "Registration Failed"
@@ -80,7 +108,8 @@ export default function Register() {
                 onSubmit={handleRegister}
                 style={{
                     width: 430,
-                    background: "#fff",
+                    background: colors.card,
+border: colors.borderStyle,
                     padding: 40,
                     borderRadius: 12,
                     boxShadow: "0 10px 30px rgba(0,0,0,.08)"
@@ -90,7 +119,8 @@ export default function Register() {
                 <h1
                     style={{
                         textAlign: "center",
-                        marginBottom: 10
+                        marginBottom: 10,
+                        color: colors.text
                     }}
                 >
                     Create Account
@@ -99,7 +129,7 @@ export default function Register() {
                 <p
                     style={{
                         textAlign: "center",
-                        color: "#666",
+                        color: colors.subText,
                         marginBottom: 25
                     }}
                 >
@@ -125,8 +155,8 @@ export default function Register() {
                     success &&
                     <div
                         style={{
-                            background: "#dcfce7",
-                            color: "#15803d",
+                            background: colors.successBg || "#dcfce7",
+                            color: colors.successText || "#15803d",
                             padding: 12,
                             borderRadius: 8,
                             marginBottom: 15
@@ -218,19 +248,6 @@ const inputStyle={
     marginBottom:18,
     border:"1px solid #ddd",
     borderRadius:8
-
-};
-
-const buttonStyle={
-
-    width:"100%",
-    padding:14,
-    background:"#2563eb",
-    color:"#fff",
-    border:0,
-    borderRadius:8,
-    cursor:"pointer",
-    fontSize:16
 
 };
 

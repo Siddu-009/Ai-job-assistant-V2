@@ -1,8 +1,10 @@
+import { useTheme } from "../../context/ThemeContext";
 export default function Loader({
 
   text = "Loading..."
 
 }) {
+  const { colors } = useTheme();
 
   return (
 
@@ -20,7 +22,7 @@ export default function Loader({
 
         fontSize: "18px",
 
-        color: "#6b7280"
+        color: colors.subText
 
       }}
 

@@ -1,6 +1,9 @@
 import { useState } from "react";
+import { useTheme } from "../context/ThemeContext";
 
 export default function CoverLetter() {
+  const { colors } = useTheme();
+
   const [jobTitle, setJobTitle] = useState("");
   const [company, setCompany] = useState("");
   const [jobDescription, setJobDescription] = useState("");
@@ -8,7 +11,11 @@ export default function CoverLetter() {
   const [loading, setLoading] = useState(false);
 
   const generate = async () => {
-    if (!jobTitle || !company || !jobDescription) {
+    if (
+      !jobTitle.trim() ||
+      !company.trim() ||
+      !jobDescription.trim()
+    ) {
       alert("Please complete all fields.");
       return;
     }
@@ -17,6 +24,7 @@ export default function CoverLetter() {
 
     if (!token) {
       alert("Please login first.");
+      window.location.href = "/login";
       return;
     }
 
@@ -36,7 +44,7 @@ export default function CoverLetter() {
         }),
       });
 
-      const data = await response.json();
+      const data = await response.json().catch(() => ({}));
 
       if (!response.ok) {
         alert(
@@ -53,17 +61,23 @@ export default function CoverLetter() {
           data.result ||
           ""
       );
-    } catch (err) {
-      console.error(err);
-      alert("Unable to generate cover letter.");
-    }
+    } 
+    catch (err) {
 
-    setLoading(false);
-  };
+        console.error(err);
+        alert("Unable to generate cover letter.");
+
+    }
+    finally {
+
+        setLoading(false);
+
+    };
+  }
 
   const copyLetter = () => {
     navigator.clipboard.writeText(coverLetter);
-    alert("Copied!");
+    alert("Cover letter copied successfully!");
   };
 
   return (
@@ -71,15 +85,22 @@ export default function CoverLetter() {
       style={{
         maxWidth: "1100px",
         margin: "40px auto",
-        background: "#fff",
+        background: colors.card,
+        border: colors.borderStyle,
         padding: "35px",
         borderRadius: "20px",
         boxShadow: "0 15px 35px rgba(0,0,0,.08)",
       }}
     >
-      <h1>AI Cover Letter Generator</h1>
+      <h1
+        style={{
+          color: colors.text,
+        }}
+      >
+        AI Cover Letter Generator
+      </h1>
 
-      <p style={{ color: "#6b7280" }}>
+      <p style={{ color: colors.subText }}>
         Generate a professional cover letter in seconds.
       </p>
 
@@ -115,7 +136,13 @@ export default function CoverLetter() {
 
       {coverLetter && (
         <div style={{ marginTop: "35px" }}>
-          <h2>Generated Cover Letter</h2>
+          <h2
+          style={{
+          color: colors.text
+          }}
+          >
+          Generated Cover Letter
+          </h2>
 
           <textarea
             rows="18"

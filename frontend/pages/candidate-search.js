@@ -1,6 +1,23 @@
 import { useState } from "react";
+import { useTheme } from "../context/ThemeContext";
 
 export default function CandidateSearch() {
+  const { colors } = useTheme();
+
+  const card={
+
+  marginTop:"30px",
+
+  padding:"25px",
+
+  background: colors.card,
+  border: colors.borderStyle,
+
+  borderRadius:"15px",
+
+  boxShadow:"0 8px 25px rgba(0,0,0,.08)"
+
+  };
 
   const [skill, setSkill] = useState("");
   const [experience, setExperience] = useState("");
@@ -81,7 +98,7 @@ fontWeight:"700"
 
 <p
 style={{
-color:"#6b7280",
+color: colors.subText,
 marginBottom:"25px"
 }}
 >
@@ -151,7 +168,7 @@ candidates.length===0
 <p
 style={{
 marginTop:"40px",
-color:"#6b7280"
+color: colors.subText
 }}
 >
 
@@ -386,20 +403,6 @@ borderRadius:"10px",
 padding:"15px 30px",
 
 cursor:"pointer"
-
-};
-
-const card={
-
-marginTop:"30px",
-
-padding:"25px",
-
-background:"#fff",
-
-borderRadius:"15px",
-
-boxShadow:"0 8px 25px rgba(0,0,0,.08)"
 
 };
 

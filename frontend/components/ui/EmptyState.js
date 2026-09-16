@@ -7,7 +7,8 @@ export default function EmptyState({
       style={{
         padding: 60,
         textAlign: "center",
-        background: "#fff",
+        background: colors.card,
+border: colors.borderStyle,
         borderRadius: 16,
       }}
     >
@@ -15,7 +16,7 @@ export default function EmptyState({
 
       <p
         style={{
-          color: "#6b7280",
+          color: colors.subText,
         }}
       >
         {description}

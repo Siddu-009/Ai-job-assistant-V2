@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import Layout from "../components/Layout";
+import { useTheme } from "../context/ThemeContext";
 
 export default function ResumeVersions() {
+  const { colors } = useTheme();
   const [versions, setVersions] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -39,7 +41,7 @@ export default function ResumeVersions() {
 
         <p
           style={{
-            color: "#6b7280",
+            color: colors.subText,
             marginBottom: "30px"
           }}
         >

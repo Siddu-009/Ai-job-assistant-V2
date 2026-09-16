@@ -1,6 +1,8 @@
 import { useState } from "react";
+import { useTheme } from "../context/ThemeContext";
 
 export default function CareerCoach() {
+  const { colors } = useTheme();
 
   const [question, setQuestion] = useState("");
   const [response, setResponse] = useState("");
@@ -16,6 +18,7 @@ export default function CareerCoach() {
 
     }
 
+    setResponse("");
     setLoading(true);
 
     try {
@@ -44,7 +47,12 @@ export default function CareerCoach() {
 
       );
 
-      const data = await res.json();
+      const data = await res.json().catch(() => ({}));
+
+      if (!res.ok) {
+          alert(data.message || data.detail || "Something went wrong.");
+          return;
+      }
 
       setResponse(
 
@@ -58,13 +66,18 @@ export default function CareerCoach() {
 
     }
 
-    catch{
+    catch (error) {
 
-      alert("Unable to get AI response.");
+        console.error(error);
+
+        alert("Unable to get AI response.");
 
     }
+    finally {
 
-    setLoading(false);
+        setLoading(false);
+
+    }
 
   };
 
@@ -78,7 +91,8 @@ maxWidth:"1100px",
 
 margin:"40px auto",
 
-background:"#fff",
+background: colors.card,
+border: colors.borderStyle,
 
 padding:"35px",
 
@@ -100,7 +114,7 @@ AI Career Coach
 
 style={{
 
-color:"#6b7280"
+color: colors.subText
 
 }}
 
@@ -128,7 +142,7 @@ style={textarea}
 
 onClick={askCoach}
 
-disabled={loading}
+disabled={loading || !question.trim()}
 
 style={button}
 
@@ -177,15 +191,12 @@ AI Response
 </h2>
 
 <pre
-
 style={{
-
-whiteSpace:"pre-wrap",
-
-fontFamily:"inherit"
-
+whiteSpace: "pre-wrap",
+wordBreak: "break-word",
+lineHeight: "1.7",
+fontFamily: "inherit",
 }}
-
 >
 
 {response}

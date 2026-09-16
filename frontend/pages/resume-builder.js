@@ -1,6 +1,64 @@
 import { useState } from "react";
+import { useTheme } from "../context/ThemeContext";
+import api from "../services/api";
 
 export default function ResumeBuilder() {
+
+  const { colors } = useTheme();
+
+  const input={
+
+  width:"100%",
+
+  padding:"14px",
+
+  marginTop:"20px",
+
+  borderRadius:"10px",
+
+  border: colors.borderStyle,
+  background: colors.card,
+  color: colors.text,
+
+  };
+
+  const textarea={
+
+  width:"100%",
+
+  padding:"14px",
+
+  marginTop:"20px",
+
+  borderRadius:"10px",
+
+  border: colors.borderStyle,
+  background: colors.card,
+  color: colors.text,
+
+  };
+
+  const button={
+
+  width:"100%",
+
+  padding:"16px",
+
+  marginTop:"25px",
+
+  border:"none",
+
+  borderRadius:"12px",
+
+  background:"#2563eb",
+
+  color:"#fff",
+
+  fontSize:"17px",
+
+  cursor:"pointer"
+
+  };
 
   const [form, setForm] = useState({
 
@@ -42,29 +100,21 @@ export default function ResumeBuilder() {
 
     setMessage("");
 
+    if (
+        !form.full_name ||
+        !form.email ||
+        !form.phone
+    ) {
+        setMessage("Please fill all required fields.");
+        return;
+    }
+
     try{
 
-      const response=await fetch(
-
-        "/api/resume-builder/",
-
-        {
-
-          method:"POST",
-
-          headers:{
-
-            "Content-Type":"application/json"
-
-          },
-
-          body:JSON.stringify(form)
-
-        }
-
+      const { data } = await api.post(
+          "/resume-builder",
+          form
       );
-
-      const data=await response.json();
       
       setMessage(data.message);
 
@@ -74,7 +124,7 @@ export default function ResumeBuilder() {
 
     }
 
-    catch{
+    catch(error){
 
       setMessage(
 
@@ -98,7 +148,9 @@ maxWidth:"1100px",
 
 margin:"40px auto",
 
-background:"#fff",
+background: colors.card,
+
+border: colors.borderStyle,
 
 padding:"40px",
 
@@ -110,17 +162,19 @@ boxShadow:"0 15px 35px rgba(0,0,0,.08)"
 
 >
 
-<h1>
-
+<h1
+style={{
+color: colors.text
+}}
+>
 AI Resume Builder
-
 </h1>
 
 <p
 
 style={{
 
-color:"#6b7280"
+color: colors.subText
 
 }}
 
@@ -281,7 +335,7 @@ message &&
 style={{
 marginTop:"20px",
 padding:"20px",
-background:"#dcfce7",
+background: colors.successBg || "#dcfce7",
 borderRadius:"12px"
 }}
 >
@@ -289,7 +343,7 @@ borderRadius:"12px"
 <div
 style={{
 fontWeight:"600",
-color:"#166534",
+color: colors.successText || "#166534",
 marginBottom:"15px"
 }}
 >
@@ -351,53 +405,3 @@ Download Resume
 );
 
 }
-
-const input={
-
-width:"100%",
-
-padding:"14px",
-
-marginTop:"20px",
-
-borderRadius:"10px",
-
-border:"1px solid #d1d5db"
-
-};
-
-const textarea={
-
-width:"100%",
-
-padding:"14px",
-
-marginTop:"20px",
-
-borderRadius:"10px",
-
-border:"1px solid #d1d5db"
-
-};
-
-const button={
-
-width:"100%",
-
-padding:"16px",
-
-marginTop:"25px",
-
-border:"none",
-
-borderRadius:"12px",
-
-background:"#2563eb",
-
-color:"#fff",
-
-fontSize:"17px",
-
-cursor:"pointer"
-
-};

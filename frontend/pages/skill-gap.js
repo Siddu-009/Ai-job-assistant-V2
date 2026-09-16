@@ -1,6 +1,8 @@
 import { useState } from "react";
+import { useTheme } from "../context/ThemeContext";
 
 export default function SkillGap() {
+  const { colors } = useTheme();
 
   const [resume, setResume] = useState("");
   const [jobDescription, setJobDescription] = useState("");
@@ -86,7 +88,8 @@ export default function SkillGap() {
       style={{
         maxWidth: "1100px",
         margin: "40px auto",
-        background: "#fff",
+        background: colors.card,
+border: colors.borderStyle,
         padding: "35px",
         borderRadius: "20px",
         boxShadow: "0 15px 35px rgba(0,0,0,.08)"
@@ -97,7 +100,7 @@ export default function SkillGap() {
 
       <p
         style={{
-          color:"#6b7280"
+          color: colors.subText
         }}
       >
         Compare your resume against a Job Description.

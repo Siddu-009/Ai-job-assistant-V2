@@ -1,3 +1,5 @@
+import { useTheme } from "../../context/ThemeContext";
+
 export default function Card({
 
   title,
@@ -11,6 +13,7 @@ export default function Card({
   style = {}
 
 }) {
+  const { colors } = useTheme();
 
   return (
 
@@ -70,7 +73,7 @@ export default function Card({
 
                   fontWeight: "700",
 
-                  color: "#111827"
+                  color: colors.text
 
                 }}
 
@@ -90,7 +93,7 @@ export default function Card({
 
                   marginTop: "6px",
 
-                  color: "#6b7280",
+                  color: colors.subText,
 
                   fontSize: "14px"
 

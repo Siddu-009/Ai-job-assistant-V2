@@ -1,3 +1,7 @@
+from dotenv import load_dotenv
+
+load_dotenv()
+
 from fastapi import FastAPI
 
 from cors import setup_cors
@@ -73,6 +77,12 @@ from utils.exceptions import (
     validation_exception_handler,
     global_exception_handler
 )
+
+from database import engine
+from models.job import Job
+from database import Base
+
+Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
     title="AI Job Assistant",

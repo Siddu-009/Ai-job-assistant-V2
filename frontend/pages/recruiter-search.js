@@ -41,7 +41,7 @@ export default function RecruiterSearch() {
 
         <p
           style={{
-            color: "#6b7280",
+            color: colors.subText,
             marginBottom: "25px"
           }}
         >

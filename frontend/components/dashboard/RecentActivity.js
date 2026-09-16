@@ -1,4 +1,7 @@
-export default function RecentActivity({ darkMode }) {
+import { useTheme } from "../../context/ThemeContext";
+
+export default function RecentActivity() {
+    const { colors, darkMode } = useTheme();
 
 const activity = [
     "Resume Uploaded",
@@ -11,8 +14,8 @@ const activity = [
 return (
 <div
     style={{
-        background: darkMode ? "#1e293b" : "#fff",
-        color: darkMode ? "#fff" : "#111827",
+        background: colors.card,
+        color: colors.text,
         padding: "25px",
         borderRadius: "18px",
         boxShadow: "0 8px 25px rgba(0,0,0,.06)"
@@ -27,10 +30,8 @@ return (
             key={index}
             style={{
                 padding:"15px 0",
-                borderBottom: darkMode
-                    ? "1px solid #334155"
-                    : "1px solid #eee",
-                color: darkMode ? "#e2e8f0" : "#374151"
+                borderBottom: colors.borderStyle,
+                color: colors.subText
             }}
         >
             ✅ {item}

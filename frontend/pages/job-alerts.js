@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
+import { useTheme } from "../context/ThemeContext";
 
 export default function JobAlerts() {
+  const { colors } = useTheme();
 
   const [alerts, setAlerts] = useState([]);
 
@@ -181,7 +183,8 @@ maxWidth:"1200px",
 
 margin:"40px auto",
 
-background:"#fff",
+background: colors.card,
+border: colors.borderStyle,
 
 padding:"35px",
 
@@ -203,7 +206,7 @@ Job Alerts
 
 style={{
 
-color:"#6b7280"
+color: colors.subText
 
 }}
 
