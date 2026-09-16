@@ -15,7 +15,7 @@ export default function ResumeUpload() {
       file
     );
 
-    const response = await fetch("http://localhost:8000/resume/upload",
+    const response = await fetch("/api/resume/upload",
       {
         method: "POST",
         body: formData

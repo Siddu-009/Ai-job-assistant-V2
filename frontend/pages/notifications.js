@@ -20,7 +20,7 @@ export default function Notifications() {
         return;
       }
 
-      const response = await fetch("http://localhost:8000/notifications/", {
+      const response = await fetch("/api/notifications/", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -62,7 +62,7 @@ export default function Notifications() {
     try {
       const token = localStorage.getItem("token");
 
-      await fetch(`http://localhost:8000/notifications/${id}/read`, {
+      await fetch(`/api/notifications/${id}/read`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -80,7 +80,7 @@ export default function Notifications() {
     try {
       const token = localStorage.getItem("token");
 
-      await fetch("http://localhost:8000/notifications/read-all", {
+      await fetch("/api/notifications/read-all", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -98,7 +98,7 @@ export default function Notifications() {
     try {
       const token = localStorage.getItem("token");
 
-      await fetch("http://localhost:8000/notifications/clear-all", {
+      await fetch("/api/notifications/clear-all", {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",

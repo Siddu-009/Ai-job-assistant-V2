@@ -296,7 +296,7 @@ export default function Navbar({
       }
 
       const response = await fetch(
-        "http://localhost:8000/notifications/",
+        "/api/notifications/",
         {
           method: "POST",
 
@@ -391,7 +391,7 @@ export default function Navbar({
       if (!token) return;
 
       await fetch(
-        "http://localhost:8000/notifications/read-all",
+        "/api/notifications/read-all",
         {
           method: "PUT",
 
@@ -422,7 +422,7 @@ export default function Navbar({
       if (!token) return;
 
       await fetch(
-        "http://localhost:8000/notifications/clear-all",
+        "/api/notifications/clear-all",
         {
           method: "DELETE",
 
