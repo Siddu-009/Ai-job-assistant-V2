@@ -1,55 +1,122 @@
-name: AI Job Assistant CI/CD
 
+name: AI Job Assistant CI/CD
 
 on:
   push:
     branches:
       - main
 
+  workflow_dispatch:
+
+concurrency:
+  group: ai-job-assistant-deployment
+  cancel-in-progress: false
+
 jobs:
   build-and-deploy:
-
+    name: Build, Push and Deploy
     runs-on: ubuntu-latest
 
-    steps:
+    env:
+      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+      BACKEND_IMAGE: ${{ secrets.DOCKER_USERNAME }}/ai-job-backend
+      FRONTEND_IMAGE: ${{ secrets.DOCKER_USERNAME }}/ai-job-frontend
+      IMAGE_TAG: ${{ github.sha }}
 
+    steps:
+      # --------------------------------
+      # 1. Checkout Repository
+      # --------------------------------
       - name: Checkout Repository
         uses: actions/checkout@v4
 
+      # --------------------------------
+      # 2. Set Up Docker Buildx
+      # --------------------------------
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
+      # --------------------------------
+      # 3. Validate Docker Hub Secrets
+      # --------------------------------
+      - name: Validate Docker Hub Username
+        shell: bash
+        run: |
+          if [ -z "$DOCKER_USERNAME" ]; then
+            echo "ERROR: DOCKER_USERNAME secret is missing"
+            exit 1
+          fi
+
+      # --------------------------------
+      # 4. Login to Docker Hub
+      # --------------------------------
       - name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Build Backend Image
-        run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/ai-job-backend:latest ./backend
+      # --------------------------------
+      # 5. Build and Push Backend Image
+      # --------------------------------
+      - name: Build and Push Backend Image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./backend
+          file: ./backend/Dockerfile
+          push: true
+          tags: |
+            ${{ env.BACKEND_IMAGE }}:latest
+            ${{ env.BACKEND_IMAGE }}:${{ env.IMAGE_TAG }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
-      - name: Build Frontend Image
-        run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/ai-job-frontend:latest ./frontend
+      # --------------------------------
+      # 6. Build and Push Frontend Image
+      # --------------------------------
+      - name: Build and Push Frontend Image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./frontend
+          file: ./frontend/Dockerfile
+          push: true
+          tags: |
+            ${{ env.FRONTEND_IMAGE }}:latest
+            ${{ env.FRONTEND_IMAGE }}:${{ env.IMAGE_TAG }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
-      - name: Push Backend Image
-        run: |
-          docker push ${{ secrets.DOCKER_USERNAME }}/ai-job-backend:latest
-
-      - name: Push Frontend Image
-        run: |
-          docker push ${{ secrets.DOCKER_USERNAME }}/ai-job-frontend:latest
-
+      # --------------------------------
+      # 7. Deploy to EC2
+      # --------------------------------
       - name: Deploy to EC2
-        uses: appleboy/ssh-action@master
+        uses: appleboy/ssh-action@v1.2.2
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ubuntu
           key: ${{ secrets.EC2_SSH_KEY }}
+          port: 22
+          script_stop: true
           script: |
+            set -e
+
+            echo "Starting deployment..."
+
             cd ~/Ai-job-assistant
 
+            echo "Pulling latest images..."
             docker compose pull
 
-            docker compose up -d
+            echo "Starting containers..."
+            docker compose up -d --remove-orphans
+
+            echo "Waiting for containers..."
+            sleep 10
+
+            echo "Container status:"
+            docker compose ps
+
+            echo "Cleaning unused Docker images..."
+            docker image prune -af
+
+            echo "Deployment completed successfully!"
